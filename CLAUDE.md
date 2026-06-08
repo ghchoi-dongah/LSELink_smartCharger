@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**FastCharger Dual** is an Android application for dual-channel EV charging stations. It implements OCPP 1.6 WebSocket communication, payment terminal integration, serial hardware control, and RF card reader support.
+**SmartCharger Dual** is an Android application for dual-channel EV charging stations. It implements OCPP 1.6 WebSocket communication, payment terminal integration, serial hardware control, and RF card reader support.
 
-- Package: `com.dongah.fastcharger`
+- Package: `com.dongah.smartcharger`
 - Min SDK: 24 (Android 7.0), Target/Compile SDK: 36
 - Language: Java (primary) + Kotlin (Compose UI)
 - NDK: Serial port native library via `app/src/main/jni/Android.mk`
@@ -98,7 +98,7 @@ Fragment navigation is handled by `basefunction/FragmentChange.java`. UI state t
 Located in `app/src/main/aidl/`:
 - `service/vact/smartro/com/vcat/SmartroVCatInterface.aidl` — V-CAT payment service (executeService, postExtraData, cancelService)
 - `service/vact/smartro/com/vcat/SmartroVCatCallback.aidl` — V-CAT callbacks (onServiceEvent, onServiceResult)
-- `com/dongah/fastcharger/VCatConstructor.java` — AIDL helper
+- `com/dongah/smartcharger/VCatConstructor.java` — AIDL helper
 
 ### OCPP Message Flow
 

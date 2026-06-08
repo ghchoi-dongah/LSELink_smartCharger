@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FastCharger"
+rootProject.name = "SmartCharger"
 include ':app'

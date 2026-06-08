@@ -15,7 +15,7 @@
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:name="com.dongah.fastcharger.pages.ProductTestBottomFragment"
+        android:name="com.dongah.smartcharger.pages.ProductTestBottomFragment"
         android:id="@+id/frameProductTestBottom"
         android:layout_width="1024dp"
         android:layout_height="168dp"
