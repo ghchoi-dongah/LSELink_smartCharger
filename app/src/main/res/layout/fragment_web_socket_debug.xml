@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="1024dp"
-    android:layout_height="768dp"
+    android:layout_width="800dp"
+    android:layout_height="480dp"
     android:orientation="horizontal"
     tools:context=".pages.WebSocketDebugFragment">
 
@@ -12,7 +12,7 @@
         android:layout_width="150dp"
         android:layout_height="80dp"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="650dp"
+        android:layout_marginStart="450dp"
         android:text="@string/logDel"
         android:textColor="@color/black"
         android:background="@drawable/shape_btn_white"

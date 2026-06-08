@@ -50,7 +50,6 @@ public class ControlDebugFragment extends Fragment implements View.OnClickListen
     private String mParam2;
 
     Button btnClose;
-    RadioGroup rgSelectChannel;
     DecimalFormat decimalFormat;
     ListView listRx, listTx;
     ListViewDspAdapter listViewRxAdapter, listViewTxAdapter;
@@ -98,7 +97,6 @@ public class ControlDebugFragment extends Fragment implements View.OnClickListen
 
         decimalFormat = new DecimalFormat("#,###,##0.0#");
         controlBoardUtil = new ControlBoardUtil();
-        rgSelectChannel = view.findViewById(R.id.rgSelectChannel);
 
         //** Rx data */
         listRx = (ListView) view.findViewById(R.id.listRx);
@@ -122,18 +120,6 @@ public class ControlDebugFragment extends Fragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            rgSelectChannel.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    RadioButton rbSelect = (RadioButton) view.findViewById(checkedId);
-                    if (Objects.equals(rbSelect.getTag(), "0")) {
-                        setCurrCh(0);
-                    }
-                    if (Objects.equals(rbSelect.getTag(), "1")) {
-                        setCurrCh(1);
-                    }
-                }
-            });
         } catch (Exception e) {
             logger.error("ControlDebugFragment onViewCreated error : {}", e.getMessage());
         }

@@ -54,10 +54,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     private int mChannel;
 
     Button btnChargingStop;
-    TextView textViewSocValue, textViewLimitSocValue, textViewLimitKwValue, textViewCarNum;
-    TextView textViewChargingAmtValue, textViewChargingTimeRemainValue, textViewChargingTimeValue;
-    TextView textViewChargingVoltageValue, textViewChargingPowerValue, textViewChargingCurrentValue, textViewRequestCurrentValue;
-    CircularProgressIndicator progressCircular;
+    TextView textViewSocValue, textViewLimitSocValue, textViewChargingAmtValue, txtChargePay, textViewChargingTimeValue, txtPowerUnitPrice;
 
     MediaPlayer mediaPlayer;
     SharedModel sharedModel;
@@ -116,16 +113,11 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         btnChargingStop = view.findViewById(R.id.btnChargingStop);
         btnChargingStop.setOnClickListener(this);
         textViewSocValue = view.findViewById(R.id.textViewSocValue);
-        textViewChargingAmtValue = view.findViewById(R.id.textViewChargingAmtValue);
-        textViewChargingTimeRemainValue = view.findViewById(R.id.textViewChargingTimeRemainValue);
-        textViewChargingTimeValue = view.findViewById(R.id.textViewChargingTimeValue);
-        textViewChargingVoltageValue = view.findViewById(R.id.textViewChargingVoltageValue);
-        textViewChargingPowerValue = view.findViewById(R.id.textViewChargingPowerValue);
-        textViewChargingCurrentValue = view.findViewById(R.id.textViewChargingCurrentValue);
-        textViewRequestCurrentValue = view.findViewById(R.id.textViewRequestCurrentValue);
         textViewLimitSocValue = view.findViewById(R.id.textViewLimitSocValue);
-        textViewLimitKwValue = view.findViewById(R.id.textViewLimitKwValue);
-        progressCircular = view.findViewById(R.id.progressCircular);
+        textViewChargingAmtValue = view.findViewById(R.id.textViewChargingAmtValue);
+        textViewChargingTimeValue = view.findViewById(R.id.textViewChargingTimeValue);
+        txtChargePay = view.findViewById(R.id.txtChargePay);
+        txtPowerUnitPrice = view.findViewById(R.id.txtPowerUnitPrice);
         return view;
     }
 
@@ -137,21 +129,12 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
             sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
             requestStrings[0] = String.valueOf(mChannel);
             sharedModel.setMutableLiveData(requestStrings);
-            progressCircular.setIndeterminate(false);
             mediaPlayer();      // media player
 
             try {
                 textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
-                textViewLimitKwValue.setText(txData.getOutPowerLimit() + "kW");
                 textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getLimitSoc() + "%");
-                progressCircular.setProgress(chargingCurrentData.getSoc(), true);
                 startTime = zonedDateTimeConvert.doStringDateToDate(chargingCurrentData.getChargingStartTime());
-
-                if (Objects.equals(chargerConfiguration.getOpMode(), 1)) {
-                    textViewCarNum.setText(getString(R.string.carNum) + chargingCurrentData.getParentIdTag());
-                } else {
-                    textViewCarNum.setText(getString(R.string.carNum) + "테스트 모드");
-                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -192,20 +175,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                                  chargingCurrentData.setChargingUseTime(textViewChargingTimeValue.getText().toString());
 
                                  textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
-
-                                 int rHour = chargingCurrentData.getRemaintime() / 3600;
-                                 int rMinute = (chargingCurrentData.getRemaintime() % 3600) / 60;
-                                 int rSecond = chargingCurrentData.getRemaintime() % 60;
-
-                                 textViewChargingTimeRemainValue.setText(String.format("%02d", rHour) + ":" + String.format("%02d", rMinute) + ":" + String.format("%02d", rSecond));
-
                                  textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
-                                 progressCircular.setProgress(chargingCurrentData.getSoc(), true);
-
-                                 textViewChargingVoltageValue.setText(voltageFormatter.format(chargingCurrentData.getOutPutVoltage() * 0.1) + " V");
-                                 textViewChargingCurrentValue.setText(powerFormatter.format(chargingCurrentData.getOutPutCurrent() * 0.1) + " A");
-                                 textViewChargingPowerValue.setText(powerFormatter.format(chargingCurrentData.getOutPutVoltage() * chargingCurrentData.getOutPutCurrent() * 0.00001) + " kW");
-                                 textViewRequestCurrentValue.setText(powerFormatter.format(chargingCurrentData.getTargetCurrent() * 0.1) + "A");
                              }
                          } catch (Exception e) {
                              logger.error("onCharging error : {}", e.getMessage());

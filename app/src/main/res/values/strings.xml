@@ -12,7 +12,7 @@
     <string name="memChargingUnit">충전단가:</string>
     <string name="nomemberMessage">비회원 충전</string>
     <string name="creditMessage"><font color="#000">신용 카드 결제</font></string>
-    <string name="creditSubMessage">선결제로 진행되며,\n충전 후 사용한 금액만큼 최종 결제됩니다.\n나머지 금액은 자동 취소됩니다.</string>
+    <string name="creditSubMessage">선결제로 진행되며, 충전 후 사용한 금액만큼 최종 결제됩니다.\n나머지 금액은 자동 취소됩니다.</string>
     <string name="prePayment">선결제금액</string>
     <string name="partCancelPay">부분취소금액</string>
     <string name="payUnitMessage">원</string>
@@ -124,6 +124,7 @@
     <string name="systemExit">시스템\n종료</string>
     <string name="loadTest">Load Test</string>
     <string name="remoteTest">원격\n테스트</string>
+    <string name="insertMember">회원등록</string>
 
     <!-- control board -->
     <string name="channelSelect">[채널 선택]</string>

@@ -101,12 +101,7 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
         textViewSocValue = view.findViewById(R.id.textViewSocValue);
         textViewChargingAmtValue = view.findViewById(R.id.textViewChargingAmtValue);
         textViewChargingTimeValue = view.findViewById(R.id.textViewChargingTimeValue);
-        progressCircular = view.findViewById(R.id.progressCircular);
         textViewLimitSocValue = view.findViewById(R.id.textViewLimitSocValue);
-        textViewPrePayment = view.findViewById(R.id.textViewPrePayment);
-        textViewInputPrePayment = view.findViewById(R.id.textViewInputPrePayment);
-        textViewPartCancelPay = view.findViewById(R.id.textViewPartCancelPay);
-        textViewInputCancelPayment = view.findViewById(R.id.textViewInputCancelPayment);
         return view;
     }
 

@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/initLayout"
-    android:layout_width="512dp"
-    android:layout_height="662dp"
+    android:layout_width="800dp"
+    android:layout_height="380dp"
     tools:context=".pages.InitFragment">
 
     <View
         android:id="@+id/viewCircle"
-        android:layout_width="440dp"
-        android:layout_height="440dp"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
         android:background="@drawable/layer_list_oval_blue"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,10 +18,10 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <ImageView
-        android:id="@+id/imageViewBus"
+        android:id="@+id/imageViewCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="70dp"
         android:background="@drawable/car_blue"
         app:layout_constraintTop_toTopOf="@id/viewCircle"
         app:layout_constraintStart_toStartOf="@id/viewCircle"
@@ -34,33 +34,33 @@
         android:layout_height="wrap_content"
         android:background="@drawable/nm"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="@id/imageViewBus"
-        app:layout_constraintEnd_toEndOf="@id/imageViewBus"
-        app:layout_constraintBottom_toBottomOf="@id/imageViewBus"
+        app:layout_constraintStart_toStartOf="@id/imageViewCar"
+        app:layout_constraintEnd_toEndOf="@id/imageViewCar"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewCar"
         tools:ignore="contentDescription" />
-
-    <TextView
-        android:id="@+id/textViewConnector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/connector"
-        android:textSize="36sp"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/imageViewBus"
-        app:layout_constraintStart_toStartOf="@id/imageViewBus"
-        app:layout_constraintEnd_toEndOf="@id/imageViewBus" />
 
     <TextView
         android:id="@+id/textViewInitMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="@string/initMessage"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/textViewConnector"
-        app:layout_constraintStart_toStartOf="@id/textViewConnector"
-        app:layout_constraintEnd_toEndOf="@id/textViewConnector" />
+        android:textSize="22sp"
+        app:layout_constraintTop_toBottomOf="@id/imageViewCar"
+        app:layout_constraintStart_toStartOf="@id/imageViewCar"
+        app:layout_constraintEnd_toEndOf="@id/imageViewCar" />
+
+    <TextView
+        android:id="@+id/textViewMemberUnitInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/memChargingUnit"
+        android:textSize="19sp"
+        app:layout_constraintStart_toStartOf="@id/textViewInitMessage"
+        app:layout_constraintTop_toBottomOf="@id/textViewInitMessage"
+        app:layout_constraintEnd_toEndOf="@id/textViewInitMessage"/>
 
     <TextView
         android:id="@+id/textViewInfo"

@@ -2,17 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="1024dp"
-    android:layout_height="768dp"
+    android:layout_width="800dp"
+    android:layout_height="480dp"
     android:orientation="horizontal"
     tools:context=".pages.EnvironmentFragment">
 
     <Button
         android:id="@+id/btnConfig"
-        android:layout_width="420dp"
+        android:layout_width="360dp"
         android:layout_height="140dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded"
         android:text="@string/configButton"
         android:textStyle="bold"
@@ -24,7 +24,7 @@
 
     <Button
         android:id="@+id/btnWebSocket"
-        android:layout_width="420dp"
+        android:layout_width="360dp"
         android:layout_height="140dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded"
@@ -38,7 +38,7 @@
 
     <Button
         android:id="@+id/btnControl"
-        android:layout_width="420dp"
+        android:layout_width="360dp"
         android:layout_height="140dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded"
         android:text="@string/controlButton"
@@ -47,11 +47,11 @@
         app:backgroundTint="@null"
         app:layout_constraintLeft_toLeftOf="@id/btnConfig"
         app:layout_constraintTop_toBottomOf="@id/btnConfig"
-        app:layout_constraintBottom_toTopOf="@id/btnLoadTest"/>
+        app:layout_constraintBottom_toTopOf="@id/btnMember"/>
 
     <Button
         android:id="@+id/btnDbControl"
-        android:layout_width="205dp"
+        android:layout_width="175dp"
         android:layout_height="140dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded_left"
         android:text="@string/dbControl"
@@ -64,7 +64,7 @@
 
     <Button
         android:id="@+id/btnRemoteTest"
-        android:layout_width="205dp"
+        android:layout_width="175dp"
         android:layout_height="140dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded_right"
         android:text="@string/remoteTest"
@@ -76,12 +76,12 @@
         app:layout_constraintTop_toTopOf="@id/btnControl" />
 
     <Button
-        android:id="@+id/btnLoadTest"
-        android:layout_width="420dp"
+        android:id="@+id/btnMember"
+        android:layout_width="360dp"
         android:layout_height="140dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded"
-        android:text="@string/loadTest"
+        android:text="@string/insertMember"
         android:textSize="42sp"
         android:textColor="@color/primary"
         app:backgroundTint="@null"
@@ -90,7 +90,7 @@
 
     <Button
         android:id="@+id/btnUi"
-        android:layout_width="205dp"
+        android:layout_width="175dp"
         android:layout_height="140dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded_left"
         android:text="@string/uiButton"
@@ -99,11 +99,11 @@
         android:textColor="@color/primary"
         app:backgroundTint="@null"
         app:layout_constraintLeft_toLeftOf="@id/btnDbControl"
-        app:layout_constraintTop_toTopOf="@id/btnLoadTest" />
+        app:layout_constraintTop_toTopOf="@id/btnMember" />
 
     <Button
         android:id="@+id/btnSystemExit"
-        android:layout_width="205dp"
+        android:layout_width="175dp"
         android:layout_height="140dp"
         android:background="@drawable/shape_btn_white_stroke_blue_rounded_right"
         android:text="@string/systemExit"

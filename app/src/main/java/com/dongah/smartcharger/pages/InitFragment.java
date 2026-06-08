@@ -57,8 +57,8 @@ public class InitFragment extends Fragment implements View.OnClickListener {
 
     Animation animBlink;
     View viewCircle;
-    TextView textViewInitMessage, textViewConnector, textViewInfo;
-    ImageView imageViewBus, imageViewFault;
+    TextView textViewInitMessage, textViewInfo;
+    ImageView imageViewCar, imageViewFault;
 
     MainActivity activity;
     ChargerConfiguration chargerConfiguration;
@@ -119,8 +119,7 @@ public class InitFragment extends Fragment implements View.OnClickListener {
         txData = activity.getControlBoard().getTxData(mChannel);
         textViewInitMessage = view.findViewById(R.id.textViewInitMessage);
         textViewInitMessage.startAnimation(animBlink);
-        textViewConnector = view.findViewById(R.id.textViewConnector);
-        imageViewBus = view.findViewById(R.id.imageViewBus);
+        imageViewCar = view.findViewById(R.id.imageViewCar);
         viewCircle = view.findViewById(R.id.viewCircle);
         viewCircle.setOnClickListener(this);
         imageViewFault = view.findViewById(R.id.imageViewFault);
@@ -134,14 +133,6 @@ public class InitFragment extends Fragment implements View.OnClickListener {
             } else {
                 textViewInitMessage.setText(R.string.changeModeMessage);
                 imageViewFault.setVisibility(View.VISIBLE);
-            }
-
-            if (mChannel == 0) {
-                imageViewBus.setScaleX(1f);
-                textViewConnector.setText("1 커넥터");
-            } else {
-                imageViewBus.setScaleX(-1f);
-                textViewConnector.setText("2 커넥터");
             }
         } catch (Exception e) {
             logger.error("onCreateView error : {}", e.getMessage(), e);
