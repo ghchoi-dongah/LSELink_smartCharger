@@ -32,6 +32,7 @@ import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.ClassUiProcess;
 import com.dongah.smartcharger.basefunction.ConfigurationKeyRead;
 import com.dongah.smartcharger.controlboard.ControlBoard;
+import com.dongah.smartcharger.plc.PlcModem;
 import com.dongah.smartcharger.rfcard.RfCardReaderReceive;
 import com.dongah.smartcharger.sqlite.SQLiteHelper;
 import com.dongah.smartcharger.basefunction.FragmentChange;
@@ -83,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
     SQLiteDatabase sqLiteDatabase;
 
 
-    UiSeq[] fragmentSeq;
-    ClassUiProcess[] classUiProcess;
-    ChargingCurrentData[] chargingCurrentData;
+    UiSeq fragmentSeq;
+    ClassUiProcess classUiProcess;
+    ChargingCurrentData chargingCurrentData;
     ConfigurationKeyRead configurationKeyRead;
     ChargerConfiguration chargerConfiguration;
     SocketReceiveMessage socketReceiveMessage;
@@ -99,25 +100,24 @@ public class MainActivity extends AppCompatActivity {
     ClientSocket clientSocket;
     MonitorHttpServer monitorHttpServer;
 
+    /** PLC Modem*/
+    PlcModem plcModem;
 
-    public UiSeq getFragmentSeq(int ch)  {
-        return fragmentSeq[ch];
+
+    public UiSeq getFragmentSeq()  {
+        return fragmentSeq;
     }
 
-    public void setFragmentSeq(int ch, UiSeq fragmentSeq) {
-        this.fragmentSeq[ch] = fragmentSeq;
+    public void setFragmentSeq(UiSeq fragmentSeq) {
+        this.fragmentSeq = fragmentSeq;
     }
 
-    public ClassUiProcess[] getClassUiProcess() {
+    public ClassUiProcess getClassUiProcess() {
         return classUiProcess;
     }
 
-    public ClassUiProcess getClassUiProcess(int ch) {
-        return classUiProcess[ch];
-    }
-
-    public ChargingCurrentData getChargingCurrentData(int ch) {
-        return chargingCurrentData[ch];
+    public ChargingCurrentData getChargingCurrentData() {
+        return chargingCurrentData;
     }
 
     public ConfigurationKeyRead getConfigurationKeyRead() {
@@ -150,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
 
     public ProcessHandler getProcessHandler() {
         return processHandler;
+    }
+    public PlcModem getPlcModem() {
+        return plcModem;
     }
 
 
@@ -210,15 +213,14 @@ public class MainActivity extends AppCompatActivity {
         textViewVersion.setText("VER-DEVD " + GlobalVariables.VERSION + " | ");
 
         // 2. fragment change management
+//        fragmentSeq = new UiSeq[GlobalVariables.maxChannel];
+
         fragmentChange = new FragmentChange();
-        fragmentSeq = new UiSeq[GlobalVariables.maxChannel];
-        chargingCurrentData = new ChargingCurrentData[GlobalVariables.maxChannel];
-        for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-            fragmentChange.onFragmentChange(i, UiSeq.INIT, "INIT", "");
-            fragmentChange.onFragmentHeaderChange(i, "Header");
-            chargingCurrentData[i] = new ChargingCurrentData();
-            chargingCurrentData[i].onCurrentDataClear();
-        }
+        fragmentChange.onFragmentChange(UiSeq.INIT, "INIT", "");
+        fragmentChange.onFragmentHeaderChange("Header");
+
+        chargingCurrentData = new ChargingCurrentData();
+        chargingCurrentData.onCurrentDataClear();
 
         // 3. control board
         controlBoard = new ControlBoard(GlobalVariables.maxChannel, chargerConfiguration.getControlCom());
@@ -263,21 +265,16 @@ public class MainActivity extends AppCompatActivity {
 
         if (state != SocketState.OPEN || Objects.equals(chargerConfiguration.getOpMode(), 0)) {
             // 전류, SoC 제한 설정
-            for (int i = 0; i <GlobalVariables.maxChannel; i++) {
-                ((MainActivity) MainActivity.mContext).getControlBoard().getTxData(i).setOutPowerLimit((short) chargerConfiguration.getDr());
-                ((MainActivity) MainActivity.mContext).getChargingCurrentData(i).setLimitSoc(chargerConfiguration.getTargetSoc());
-            }
+            ((MainActivity) MainActivity.mContext).getControlBoard().getTxData().setOutPowerLimit((short) chargerConfiguration.getDr());
+            ((MainActivity) MainActivity.mContext).getChargingCurrentData().setLimitSoc(chargerConfiguration.getTargetSoc());
         }
 
         // 7. classUiProcess
-        classUiProcess = new ClassUiProcess[GlobalVariables.maxChannel];
-        for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-            classUiProcess[i] = new ClassUiProcess(i);
-            classUiProcess[i].setUiSeq(UiSeq.INIT);
+        classUiProcess = new ClassUiProcess();
+        classUiProcess.setUiSeq(UiSeq.INIT);
 
-        }
-
-        // 8. PLC modem
+        // 8. PLC Modem
+        plcModem = new PlcModem(chargerConfiguration.getPlcCom());
         clientSocket = new ClientSocket("192.168.39.1", 9999, new ClientSocket.TcpClientListener() {
             @Override
             public void onConnected() {
@@ -410,16 +407,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             boolean result = false;
             ChargingCurrentData chargingCurrentData;
-            for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(i);
-                result = chargingCurrentData.isReBoot() && (getClassUiProcess(i).getUiSeq() == UiSeq.INIT);
-            }
+            chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
+            result = chargingCurrentData.isReBoot() && (getClassUiProcess().getUiSeq() == UiSeq.INIT);
 
             if (result) {
-                for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                    getClassUiProcess(i).setUiSeq(UiSeq.REBOOTING);
-                    ((MainActivity) MainActivity.mContext).getChargingCurrentData(i).setStopReason(Reason.Reboot);
-                }
+                getClassUiProcess().setUiSeq(UiSeq.REBOOTING);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setStopReason(Reason.Reboot);
             }
         } catch (Exception e) {
             logger.error("MainActivity version reboot : {}", e.getMessage());
@@ -495,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 1; i <= GlobalVariables.maxChannel; i++) {
                 Cursor cursor = helper.select(tableName,"CONNECTOR_ID=?", new String[]{String.valueOf(i)});
-                ChargingCurrentData currentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(i-1);
+                ChargingCurrentData currentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
 
                 if (cursor == null || !cursor.moveToFirst()) {
                     ChangeModeThread.insertChgMode(helper, i);
@@ -536,9 +529,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
 //        inactivityHandler.removeCallbacks(inactivityRunnable);
         handler.removeCallbacks(runnable);
-        for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-            classUiProcess[i].stopEventLoop();
-        }
+        classUiProcess.stopEventLoop();
+
         if (monitorHttpServer != null) {
             monitorHttpServer.stopServer();
         }

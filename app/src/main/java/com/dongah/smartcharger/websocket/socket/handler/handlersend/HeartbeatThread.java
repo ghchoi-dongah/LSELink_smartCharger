@@ -84,10 +84,10 @@ public class HeartbeatThread extends Thread{
     private void processHeartbeat() throws OccurenceConstraintException {
         if (activity == null) return;
 
-        ClassUiProcess[] classUiProcess = activity.getClassUiProcess();
+        ClassUiProcess classUiProcess = activity.getClassUiProcess();
         boolean sendCheck = true;
         for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-            if (classUiProcess[i].getUiSeq() == UiSeq.CHARGING) {
+            if (classUiProcess.getUiSeq() == UiSeq.CHARGING) {
                 sendCheck = false;
                 break;
             }

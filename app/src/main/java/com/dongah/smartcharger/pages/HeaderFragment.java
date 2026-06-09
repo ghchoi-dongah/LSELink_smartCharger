@@ -40,7 +40,6 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     int clickedCnt = 0;
@@ -109,21 +108,17 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
                         return;
                     }
 
-                    UiSeq ui0 = activity.getClassUiProcess(0) != null
-                            ? activity.getClassUiProcess(0).getUiSeq()
-                            : null;
-                    UiSeq ui1 = activity.getClassUiProcess(1) != null
-                            ? activity.getClassUiProcess(1).getUiSeq()
+                    UiSeq ui = activity.getClassUiProcess() != null
+                            ? activity.getClassUiProcess().getUiSeq()
                             : null;
 
-                    boolean chkUiSeq = (ui0 == UiSeq.INIT || ui0 == UiSeq.FAULT || ui0 == UiSeq.OP_STOP) &&
-                                            (ui1 == UiSeq.INIT || ui1 == UiSeq.FAULT || ui1 == UiSeq.OP_STOP);
-                    System.out.println("clickedCnt > 8, ui0: " + ui0 + ", ui1: " + ui1 + ", chkUiSeq: " + chkUiSeq + ", mChannel:" + mChannel);
+                    boolean chkUiSeq = (ui == UiSeq.INIT || ui == UiSeq.FAULT || ui == UiSeq.OP_STOP);
+                    System.out.println("clickedCnt > 8, ui: " + ui + ", chkUiSeq: " + chkUiSeq);
                     if (chkUiSeq) {
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.ADMIN_PASS,"ADMIN_PASS",null);
+                                activity.getFragmentChange().onFragmentChange(UiSeq.ADMIN_PASS,"ADMIN_PASS",null);
                             }
                         });
                     }

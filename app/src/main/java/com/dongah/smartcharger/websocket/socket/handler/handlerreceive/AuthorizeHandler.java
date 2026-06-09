@@ -5,7 +5,6 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
-import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.FragmentChange;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
@@ -40,9 +39,8 @@ public class AuthorizeHandler implements OcppHandler {
     public void handle(JSONObject payload, int connectorId, String messageId) throws Exception {
         FragmentChange fragmentChange = new FragmentChange();
         MainActivity activity = (MainActivity) MainActivity.mContext;
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
-        UiSeq uiSeq = activity.getClassUiProcess(connectorId-1).getUiSeq();
-        ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+        UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
 
         try {
             JSONObject idTagInfo = payload.getJSONObject("idTagInfo");
@@ -96,23 +94,23 @@ public class AuthorizeHandler implements OcppHandler {
                         statusNotificationReq.sendStatusNotification();
                     }
 
-                    activity.getChargingCurrentData(connectorId-1).setAuthorizeResult(true);
-                    activity.getClassUiProcess(connectorId-1).setUiSeq(UiSeq.PLUG_CHECK);
-                    fragmentChange.onFragmentChange(connectorId-1, UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
+                    activity.getChargingCurrentData().setAuthorizeResult(true);
+                    activity.getClassUiProcess().setUiSeq(UiSeq.PLUG_CHECK);
+                    fragmentChange.onFragmentChange(UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
                 }
             } else {
                 String certificationReason = status.name();
                 ToastPositionMake toastPositionMake = new ToastPositionMake(activity);
-                activity.getChargingCurrentData(connectorId-1).setAuthorizeResult(false);
+                activity.getChargingCurrentData().setAuthorizeResult(false);
                 if (Objects.equals(uiSeq, UiSeq.CHARGING)) {
-                    activity.getClassUiProcess(connectorId-1).setUiSeq(UiSeq.CHARGING);
-                    fragmentChange.onFragmentChange(connectorId-1, UiSeq.CHARGING, "CHARGING", null);
-                    toastPositionMake.onShowToast(connectorId-1, "충전 중지 인증 실패 : " + certificationReason);
+                    activity.getClassUiProcess().setUiSeq(UiSeq.CHARGING);
+                    fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
+                    toastPositionMake.onShowToast("충전 중지 인증 실패 : " + certificationReason);
                 } else {
                     // 회원 인증 실패
-                    activity.getChargingCurrentData(connectorId-1).setAuthorizeResult(false);
-                    activity.getClassUiProcess(connectorId-1).setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-                    fragmentChange.onFragmentChange(connectorId-1, UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                    activity.getChargingCurrentData().setAuthorizeResult(false);
+                    activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
+                    fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
                 }
             }
         } catch (Exception e) {

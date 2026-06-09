@@ -48,12 +48,12 @@ public class InitFragment extends Fragment implements View.OnClickListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
+
 
     Animation animBlink;
     View viewCircle;
@@ -102,7 +102,6 @@ public class InitFragment extends Fragment implements View.OnClickListener {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -115,8 +114,8 @@ public class InitFragment extends Fragment implements View.OnClickListener {
         animBlink = AnimationUtils.loadAnimation(getActivity(), R.anim.blink_animation);
         activity = ((MainActivity) MainActivity.mContext);
         chargerConfiguration = activity.getChargerConfiguration();
-        chargingCurrentData = activity.getChargingCurrentData(mChannel);
-        txData = activity.getControlBoard().getTxData(mChannel);
+        chargingCurrentData = activity.getChargingCurrentData();
+        txData = activity.getControlBoard().getTxData();
         textViewInitMessage = view.findViewById(R.id.textViewInitMessage);
         textViewInitMessage.startAnimation(animBlink);
         imageViewCar = view.findViewById(R.id.imageViewCar);
@@ -124,7 +123,7 @@ public class InitFragment extends Fragment implements View.OnClickListener {
         viewCircle.setOnClickListener(this);
         imageViewFault = view.findViewById(R.id.imageViewFault);
         textViewInfo = view.findViewById(R.id.textViewInfo);
-        rxData = activity.getControlBoard().getRxData(mChannel);
+        rxData = activity.getControlBoard().getRxData();
 
         try {
             if (chargingCurrentData.isConnectUse()) {
@@ -151,8 +150,8 @@ public class InitFragment extends Fragment implements View.OnClickListener {
 
             if (chargerConfiguration.isInitInfo()) {
                 textViewInfo.setVisibility(View.VISIBLE);
-                textViewInfo.setText(getString(R.string.intiInfo, chargingCurrentData.getLimitSoc(),
-                        txData.getOutPowerLimit()));
+//                textViewInfo.setText(getString(R.string.intiInfo, chargingCurrentData.getLimitSoc(),
+//                        txData.getOutPowerLimit()));
             } else {
                 textViewInfo.setVisibility(View.INVISIBLE);
             }
@@ -173,10 +172,8 @@ public class InitFragment extends Fragment implements View.OnClickListener {
     private void initData() {
         try {
             chargingCurrentData.onCurrentDataClear();   // clear
-            chargingCurrentData.setConnectorId(mChannel + 1);
-
-            activity.getChargingCurrentData(mChannel).setChargerPointType(ChargerPointType.COMBO);
-            activity.getChargingCurrentData(mChannel).setConnectorId(mChannel + 1);
+            chargingCurrentData.setConnectorId(1);
+            chargingCurrentData.setChargerPointType(ChargerPointType.CTYPE);
         } catch (Exception e) {
             logger.error("initData error : {}", e.getMessage());
         }
@@ -189,9 +186,9 @@ public class InitFragment extends Fragment implements View.OnClickListener {
             if (Objects.equals(chargerConfiguration.getOpMode(), 0)) {
                 // test mode
                 double testPrice = Double.parseDouble(activity.getChargerConfiguration().getTestPrice());
-                activity.getChargingCurrentData(mChannel).setPowerUnitPrice(testPrice);
-                activity.getClassUiProcess(mChannel).setUiSeq(UiSeq.PLUG_CHECK);
-                activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
+                activity.getChargingCurrentData().setPowerUnitPrice(testPrice);
+                activity.getClassUiProcess().setUiSeq(UiSeq.PLUG_CHECK);
+                activity.getFragmentChange().onFragmentChange(UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
             } else if (Objects.equals(chargerConfiguration.getOpMode(), 1)) {
                 // server mode
                 if (!onUnitPrice()) {
@@ -201,13 +198,13 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                 try {
                     SocketState socketState = activity.getSocketReceiveMessage().getSocket().getState();
                     if (Objects.equals(socketState, SocketState.OPEN)) {
-                        activity.getClassUiProcess(mChannel).setUiSeq(UiSeq.AUTH_SELECT);
-                        activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
+                        activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
+                        activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
                     } else {
-                        activity.getToastPositionMake().onShowToast(mChannel, "서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
+                        activity.getToastPositionMake().onShowToast("서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
                     }
                 } catch (Exception e){
-                    activity.getToastPositionMake().onShowToast(mChannel, "서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
+                    activity.getToastPositionMake().onShowToast("서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
                     logger.error("server disconnect error : {}", e.getMessage(), e);
                 }
             }
@@ -230,7 +227,7 @@ public class InitFragment extends Fragment implements View.OnClickListener {
     public void onDetach() {
         super.onDetach();
         try {
-            requestStrings[0] = String.valueOf(mChannel);
+            requestStrings[0] = String.valueOf(0);
             sharedModel.setMutableLiveData(requestStrings);
 
             if (handler != null) {

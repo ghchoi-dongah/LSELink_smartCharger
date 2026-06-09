@@ -44,18 +44,15 @@ public class FragmentChange {
 
     public FragmentChange() {}
 
-    public void onFragmentChange(int channel, UiSeq uiSeq, String sendText, String type) {
+    public void onFragmentChange(UiSeq uiSeq, String sendText, String type) {
         Bundle bundle = new Bundle();
-        bundle.putInt("CHANNEL", channel);
-        ((MainActivity) MainActivity.mContext).setFragmentSeq(channel, uiSeq);
-        int frameLayoutId = channel == 0 ? R.id.ch0 : R.id.ch1;
-        // full = 1024*768, small = 512*692
+        ((MainActivity) MainActivity.mContext).setFragmentSeq(uiSeq);
+        int frameLayoutId = R.id.frameBody;
         FragmentTransaction transaction = ((MainActivity) MainActivity.mContext).getSupportFragmentManager().beginTransaction();
         switch (uiSeq) {
             case INIT:
                 try {
                     onFrameLayoutChange(false);
-                    bundle.putInt("CHANNEL", channel == 0 ? 0 : 1);
                     InitFragment initFragment = new InitFragment();
                     initFragment.setArguments(bundle);
                     transaction.replace(frameLayoutId, initFragment, sendText);
@@ -316,30 +313,27 @@ public class FragmentChange {
 
         activity.runOnUiThread(() -> {
             try {
-                FrameLayout frameLayout0 = activity.findViewById(R.id.ch0);
-                FrameLayout frameLayout1 = activity.findViewById(R.id.ch1);
+                FrameLayout frameBody = activity.findViewById(R.id.frameBody);
                 FrameLayout fullScreen = activity.findViewById(R.id.frameFull);
                 FrameLayout frameHeader = activity.findViewById(R.id.frameHeader);
 
-                if (frameLayout0 == null || frameLayout1 == null || fullScreen == null || frameHeader == null) {
+                if (frameBody == null || fullScreen == null || frameHeader == null) {
                     logger.error(
-                            "onFrameLayoutChange view null: ch0={}, ch1={}, frameFull={}, frameHeader={}",
-                            frameLayout0, frameLayout1, fullScreen, frameHeader
+                            "onFrameLayoutChange view null: frameBody={}, frameFull={}, frameHeader={}",
+                            frameBody, fullScreen, frameHeader
                     );
                     return;
                 }
 
                 if (hidden) {
                     fullScreen.setVisibility(View.VISIBLE);
-                    frameLayout0.setVisibility(View.INVISIBLE);
-                    frameLayout1.setVisibility(View.INVISIBLE);
+                    frameBody.setVisibility(View.INVISIBLE);
                     frameHeader.setVisibility(View.INVISIBLE);
                 } else {
                     onFrameLayoutRemove();
 
                     fullScreen.setVisibility(View.INVISIBLE);
-                    frameLayout0.setVisibility(View.VISIBLE);
-                    frameLayout1.setVisibility(View.VISIBLE);
+                    frameBody.setVisibility(View.VISIBLE);
                     frameHeader.setVisibility(View.VISIBLE);
                 }
 
@@ -349,10 +343,9 @@ public class FragmentChange {
         });
     }
 
-    public void onFragmentHeaderChange(int channel, String sendText) {
+    public void onFragmentHeaderChange(String sendText) {
         try {
             Bundle bundle = new Bundle();
-            bundle.putInt("CHANNEL", channel);
             int frameLayoutId = R.id.frameHeader;
             FragmentTransaction transaction = ((MainActivity) MainActivity.mContext).getSupportFragmentManager().beginTransaction();
             HeaderFragment headerFragment = new HeaderFragment();
@@ -380,14 +373,11 @@ public class FragmentChange {
 
     public boolean onFragmentScreenSaverChange() {
         try {
-            UiSeq ui0 = ((MainActivity) MainActivity.mContext).getClassUiProcess(0) != null
-                    ? ((MainActivity) MainActivity.mContext).getClassUiProcess(0).getUiSeq()
-                    : null;
-            UiSeq ui1 = ((MainActivity) MainActivity.mContext).getClassUiProcess(1) != null
-                    ? ((MainActivity) MainActivity.mContext).getClassUiProcess(1).getUiSeq()
+            UiSeq ui = ((MainActivity) MainActivity.mContext).getClassUiProcess() != null
+                    ? ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq()
                     : null;
 
-            boolean chkUiSeq = ui0 == UiSeq.INIT && ui1 == UiSeq.INIT;
+            boolean chkUiSeq = ui == UiSeq.INIT;
 
             if (chkUiSeq) {
                 FragmentTransaction transaction = ((MainActivity) MainActivity.mContext).getSupportFragmentManager().beginTransaction();
@@ -398,8 +388,7 @@ public class FragmentChange {
                 return true;
             }
         } catch (Exception e) {
-            Log.e("FragmentChange", "onFragmentScreenSaverChange error", e);
-            logger.error("FragmentChange onFragmentScreenSaverChange error : {}", e.getMessage());
+            logger.error("onFragmentScreenSaverChange error : {}", e.getMessage());
         }
         return false;
     }

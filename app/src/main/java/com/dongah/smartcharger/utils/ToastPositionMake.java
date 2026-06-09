@@ -24,20 +24,13 @@ public class ToastPositionMake {
         this.activity = activity;
     }
 
-    public void onShowToast(int ch, String text) {
+    public void onShowToast(String text) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Toast toast = Toast.makeText(activity, text, Toast.LENGTH_LONG);
-                    switch (ch) {
-                        case 0:
-                            toast.setGravity(Gravity.TOP | Gravity.LEFT, 150, 450);
-                            break;
-                        case 1:
-                            toast.setGravity(Gravity.TOP | Gravity.LEFT, 650, 450);
-                            break;
-                    }
+                    toast.setGravity(Gravity.TOP | Gravity.CENTER, 150, 450);
                     toast.show();
                 } catch (Exception e) {
                     logger.error("ToastPositionMake error : {}", e.getMessage());

@@ -27,6 +27,20 @@ public class BitUtilities {
         return (((b1 & 0xff) << 8) | ((b0 & 0xff)));
     }
 
+    public static int makeInt(byte b3, byte b2, byte b1, byte b0) {
+        return (((b3 & 0xff) << 24) |
+                ((b2 & 0xff) << 16) |
+                ((b1 & 0xff) << 8) |
+                ((b0 & 0xff)));
+    }
+
+    public static short makeShort(byte b1, byte b0) {
+        short newValue = 0;
+        newValue |= (short) ((b1 << 8) & 0xFF00);
+        newValue |= (short) (b0 & 0xFF00);
+        return  newValue;
+    }
+
     /**
      * hex array -> String
      */

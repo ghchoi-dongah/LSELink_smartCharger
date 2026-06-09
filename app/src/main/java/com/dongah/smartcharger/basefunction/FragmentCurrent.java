@@ -14,10 +14,6 @@ public class FragmentCurrent {
 
     public FragmentCurrent() { }
 
-    public Fragment getCurrentFragment(int ch) {
-        return ((MainActivity) MainActivity.mContext).getSupportFragmentManager().findFragmentById(ch == 0 ? R.id.ch0 : R.id.ch1);
-    }
-
     public Fragment getCurrentFragment() {
         return ((MainActivity) MainActivity.mContext).getSupportFragmentManager().findFragmentById(R.id.frameFull);
     }

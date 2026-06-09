@@ -1,6 +1,7 @@
 package com.dongah.smartcharger.controlboard;
 
 import com.dongah.smartcharger.R;
+import com.dongah.smartcharger.utils.BitUtilities;
 import com.dongah.smartcharger.utils.CRC16;
 
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ public class ControlBoard implements Runnable {
 
     public static final int HEAD_SIZE = 3;
     public static final int CRC_SIZE = 2;
-    public static final int RX_SIZE = 46 * 2;
+    public static final int RX_SIZE = 31 * 2;
     public static final int RX_DATA_SIZE = HEAD_SIZE + CRC_SIZE + RX_SIZE;
 
     /**
@@ -32,14 +33,14 @@ public class ControlBoard implements Runnable {
     /**
      * buffer
      **/
-    private RxData[] rxData;
-    private TxData[] txData;
+    private RxData rxData;
+    private TxData txData;
     private int noDataCount;
     private boolean disconnected = true;
     private  boolean bEndFlag = false;
 
     boolean isOpen = false;
-    int maxCh;
+    int maxCh = 1;
     String comPort;
     int tCount = 0;
     int curCh = 0;
@@ -54,6 +55,9 @@ public class ControlBoard implements Runnable {
     short[] rxBuffer200 = new short[10];
     byte[] receiveData = new byte[128];
     byte[] realReceiveData = new byte[RX_DATA_SIZE];
+    byte[] powerReceiveData = new byte[77];                             //header + data + checksum
+    short command = 0;
+    byte[] headParse = new byte[2];
 
     /**
      *  controlBoard Listener register
@@ -73,16 +77,26 @@ public class ControlBoard implements Runnable {
     /**
      * Getter & Setter
      **/
-    public RxData getRxData(int ch) {
-        return rxData[ch];
+    public RxData getRxData() {
+        return rxData;
     }
 
-    public TxData getTxData(int ch) {
-        return txData[ch];
+    public TxData getTxData() {
+        return txData;
     }
 
     public boolean isDisconnected() {
         return disconnected;
+    }
+
+    ControlBoardListener controlBoardListener;
+
+    public void setControlBoardListener(ControlBoardListener controlBoardListener) {
+        this.controlBoardListener = controlBoardListener;
+    }
+
+    public void setControlBoardListenerStop() {
+        controlBoardListener = null;
     }
 
     /**
@@ -98,17 +112,13 @@ public class ControlBoard implements Runnable {
 
             serialPort = new SerialPort(new File(comPort), 38400, 0);
             // multi channel
-            rxData = new RxData[maxCh];
-            txData = new TxData[maxCh];
-            for (int i = 0; i < maxCh; i++) {
-                rxData[i] = new RxData();
-                txData[i] = new TxData();
-                txData[i].setInit();    // 초기화
-            }
+            rxData = new RxData();
+            txData = new TxData();
+            txData.setInit(); // 초기화
             isOpen = true;
+            disconnected = false;
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
-
             receiveThread = new Thread(this);
             receiveThread.start();
         } catch (Exception e) {
@@ -149,11 +159,11 @@ public class ControlBoard implements Runnable {
                         lowBit = (short) (realReceiveData[4 + (i * 2)] & 0xff);
                         values[i] = (short) (values[i] | lowBit);
                     }
-//                    rxData[currentCh-1].Decode(values);
-                    rxData[curCh].Decode(values);
-                    for (ControlBoardListener listener : listeners) {
-                        listener.onControlBoardReceive(rxData);
-                    }
+                    rxData.Decode(values);
+                    if (controlBoardListener != null) controlBoardListener.onControlBoardReceive(rxData);
+//                    for (ControlBoardListener listener : listeners) {
+//                        listener.onControlBoardReceive(rxData);
+//                    }
                     Arrays.fill(realReceiveData, (byte) 0x00);
                 }
             } catch (Exception e) {
@@ -246,17 +256,33 @@ public class ControlBoard implements Runnable {
                  * 0: 채널 변경하면서 0x04 명령 전송
                  * 1: 현재 채널의 txData를 Encode()해서 0x10 명령 전송
                  **/
-                if ((tCount % 2) == 0) {
-                    curCh = (curCh + 1) % maxCh;
-                    chkTx = requestSend(sendCh[0], (byte) 0x04, curCh == 0 ? (short) 400 : (short) 446, (short) 46);
-                } else {
-                    rxBuffer200 = txData[curCh].Encode();
-                    chkTx = requestSend(sendCh[0], (byte) 0x10, curCh == 0 ? (short) 200 : (short) 210, (short) 10, rxBuffer200);
-                    // tx data listener
-                    for (ControlBoardListener listener : listeners) {
-                        listener.onControlBoardSend(txData);
-                    }
+                int sendType = tCount % 3;
+                switch (sendType) {
+                    case 0:
+                        curCh = (curCh + 1) % maxCh;
+                        chkTx = requestSend(sendCh[curCh], (byte) 0x04, (short) 400, (short) 14);
+                        break;
+                    case 1:
+                        rxBuffer200 = txData.Encode();
+                        chkTx = requestSend(sendCh[curCh],(byte)0x10, (short)200, (short)9, rxBuffer200);
+                        if (controlBoardListener != null) controlBoardListener.onControlBoardSend(txData);
+                        break;
+                    case 2:
+                        chkTx = requestSend();
+                        break;
                 }
+
+//                if ((tCount % 2) == 0) {
+//                    curCh = (curCh + 1) % maxCh;
+//                    chkTx = requestSend(sendCh[curCh], (byte) 0x04, (short) 400, (short) 14);
+//                } else {
+//                    rxBuffer200 = txData.Encode();
+//                    chkTx = requestSend(sendCh[0], (byte) 0x10, curCh == 0 ? (short) 200 : (short) 210, (short) 10, rxBuffer200);
+//                    // tx data listener
+//                    for (ControlBoardListener listener : listeners) {
+//                        listener.onControlBoardSend(txData);
+//                    }
+//                }
                 Thread.sleep(150);
                 try {
                     Arrays.fill(receiveData, (byte) 0x00);  // 수신 버퍼 초기화
@@ -271,19 +297,32 @@ public class ControlBoard implements Runnable {
                         }
                         continue;
                     }
-                    switch (receiveData[1]) {
-                        case (byte) 0x10:
+
+
+                    System.arraycopy(receiveData,0,headParse,0,2);
+//                Log.d("CLEAR", Arrays.toString(dataTransformation.bytesToHexArray(receiveData)));
+                    command = (short) BitUtilities.makeInt(headParse[0],headParse[1]);
+                    //parsing
+                    switch (command) {
+                        case 0x0110:
                             noDataCount = 0;
                             disconnected = false;
                             break;
-                        case (byte) 0x04:
+                        case 0x0104:
+                            responseReceive(receiveData);
                             noDataCount = 0;
                             disconnected = false;
-                            responseReceive(receiveData);
+                            break;
+                        case 0x0204:
+                            responseReceivePowerMeter(receiveData);
+                            noDataCount = 0;
+                            disconnected = false;
                             break;
                         default:
                             if (noDataCount < 6500) noDataCount++;
-                            if (noDataCount > 20) disconnected = true;
+                            if (noDataCount > 50) {
+                                disconnected = true;
+                            }
                             break;
                     }
                     Thread.sleep(150);
@@ -294,5 +333,66 @@ public class ControlBoard implements Runnable {
                 logger.error("thread receive error : {} ", e.getMessage());
             }
         }
+    }
+
+    private void responseReceivePowerMeter(byte[] srcData){
+        try {
+            System.arraycopy(srcData,0, powerReceiveData,0,77);
+            if (CheckResponse(powerReceiveData)){
+                int voltage = BitUtilities.makeInt(srcData[3],srcData[4],srcData[5],srcData[6]);    //소수 3째자리 표시
+                int current = BitUtilities.makeInt(srcData[7],srcData[8],srcData[9],srcData[10]);   //소수 3째자리 표시
+                long activePower = BitUtilities.makeInt(srcData[11],srcData[12],srcData[13],srcData[14]);    //W를 표시
+                short frequency = (short) BitUtilities.makeInt(srcData[23],srcData[24]);
+                long activeEnergy = BitUtilities.makeInt(srcData[71],srcData[72],srcData[73],srcData[74]);  //W로 표시
+
+                rxData.setVoltage((long) (voltage * 0.001));
+                rxData.setCurrent((long) (current * 0.001));
+                rxData.setActivePower((long) (activePower * 0.1));  //w
+                rxData.setActiveEnergy(activeEnergy * 10);               // 전력량 : w
+                rxData.setFrequency((short) (frequency * 0.01));
+
+//                rxData.csOVR = rxData.getVoltage() >= maxVoltage;
+//                rxData.csUVR = rxData.getVoltage() <= minVoltage;
+//                rxData.csOCR = rxData.getCurrent() >= maxCurrent;
+
+                //rxData.csFault = rxData.isCsEmergency() || rxData.isCsOVR() || rxData.isCsUVR() || rxData.isCsOCR();
+
+                rxData.csFault = rxData.isCsEmergency();
+
+                txData.setHighPowerMeter(BitUtilities.makeShort(srcData[71],srcData[72]));
+                txData.setLowPowerMeter(BitUtilities.makeShort(srcData[73],srcData[74]));
+                txData.setOutVoltage((short) voltage);
+                txData.setOutCurrent((short) current);
+            }
+        } catch (Exception e) {
+            logger.error("responseReceivePowerMeter error : {}", e.getMessage());
+        }
+    }
+
+    /**
+     * POWER METER
+     */
+    private static final byte POWER_METER_ID = 0x02;
+    private static final byte POWER_METER_READ = 0x04;
+    byte[] powerMeterRequest = new byte[8];
+    private boolean requestSend(){
+        try {
+            byte[] crc;
+            powerMeterRequest[0] = POWER_METER_ID;
+            powerMeterRequest[1] = POWER_METER_READ;
+            powerMeterRequest[2] = 0X01;
+            powerMeterRequest[3] = 0X00;
+            powerMeterRequest[4] = 0X00;
+            powerMeterRequest[5] = 0X24;
+            crc = CRC16.setCrcModBusReverse(powerMeterRequest,0,powerMeterRequest.length-2);
+            powerMeterRequest[6] = crc[0];
+            powerMeterRequest[7] = crc[1];
+            outputStream.write(powerMeterRequest);
+//            Log.d("CLEAR", Arrays.toString(dataTransformation.bytesToHexArray(powerMeterRequest)));
+            return true;
+        } catch (Exception e) {
+            logger.error("power meter requestSend() error : {}" , e.getMessage());
+        }
+        return false;
     }
 }

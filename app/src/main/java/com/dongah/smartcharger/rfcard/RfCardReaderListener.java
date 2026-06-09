@@ -1,5 +1,5 @@
 package com.dongah.smartcharger.rfcard;
 
 public interface RfCardReaderListener {
-    void onRfCardDataReceive(int ch, String cardNum, boolean value);
+    void onRfCardDataReceive(String cardNum, boolean value);
 }

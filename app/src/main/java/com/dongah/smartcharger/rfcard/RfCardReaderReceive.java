@@ -104,7 +104,7 @@ public class RfCardReaderReceive extends RfCardReader implements Runnable {
                     // 카드 읽기
                     System.arraycopy(readData, dataStart, src_data, 0, 8);
                     destData = BitUtilities.byteArrayToString(src_data);
-                    if (rfCardReaderListener != null) rfCardReaderListener.onRfCardDataReceive(getCh(), destData, true);
+                    if (rfCardReaderListener != null) rfCardReaderListener.onRfCardDataReceive(destData, true);
                 } catch (Exception e) {
                     destData = "0000000000000000";
                     logger.error("processCardData error : {} " , e.getMessage());
@@ -114,7 +114,7 @@ public class RfCardReaderReceive extends RfCardReader implements Runnable {
                     //카드 읽기
                     System.arraycopy(readData, dataStart, src_data, 0,8);
                     destData = BitUtilities.byteArrayToString(src_data);
-                    if (rfCardReaderListener != null) rfCardReaderListener.onRfCardDataReceive(getCh(),destData,true);
+                    if (rfCardReaderListener != null) rfCardReaderListener.onRfCardDataReceive(destData,true);
                 } catch (Exception e) {
                     destData = "0000000000000000";
                     logger.error("rf processCardData error : {} " , e.getMessage());
@@ -122,7 +122,7 @@ public class RfCardReaderReceive extends RfCardReader implements Runnable {
             }
         } else  {
             if (rfCardReaderListener != null) {
-                rfCardReaderListener.onRfCardDataReceive(getCh(),"0000000000000000", false);
+                rfCardReaderListener.onRfCardDataReceive("0000000000000000", false);
             }
         }
     }

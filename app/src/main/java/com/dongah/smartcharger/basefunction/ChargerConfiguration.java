@@ -65,6 +65,13 @@ public class ChargerConfiguration {
     public String controlCom = "/dev/ttyS7";
     public String rfCom = "/dev/ttyS3";
     public String creditCom = "/dev/ttyS4";
+    public String PlcCom = "/dev/ttyS2";
+
+    /**
+     * Duty 50%, 25%
+     */
+    public int duty = 50;
+
 
     /** charging point configuration setting */
     public int chargerPointType = 0;                    // 커플러 타입
@@ -104,9 +111,6 @@ public class ChargerConfiguration {
             File targetFile = new File(GlobalVariables.ROOT_PATH + File.separator + CONFIG_FILE_NAME);
             String configurationString;
             if (!targetFile.exists()) onSaveConfiguration();
-
-//            targetFile.setReadable(true, false);
-//            targetFile.setWritable(true, false);
 
             // get file context json string
             configurationString = fileManagement.getStringFromFile(GlobalVariables.ROOT_PATH  + File.separator + CONFIG_FILE_NAME);
@@ -481,5 +485,21 @@ public class ChargerConfiguration {
 
     public void setDr(int dr) {
         this.dr = dr;
+    }
+
+    public int getDuty() {
+        return duty;
+    }
+
+    public void setDuty(int duty) {
+        this.duty = duty;
+    }
+
+    public String getPlcCom() {
+        return PlcCom;
+    }
+
+    public void setPlcCom(String plcCom) {
+        PlcCom = plcCom;
     }
 }

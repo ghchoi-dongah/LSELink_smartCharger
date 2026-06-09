@@ -32,8 +32,8 @@ public class GlobalVariables {
     /**
      * Max plug count
      */
-    public static int maxChannel = 2;
-    public static int maxPlugCount = 3;
+    public static int maxChannel = 1;
+    public static int maxPlugCount = 2;
     public static boolean CONNECT_RETRY = false;
     public static boolean[] ChargerOperation = new boolean[maxPlugCount];
     public static UpdateStatus updateStatus;
@@ -67,8 +67,8 @@ public class GlobalVariables {
     public static String webSocketURL = "";
     public static boolean UseBasicAuth = false;
 
-    public static int[] dumpTransactionId = new int[2];
-    public static boolean[] dumpSending = new boolean[2];
+    public static int[] dumpTransactionId = new int[maxChannel];
+    public static boolean[] dumpSending = new boolean[maxChannel];
     public static boolean reconnectCheck = false;
     public static boolean Scheduled = false;
 

@@ -131,4 +131,18 @@ public class CRC16 {
         resultCRC[1] = (byte) (crcFull & 0xff);
         return resultCRC;
     }
+
+    public static byte[] setCrcModBusReverse (byte[] bytes, int offset, int length) {
+        int idx = 0x00;
+        int crcFull = 0xffff;
+        byte[] resultCRC = new byte[2];
+        for (int i = offset; i < length; i++) {
+            idx = (bytes[i] ^ crcFull) & 0xff;
+            crcFull = (crcFull >> 8) & 0xffff;
+            crcFull = crcFull ^ tableMODBUS[idx];
+        }
+        resultCRC[0] = (byte) ((crcFull & 0xff));
+        resultCRC[1] = (byte) ((crcFull >> 8) & 0xff);
+        return resultCRC;
+    }
 }
