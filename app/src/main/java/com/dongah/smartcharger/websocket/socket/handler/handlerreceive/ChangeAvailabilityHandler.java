@@ -45,10 +45,9 @@ public class ChangeAvailabilityHandler implements OcppHandler {
 
             // ChargerOperate
             // connectorId == 0 → 전체 업데이트
+            boolean isCharging = Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.CHARGING);
             if (connectorId == 0) {
 
-                boolean isCharging = Objects.equals(activity.getClassUiProcess(0).getUiSeq(), UiSeq.CHARGING);
-                isCharging = isCharging || Objects.equals(activity.getClassUiProcess(1).getUiSeq(), UiSeq.CHARGING);
 
                 AvailabilityStatus result =
                         ((type == AvailabilityType.Inoperative) || (type == AvailabilityType.Maintenance) && isCharging)
@@ -66,7 +65,7 @@ public class ChangeAvailabilityHandler implements OcppHandler {
                 Arrays.fill(GlobalVariables.ChargerOperation, checkType);
 
                 for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                    ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(i);
+                    ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
                     chargingCurrentData.setChargePointStatus(status);
 
                     // StatusNotification send
@@ -75,11 +74,6 @@ public class ChangeAvailabilityHandler implements OcppHandler {
                 }
 
             } else {
-                boolean isCharging = Objects.equals(
-                        activity.getClassUiProcess(connectorId-1).getUiSeq(),
-                        UiSeq.CHARGING
-                );
-
                 AvailabilityStatus result =
                         ((type == AvailabilityType.Inoperative) || (type == AvailabilityType.Maintenance)) && isCharging
                                 ? AvailabilityStatus.Scheduled
@@ -95,7 +89,7 @@ public class ChangeAvailabilityHandler implements OcppHandler {
 
                 GlobalVariables.ChargerOperation[connectorId] = checkType;
 
-                ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+                ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
                 chargingCurrentData.setChargePointStatus(status);
 
                 // StatusNotification send

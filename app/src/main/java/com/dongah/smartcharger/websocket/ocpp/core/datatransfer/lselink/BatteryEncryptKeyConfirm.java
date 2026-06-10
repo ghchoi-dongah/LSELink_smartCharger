@@ -2,7 +2,9 @@ package com.dongah.smartcharger.websocket.ocpp.core.datatransfer.lselink;
 
 import androidx.annotation.NonNull;
 
+import com.dongah.smartcharger.websocket.ocpp.common.model.Confirmation;
 import com.dongah.smartcharger.websocket.ocpp.common.model.Validatable;
+import com.dongah.smartcharger.websocket.ocpp.core.DataTransferStatus;
 import com.dongah.smartcharger.websocket.ocpp.utilities.MoreObjects;
 
 import org.slf4j.Logger;
@@ -10,18 +12,22 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class BatteryEncryptKeyConfirm implements Validatable {
+public class BatteryEncryptKeyConfirm implements Confirmation {
 
     private static final Logger logger = LoggerFactory.getLogger(BatteryEncryptKeyConfirm.class);
+    private static final String ACTION_NAME = "batteryEncryptKey";
 
-    private Status status;
+    private DataTransferStatus status;
     private String data;
+    public String getActionName() {
+        return ACTION_NAME;
+    }
 
-    public Status getStatus() {
+    public DataTransferStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(DataTransferStatus status) {
         this.status = status;
     }
 
@@ -31,6 +37,11 @@ public class BatteryEncryptKeyConfirm implements Validatable {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+
+    public BatteryEncryptKeyConfirm(DataTransferStatus status) {
+        setStatus(status);
     }
 
     @Override
