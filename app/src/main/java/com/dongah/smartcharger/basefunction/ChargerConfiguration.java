@@ -28,7 +28,7 @@ public class ChargerConfiguration {
     public String MID = "KIOSK1114915545";      // 결제MID
     
     /** MAX Channel Count */
-    public int maxChannel = 2;
+    public int maxChannel = 1;
 
     /**
      * server connection string
@@ -41,9 +41,8 @@ public class ChargerConfiguration {
     public int serverPort = 4000;
 
     /** 회원 인증 모드
-     * 0: mac
-     * 1: member
-     * 2: mac + member
+     * 0: 회원카드
+     * 1: 회원카드 + 신용카드
      * */
     public int authMode = 2;
     public int authModeId;
@@ -62,10 +61,10 @@ public class ChargerConfiguration {
     public int startMode = 0;
 
     /** device serial port */
-    public String controlCom = "/dev/ttyS7";
-    public String rfCom = "/dev/ttyS3";
+    public String controlCom = "/dev/ttyS0";
+    public String rfCom = "/dev/ttyS5";
     public String creditCom = "/dev/ttyS4";
-    public String PlcCom = "/dev/ttyS2";
+    public String PlcCom = "/dev/ttyS3";
 
     /**
      * Duty 50%, 25%
@@ -75,7 +74,7 @@ public class ChargerConfiguration {
 
     /** charging point configuration setting */
     public int chargerPointType = 0;                    // 커플러 타입
-    public String chargerPointModel = "DEVD240";        // 충전기 모델ID
+    public String chargerPointModel = "DEVW007";        // 충전기 모델ID
     public int chargerPointModelCode = 0;
     public String chargeBoxSerialNumber = "";           // 충전소ID
     public String chargerId = "";                       // 충전기ID
