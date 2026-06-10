@@ -76,9 +76,17 @@ public class GlobalVariables {
     public static String IMSI = "" ;
     public static String RSRP = "";
     public static boolean triggerSet = false;
+    public static short totalPackets;
 
+    public static String batteryEncryptKeyId = "";
 
+    public static String getBatteryEncryptKeyId() {
+        return batteryEncryptKeyId;
+    }
 
+    public static void setBatteryEncryptKeyId(String batteryEncryptKeyId) {
+        GlobalVariables.batteryEncryptKeyId = batteryEncryptKeyId;
+    }
 
     public static String getRootPath() {
         return ROOT_PATH;
@@ -341,5 +349,13 @@ public class GlobalVariables {
 
     public static void setTriggerSet(boolean triggerSet) {
         GlobalVariables.triggerSet = triggerSet;
+    }
+
+    public static short getTotalPackets() {
+        return totalPackets;
+    }
+
+    public static void setTotalPackets(short totalPackets) {
+        GlobalVariables.totalPackets = totalPackets;
     }
 }

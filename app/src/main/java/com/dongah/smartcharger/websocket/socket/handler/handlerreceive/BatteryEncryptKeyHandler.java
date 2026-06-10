@@ -5,6 +5,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.websocket.ocpp.core.DataTransferStatus;
 import com.dongah.smartcharger.websocket.ocpp.core.datatransfer.lselink.BatteryEncryptKeyConfirm;
 import com.dongah.smartcharger.websocket.socket.OcppHandler;
@@ -21,6 +22,11 @@ public class BatteryEncryptKeyHandler implements OcppHandler {
     public void handle(JSONObject payload, int connectorId, String messageId) throws Exception {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
+
+            JSONObject dataJson = payload.getJSONObject("data");
+            String keyId = dataJson.getString("keyId");
+            GlobalVariables.setBatteryEncryptKeyId(keyId);
+            logger.info("BatteryEncryptKey received keyId: {}", keyId);
 
             // response
             BatteryEncryptKeyConfirm batteryEncryptKeyConfirm = new BatteryEncryptKeyConfirm(DataTransferStatus.Accepted);

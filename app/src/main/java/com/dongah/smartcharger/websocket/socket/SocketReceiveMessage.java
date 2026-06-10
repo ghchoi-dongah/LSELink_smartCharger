@@ -16,6 +16,7 @@ import com.dongah.smartcharger.websocket.ocpp.common.model.Request;
 import com.dongah.smartcharger.websocket.ocpp.utilities.Stopwatch;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.AuthorizeHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.BatteryEncryptKeyHandler;
+import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.BatteryInfoHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.BootNotificationHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ChangeAvailabilityHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ChangeConfigurationHandler;
@@ -192,6 +193,7 @@ public class SocketReceiveMessage extends JSONCommunicator implements SocketInte
 
         // smart charger
         handlerMap.put("batteryEncryptKey", new BatteryEncryptKeyHandler());
+        handlerMap.put("Battery Info", new BatteryInfoHandler());
     }
 
     @Override

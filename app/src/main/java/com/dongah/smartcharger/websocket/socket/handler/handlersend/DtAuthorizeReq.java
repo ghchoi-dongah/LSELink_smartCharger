@@ -57,10 +57,7 @@ public class DtAuthorizeReq {
             activity.getSocketReceiveMessage().onSend(getConnectorId(), authorizeRequest.getActionName(), authorizeRequest);
 
         } catch (Exception e) {
-            Log.e("DtAuthorizeReq", "sendDtAuthorize error : ", e);
             logger.error("sendDtAuthorize error : {}", e.getMessage());
         }
     }
-
-
 }

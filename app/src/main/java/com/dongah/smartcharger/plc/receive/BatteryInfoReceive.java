@@ -79,7 +79,7 @@ public class BatteryInfoReceive {
             byte socLen = data[34];         //1
             byte bSoc = data[35];            // soc * 0.5
             double SoC = bSoc;
-            ((MainActivity) MainActivity.mContext).getClassUiProcess().getChargingCurrentData().setSoc((int) SoC);
+            ((MainActivity) MainActivity.mContext).getChargingCurrentData().setSoc((int) SoC);
 
             //SoH Tag (A4)
             byte sohCode = data[36];
@@ -94,9 +94,9 @@ public class BatteryInfoReceive {
             short sPackCurrent = dataTransformation.ByteArrayToShort(mPackCurrent);
             try {
                 long packCurrent = (long) (sPackCurrent * 0.1);
-                ((MainActivity) MainActivity.mContext).getClassUiProcess().getChargingCurrentData().setBatCurrent(packCurrent);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatCurrent(packCurrent);
             } catch (Exception e) {
-                ((MainActivity) MainActivity.mContext).getClassUiProcess().getChargingCurrentData().setBatCurrent(0);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatCurrent(0);
             }
 
             //BatteryPack voltage(A6)
@@ -107,9 +107,9 @@ public class BatteryInfoReceive {
             short sPackVoltage = dataTransformation.ByteArrayToShort(mPackVoltage);
             try {
                 long packVoltage = (long) (sPackVoltage * 0.1);
-                ((MainActivity) MainActivity.mContext).getClassUiProcess().getChargingCurrentData().setBatVoltage(packVoltage);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatVoltage(packVoltage);
             } catch (Exception e) {
-                ((MainActivity) MainActivity.mContext).getClassUiProcess().getChargingCurrentData().setBatVoltage(0);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatVoltage(0);
             }
 
             //Battery Cell Voltage(A7)

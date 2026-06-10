@@ -2,6 +2,7 @@ package com.dongah.smartcharger.websocket.ocpp.core.datatransfer.lselink;
 
 import com.dongah.smartcharger.websocket.ocpp.common.model.Validatable;
 
+import java.util.List;
 import java.util.Objects;
 
 public class BatteryInfoData implements Validatable {
@@ -10,7 +11,7 @@ public class BatteryInfoData implements Validatable {
     private String connectorId;     // Connector ID
     private String tsdt;            // 충전 시작 일시
     private String keyId;           // Key ID
-    private BatteryData batteryData;     // 암호화 배터리 정보
+    private List<BatteryData> batteryData;     // 암호화 배터리 정보
 
     public BatteryInfoData() {}
 
@@ -46,11 +47,11 @@ public class BatteryInfoData implements Validatable {
         this.keyId = keyId;
     }
 
-    public BatteryData getBatteryData() {
+    public List<BatteryData> getBatteryData() {
         return batteryData;
     }
 
-    public void setBatteryData(BatteryData batteryData) {
+    public void setBatteryData(List<BatteryData> batteryData) {
         this.batteryData = batteryData;
     }
 

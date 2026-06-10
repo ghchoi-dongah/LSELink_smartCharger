@@ -211,6 +211,24 @@ public class ZonedDateTimeConvert {
         return null;
     }
 
+    // yyyyMMddHHmmss
+    public String getStringTimeZone(String time) {
+        try {
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat inputFormat = new SimpleDateFormat(ZONED_DATE_TIME_FORMAT);
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat outputFormat  = new SimpleDateFormat(SIMPLE_DATE_TIME_FORMAT);
+            outputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+
+            Date date = inputFormat.parse(time);
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return null;
+    }
+
     // KST : yyyy-MM-dd'T'HH:mm:ss'Z
     @RequiresApi(api = Build.VERSION_CODES.O)
     public ZonedDateTime doGetCurrentTime() {
