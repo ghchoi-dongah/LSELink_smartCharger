@@ -11,17 +11,14 @@ public class TxData {
     private static final int TX_DATA_CNT = 10;
     public short[] rawData = new short[TX_DATA_CNT];
 
+    public boolean IsBoardRest = false;     // 3bit : OFF(0), 리셋시 ON(1) 한번만 전송
+    public boolean IsMainMC = false;        // 5bit : default : OFF(0), 충전시 ON(1)
+    public boolean IsCPRelay = true;        // 6bit : ON(1), 정상 상황에서는 사용 안 함
 
-    public boolean IsBoardRest = false;     //3 bit : OFF(0), 리셋시 ON(1) 한번만 전송
-    public boolean IsMainMC = false;        //5 bit : default : OFF(0), 충전시 ON(1)
-    public boolean IsCPRelay = true;        //6 bit : ON(1), 정상 상황에서는 사용 안 함
-
-    //
     public short pwmDuty = 100;             // 대기 100%,
     //  충전 시작시 변경 :  50%/30A,  40%/24A,   30%/25A,   16%/9.6A   10%/6
     public short uiSequence = 1;            // 1:대기, 2:충전중, 3:종료
-    public short runCount = 0;
-
+    public short runCount = 0;              // 통신 확인용
     public long powerMeter = 0;
     public short highPowerMeter = 0;
     public short lowPowerMeter = 0;

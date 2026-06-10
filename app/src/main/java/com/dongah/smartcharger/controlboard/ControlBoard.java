@@ -20,8 +20,11 @@ public class ControlBoard implements Runnable {
 
     public static final int HEAD_SIZE = 3;
     public static final int CRC_SIZE = 2;
-    public static final int RX_SIZE = 31 * 2;
+    public static final int RX_SIZE = 31 * 2; //control board word type(x2)
     public static final int RX_DATA_SIZE = HEAD_SIZE + CRC_SIZE + RX_SIZE;
+    private static final int maxVoltage = 253;
+    private static final int minVoltage = 170;
+    private static final int maxCurrent = 38;
 
     /**
      * serial
@@ -122,7 +125,7 @@ public class ControlBoard implements Runnable {
             receiveThread = new Thread(this);
             receiveThread.start();
         } catch (Exception e) {
-            logger.error("ControlBoard construct error : {}", e.getMessage());
+            logger.error("serial initial error : {}", e.getMessage());
         }
     }
 
@@ -147,24 +150,21 @@ public class ControlBoard implements Runnable {
     private void responseReceive(byte[] srcData) {
         if (isOpen) {
             try {
-                System.arraycopy(srcData, 0, realReceiveData, 0, RX_DATA_SIZE);
-                if (Objects.equals(realReceiveData[1], (byte) 0x04) && CheckResponse(realReceiveData)) {
+                System.arraycopy(srcData,0, realReceiveData,0, RX_DATA_SIZE);
+                if (Objects.equals(realReceiveData[1],(byte)0x04) && CheckResponse(realReceiveData)) {
                     byte currentCh = realReceiveData[0];
                     short dataLength = realReceiveData[2];
-                    short[] values = new short[dataLength / 2];
-                    short highBit, lowBit;
+                    short data1, data2;
+                    short[] values = new short[dataLength/2];
                     for (int i = 0; i < dataLength / 2; i++) {
-                        highBit = realReceiveData[3 + (i * 2)];
-                        values[i] = (short) ((highBit << 8) & 0xff00);
-                        lowBit = (short) (realReceiveData[4 + (i * 2)] & 0xff);
-                        values[i] = (short) (values[i] | lowBit);
+                        data1 = (realReceiveData[3 + (i * 2)]);
+                        values[i] = (short)((data1 << 8) & 0xff00);
+                        data2 = (short)(realReceiveData[4 + (i * 2)] & 0xff);
+                        values[i] = (short)(values[i] | data2);
                     }
                     rxData.Decode(values);
                     if (controlBoardListener != null) controlBoardListener.onControlBoardReceive(rxData);
-//                    for (ControlBoardListener listener : listeners) {
-//                        listener.onControlBoardReceive(rxData);
-//                    }
-                    Arrays.fill(realReceiveData, (byte) 0x00);
+                    Arrays.fill(realReceiveData,(byte)0x00);
                 }
             } catch (Exception e) {
                 logger.error("responseReceive error : {}", e.getMessage());
@@ -271,19 +271,8 @@ public class ControlBoard implements Runnable {
                         chkTx = requestSend();
                         break;
                 }
-
-//                if ((tCount % 2) == 0) {
-//                    curCh = (curCh + 1) % maxCh;
-//                    chkTx = requestSend(sendCh[curCh], (byte) 0x04, (short) 400, (short) 14);
-//                } else {
-//                    rxBuffer200 = txData.Encode();
-//                    chkTx = requestSend(sendCh[0], (byte) 0x10, curCh == 0 ? (short) 200 : (short) 210, (short) 10, rxBuffer200);
-//                    // tx data listener
-//                    for (ControlBoardListener listener : listeners) {
-//                        listener.onControlBoardSend(txData);
-//                    }
-//                }
                 Thread.sleep(150);
+                // data receive
                 try {
                     Arrays.fill(receiveData, (byte) 0x00);  // 수신 버퍼 초기화
                     availableCount = inputStream.available();   // 수신 대기 중인 바이트 수 확인
@@ -351,13 +340,13 @@ public class ControlBoard implements Runnable {
                 rxData.setActiveEnergy(activeEnergy * 10);               // 전력량 : w
                 rxData.setFrequency((short) (frequency * 0.01));
 
-//                rxData.csOVR = rxData.getVoltage() >= maxVoltage;
-//                rxData.csUVR = rxData.getVoltage() <= minVoltage;
-//                rxData.csOCR = rxData.getCurrent() >= maxCurrent;
+                rxData.csOVR = rxData.getVoltage() >= maxVoltage;
+                rxData.csUVR = rxData.getVoltage() <= minVoltage;
+                rxData.csOCR = rxData.getCurrent() >= maxCurrent;
 
-                //rxData.csFault = rxData.isCsEmergency() || rxData.isCsOVR() || rxData.isCsUVR() || rxData.isCsOCR();
+//                rxData.csFault = rxData.isCsEmergency() || rxData.isCsOVR() || rxData.isCsUVR() || rxData.isCsOCR();
 
-                rxData.csFault = rxData.isCsEmergency();
+//                rxData.csFault = rxData.isCsEmergency();
 
                 txData.setHighPowerMeter(BitUtilities.makeShort(srcData[71],srcData[72]));
                 txData.setLowPowerMeter(BitUtilities.makeShort(srcData[73],srcData[74]));

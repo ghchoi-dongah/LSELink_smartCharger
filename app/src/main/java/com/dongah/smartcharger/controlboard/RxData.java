@@ -14,32 +14,32 @@ public class RxData {
 
     //400 ~ 404
     public short csCPStatus = 0;        // STATE_A(12V), STATE_B(9V), STATE_C(6V), STATE_D(3V), STATE_E(0V), STATE_F(-12V)
-    public short csPwmDuty = 100;
-    public short csCpVoltage = 0; // csCpVoltage * 0.01
-    public short csFirmwareVersion = 0;
+    public short csPwmDuty = 100;       // 0~100%
+    public short csCpVoltage = 0;       // csCpVoltage * 0.01
+    public short csFirmwareVersion = 0; // 121 → 1.2.1
     public short csRunCount = 0;
     //405
-    public boolean csEmergency = false; //0 bit
+    public boolean csEmergency = false; // 1: 비상버튼 눌림, 0: 정상
     //406
-    public boolean csMcStatus = false;  //0 bit
+    public boolean csMcStatus = false;  // 0: open, a: close
     //407
-    public short csSequenceStatus = 0;  //
+    public short csSequenceStatus = 0;  // 0: 대기, 1: 충전 중, 2: 종료
     public short reserve0 = 0;
     public short reserve1 = 0;
 
-    public long voltage = 0;               //전압 x0.01  V
-    public long current = 0;               //전류 x0.001 A
-    public long ActiveEnergy = 0;         //전력량 x0.01 kWh
-    public long ActivePower = 0;          //전력 x0.1 w
-    public short Frequency = 0;            //주파수   0.01 Hz
+    public long voltage = 0;            // 전압 x0.01  V
+    public long current = 0;            // 전류 x0.001 A
+    public long ActiveEnergy = 0;       // 전력량 x0.01 kWh
+    public long ActivePower = 0;        // 전력 x0.1 w
+    public short Frequency = 0;         // 주파수 0.01 Hz
 
-    public boolean csPilot = false;         // plugCheck
-    public boolean csStart = false;         // start
-    public boolean csStop = false;          // stop
-    public boolean csFault = false;         // fault
-    public boolean csOVR = false;           // OVR
-    public boolean csUVR = false;           // UVR
-    public boolean csOCR = false;           // OCR
+    public boolean csPilot = false;     // plugCheck
+    public boolean csStart = false;     // start
+    public boolean csStop = false;      // stop
+    public boolean csFault = false;     // fault
+    public boolean csOVR = false;       // OVR
+    public boolean csUVR = false;       // UVR
+    public boolean csOCR = false;       // OCR
     public int csSoc = 0;
     public boolean csPowerMeterFail = false;    //311[11] 전력량계 통시 오류
 
