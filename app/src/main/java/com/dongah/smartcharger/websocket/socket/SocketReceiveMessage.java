@@ -45,6 +45,7 @@ import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.StatusNot
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.StopTransactionHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.TriggerMessageHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.UnitPriceHandler;
+import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.UpdateCertificationHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.UpdateFirmwareHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.UserSetSocHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.VehicleInfoHandler;
@@ -196,7 +197,9 @@ public class SocketReceiveMessage extends JSONCommunicator implements SocketInte
         handlerMap.put("batteryEncryptKey", new BatteryEncryptKeyHandler());
         handlerMap.put("Battery Info", new BatteryInfoHandler());
         handlerMap.put("appSetSoc", new AppSetSocHandler());
+        handlerMap.put("UpdateCertification", new UpdateCertificationHandler());
     }
+
 
     @Override
     public void onOpen(WebSocket webSocket) {

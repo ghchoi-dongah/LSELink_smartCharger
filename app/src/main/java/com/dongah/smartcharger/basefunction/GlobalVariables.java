@@ -80,6 +80,13 @@ public class GlobalVariables {
 
     public static String batteryEncryptKeyId = "";
 
+    //Certification
+    public static String kmePublic = "";
+    public static String kmeCerti = "";
+    public static String chargerPrivate = "";
+    public static String chargerCerti = "";
+    public static String validTime = "";
+
     public static String getBatteryEncryptKeyId() {
         return batteryEncryptKeyId;
     }
