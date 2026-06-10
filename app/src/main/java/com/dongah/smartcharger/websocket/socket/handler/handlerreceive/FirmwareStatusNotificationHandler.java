@@ -60,10 +60,8 @@ public class FirmwareStatusNotificationHandler implements OcppHandler  {
         } else if (Objects.equals(chargerConfiguration.getFirmwareStatus(), FirmwareStatus.Installed)) {
 
             // rebooting
-            for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                activity.getChargingCurrentData(i).setStopReason(Reason.HardReset);
-                activity.getChargingCurrentData(i).setReBoot(true);
-            }
+            activity.getChargingCurrentData().setStopReason(Reason.HardReset);
+            activity.getChargingCurrentData().setReBoot(true);
 
             // update firmware 다운 전에 GlobalVariables.ChargerOperation[] = true ==> Unavailable
 //            Arrays.fill(GlobalVariables.ChargerOperation, true);

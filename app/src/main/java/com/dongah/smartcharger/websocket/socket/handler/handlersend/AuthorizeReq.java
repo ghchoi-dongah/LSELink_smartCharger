@@ -78,7 +78,7 @@ public class AuthorizeReq {
     private String idTagWithUserType(String idTag) {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             int userType = chargingCurrentData.getPaymentType().value();
 
             /** pay type : MEMBER(1) CREDIT(2) */

@@ -34,10 +34,10 @@ public class VehicleInfoReq {
             MainActivity activity = (MainActivity) MainActivity.mContext;
 
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
-            RxData rxData = activity.getControlBoard().getRxData(getConnectorId()-1);
-            String evccId = BitUtilities.toHexString(rxData.getCsmVehicleEvccId());
-//            String evccId = "1364747EE704";   // test code
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+            RxData rxData = activity.getControlBoard().getRxData();
+//            String evccId = BitUtilities.toHexString(rxData.getCsmVehicleEvccId());
+            String evccId = "1364747EE704";   // test code
 
             VehicleInfoData vehicleInfoData = createVehicleInfoData(evccId);
 
@@ -59,7 +59,7 @@ public class VehicleInfoReq {
 
     private VehicleInfoData createVehicleInfoData(String evccId) {
         MainActivity activity = (MainActivity) MainActivity.mContext;
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
         VehicleInfoData vehicleInfoData = new VehicleInfoData();
         vehicleInfoData.setConnectorId(getConnectorId());

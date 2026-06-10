@@ -39,13 +39,13 @@ public class NotifyFaultCheck {
     public NotifyFaultCheck() {
         processHandler = ((MainActivity) MainActivity.mContext).getProcessHandler();
         socketReceiveMessage = ((MainActivity) MainActivity.mContext).getSocketReceiveMessage();
-        statusNotificationReq =  new StatusNotificationReq(1);
+        chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
+        statusNotificationReq =  new StatusNotificationReq(chargingCurrentData.getConnectorId());
     }
 
 
     public void onErrorMessageMake(RxData rxData) {
         try {
-            chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
             chargingCurrentData.faultMessage = new StringBuilder();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 onFaultDetect(rxData);
@@ -58,7 +58,6 @@ public class NotifyFaultCheck {
                 if (rxData.isCsOCR()) chargingCurrentData.faultMessage.append("OCR 에러\n");
                 if (rxData.isCsUVR()) chargingCurrentData.faultMessage.append("UVR 에러\n");
             }
-
         } catch (Exception e) {
             logger.error("onErrorMessageMake error : {} ", e.getMessage());
         }
@@ -76,12 +75,12 @@ public class NotifyFaultCheck {
                     //발생
                     chargingCurrentData.setChargePointErrorCode(ChargePointErrorCode.EVCommunicationError);
                     chargingCurrentData.setChargePointStatus(ChargePointStatus.Faulted);
-                    statusNotificationReq.sendStatusNotification(1, ChargePointStatus.Faulted);
+                    statusNotificationReq.sendStatusNotification(chargingCurrentData.getConnectorId(), ChargePointStatus.Faulted);
 
                 } else {
                     chargingCurrentData.setChargePointErrorCode(ChargePointErrorCode.NoError);
                     chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
-                    statusNotificationReq.sendStatusNotification(1, ChargePointStatus.Available);
+                    statusNotificationReq.sendStatusNotification(chargingCurrentData.getConnectorId(), ChargePointStatus.Available);
                 }
             }
 
@@ -106,22 +105,15 @@ public class NotifyFaultCheck {
                         statusNotificationReq.sendStatusNotification();
                     }
 
-//                    if (isPlugStatus) {
-//                        chargingCurrentData.setChargePointErrorCode(ChargePointErrorCode.NoError);
-//                        chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
-//                        statusNotificationReq.sendStatusNotification();
-//                    }
-
-
                 } else {
                     if (Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Available)) {
                         chargingCurrentData.setChargePointErrorCode(ChargePointErrorCode.NoError);
                         if (!chargingCurrentData.isConnectUse()) {
                             chargingCurrentData.setChargePointStatus(ChargePointStatus.Unavailable);
-                            statusNotificationReq.sendStatusNotification(1, ChargePointStatus.Unavailable);
+                            statusNotificationReq.sendStatusNotification(chargingCurrentData.getConnectorId(), ChargePointStatus.Unavailable);
                         } else {
                             chargingCurrentData.setChargePointStatus(ChargePointStatus.Preparing);
-                            statusNotificationReq.sendStatusNotification(1, ChargePointStatus.Preparing);
+                            statusNotificationReq.sendStatusNotification(chargingCurrentData.getConnectorId(), ChargePointStatus.Preparing);
                         }
                     }
                 }

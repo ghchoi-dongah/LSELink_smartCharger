@@ -55,7 +55,7 @@ public class FullRechgSocHandler implements OcppHandler {
 
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             File file = new File(GlobalVariables.getRootPath() + File.separator + GlobalVariables.FILE_FULL_RECHG_SOC);
             String content = readFile(file);

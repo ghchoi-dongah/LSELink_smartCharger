@@ -45,7 +45,7 @@ public class KeyInRechgInfoHandler implements OcppHandler {
     private void rechgInfo(int connectorId, JSONObject dataJson) {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             String idTag = dataJson.getString("idTag");
             double rechgKw = dataJson.getDouble("rechgKw");

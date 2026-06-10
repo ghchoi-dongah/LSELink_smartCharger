@@ -242,7 +242,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     /**
      * Remote Transaction stop
      * */
-    public void onRemoteTransactionStop(int channel, Reason reason) {
+    public void onRemoteTransactionStop(Reason reason) {
         try {
             UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
             if (Objects.equals(uiSeq, UiSeq.CHARGING)) {
@@ -263,8 +263,6 @@ public class ClassUiProcess implements RfCardReaderListener {
         try {
             UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
             if (Objects.equals(uiSeq, UiSeq.CHARGING)) {
-//                controlBoard.getTxData(getCh()).setStop(true);
-//                controlBoard.getTxData(getCh()).setStart(false);
                 controlBoard.getTxData().setMainMC(false);
                 controlBoard.getTxData().setPwmDuty((short) 100);
                 chargingCurrentData.setUserStop(false);
@@ -319,8 +317,6 @@ public class ClassUiProcess implements RfCardReaderListener {
             //충전중 일 때 fault 가 발생한 경우
             if (controlBoard.isDisconnected() || rxData.csFault) {
                 if (Objects.equals(getUiSeq(), UiSeq.CHARGING)) {
-//                    controlBoard.getTxData(getCh()).setStop(true);
-//                    controlBoard.getTxData(getCh()).setStart(false);
                     controlBoard.getTxData().setMainMC(false);
                     controlBoard.getTxData().setPwmDuty((short) 100);
                     chargingCurrentData.setChargePointStatus(ChargePointStatus.Faulted);
@@ -529,11 +525,12 @@ public class ClassUiProcess implements RfCardReaderListener {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void handleCharging(RxData rxData, TxData txData) {
         try {
-            txData.setPwmDuty((short) chargerConfiguration.getDuty());
-            txData.setMainMC(true);
-
+            // 충전 사용량 계산
             onUsePowerMeter(rxData);
             txData.setUiSequence((short) 2);
+
+            txData.setPwmDuty((short) chargerConfiguration.getDuty());
+            txData.setMainMC(true);
 
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
@@ -542,12 +539,6 @@ public class ClassUiProcess implements RfCardReaderListener {
 //            } else {
 //                checkNormalStop(rxData, now);
 //            }
-
-
-
-            // 충전 사용량 계산
-            onUsePowerMeter(rxData);
-            txData.setUiSequence((short) 2);
 
             // target soc
             int targetSoc = Math.min(chargingCurrentData.getLimitSoc(), chargingCurrentData.getFullrechgsoc());

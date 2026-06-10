@@ -26,7 +26,7 @@ public class StopTransactionHandler implements OcppHandler  {
     @Override
     public void handle(JSONObject payload, int connectorId, String messageId) throws Exception {
         MainActivity activity = (MainActivity) MainActivity.mContext;
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
         final StatusNotificationReq statusNotificationReq;
 
         JSONObject idTagInfo = payload.getJSONObject("idTagInfo");

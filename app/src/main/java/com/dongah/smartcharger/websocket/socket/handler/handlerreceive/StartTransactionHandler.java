@@ -33,7 +33,7 @@ public class StartTransactionHandler implements OcppHandler  {
     @Override
     public void handle(JSONObject payload, int connectorId, String messageId) throws Exception {
         MainActivity activity = ((MainActivity) MainActivity.mContext);
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
         //서버에서 transactionId 받음 ==> stopTransaction 계속하여 사용.
         chargingCurrentData.setTransactionId(payload.getInt("transactionId"));
 
@@ -70,18 +70,16 @@ public class StartTransactionHandler implements OcppHandler  {
             UserSetSocReq userSetSocReq = new UserSetSocReq(connectorId);
             userSetSocReq.sendUserSetSoc();
 
-            activity.getClassUiProcess(connectorId-1).setUiSeq(UiSeq.CHARGING);
+            activity.getClassUiProcess().setUiSeq(UiSeq.CHARGING);
             FragmentChange fragmentChange = new FragmentChange();
-            fragmentChange.onFragmentChange(connectorId-1, UiSeq.CHARGING, "CHARGING", null);
+            fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
         } else {
             // stop
-            TxData txData = activity.getControlBoard().getTxData(connectorId-1);
-            txData.setStop(true);
-            txData.setStart(false);
+            TxData txData = activity.getControlBoard().getTxData();
             txData.setUiSequence((short) 3);
 
             // DataTransfer MeterValues
-            activity.getClassUiProcess(connectorId-1).onMeterValueStop();
+            activity.getClassUiProcess().onMeterValueStop();
 
             // StopTransaction
             ZonedDateTimeConvert zonedDateTimeConvert = new ZonedDateTimeConvert();
@@ -91,7 +89,7 @@ public class StartTransactionHandler implements OcppHandler  {
             stopTransactionReq.sendStopTransactionReq();
 
             // home
-            activity.getClassUiProcess(connectorId-1).onHome();
+            activity.getClassUiProcess().onHome();
         }
     }
 }

@@ -52,7 +52,7 @@ public class PaymentReq {
     private PaymentData createPaymentData() {
         MainActivity activity = (MainActivity) MainActivity.mContext;
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
         ZonedDateTimeConvert zonedDateTimeConvert = new ZonedDateTimeConvert();
 
         PaymentData paymentData = new PaymentData();
@@ -74,7 +74,7 @@ public class PaymentReq {
     private PaymentInfoData createPaymentInfoData() {
         MainActivity activity = (MainActivity) MainActivity.mContext;
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
         // TODO
         PaymentInfoData paymentInfoData = new PaymentInfoData();

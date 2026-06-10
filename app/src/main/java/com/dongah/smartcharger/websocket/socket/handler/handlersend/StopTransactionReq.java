@@ -47,10 +47,10 @@ public class StopTransactionReq {
     public void sendStopTransactionReq() {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             ZonedDateTime timestamp = zonedDateTimeConvert.doZonedDateTimeToDatetime(chargingCurrentData.getChargingEndTime());
             
-            activity.getClassUiProcess(getConnectorId()-1).onMeterValueStop();
+            activity.getClassUiProcess().onMeterValueStop();
 
             StopTransactionRequest stopTransactionRequest = new StopTransactionRequest(
                     chargingCurrentData.getPowerMeterStop(),

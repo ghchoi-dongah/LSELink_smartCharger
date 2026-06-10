@@ -52,11 +52,12 @@ public class DiagnosticsThread extends Thread {
                     try {
                         count = 0;
                         String startTime = zonedDateTimeConvert.doGetKstDatetimeAsString();
-                        String powerMeter = powerFormatter.format(((MainActivity) MainActivity.mContext).getControlBoard().getRxData(0).getPowerMeter() * 0.01);
-                        JSONArray data = insertData(startTime, powerMeter);
-                        JSONObject obj = new JSONObject();
-                        obj.put("diagnostics", data);
-                        fileManagement.stringToFileSave(FILE_PATH, FILE_NAME, obj.toString(), true);
+                        // TODO
+//                        String powerMeter = powerFormatter.format(((MainActivity) MainActivity.mContext).getControlBoard().getRxData().getPowerMeter() * 0.01);
+//                        JSONArray data = insertData(startTime, powerMeter);
+//                        JSONObject obj = new JSONObject();
+//                        obj.put("diagnostics", data);
+//                        fileManagement.stringToFileSave(FILE_PATH, FILE_NAME, obj.toString(), true);
                     } catch (Exception e) {
                         logger.error(e.getMessage());
                     }

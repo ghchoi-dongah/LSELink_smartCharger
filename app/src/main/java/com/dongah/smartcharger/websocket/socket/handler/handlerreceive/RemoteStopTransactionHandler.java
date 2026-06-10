@@ -34,7 +34,7 @@ public class RemoteStopTransactionHandler implements OcppHandler  {
     private void sendResponse(int connectorId, String messageId, int transactionId) {
         try {
             MainActivity activity = ((MainActivity) MainActivity.mContext);
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             RemoteStartStopStatus status = !Objects.equals(chargingCurrentData.getTransactionId(), transactionId) ?
                     RemoteStartStopStatus.Rejected : RemoteStartStopStatus.Accepted;

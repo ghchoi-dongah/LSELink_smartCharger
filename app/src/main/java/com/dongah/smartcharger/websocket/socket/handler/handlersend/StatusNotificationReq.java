@@ -68,7 +68,7 @@ public class StatusNotificationReq {
             StatusNotificationRequest statusNotificationRequest = new StatusNotificationRequest(timestamp);
             statusNotificationRequest.setConnectorId(connectorId);
             ControlBoard controlBoard = activity.getControlBoard();
-            RxData rxData = controlBoard.getRxData(connectorId-1);
+            RxData rxData = controlBoard.getRxData();
             ChargePointErrorCode errorCode = (controlBoard.isDisconnected() ? ChargePointErrorCode.EVCommunicationError :
                     rxData.isCsEmergency() ? ChargePointErrorCode.OtherError : ChargePointErrorCode.NoError);
             statusNotificationRequest.setErrorCode(errorCode);
@@ -99,8 +99,8 @@ public class StatusNotificationReq {
 
             statusNotificationRequest.setConnectorId(connectorId);
             ControlBoard controlBoard = activity.getControlBoard();
-            RxData rxData = controlBoard.getRxData(connectorId-1);
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            RxData rxData = controlBoard.getRxData();
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             if (!GlobalVariables.ChargerOperation[connectorId]
                     && Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Finishing)) {
@@ -140,36 +140,16 @@ public class StatusNotificationReq {
             return CsErrorCode.EMERGENCY.value();
         }
 
-        if (rxData.csPLCComm) {
-            return CsErrorCode.PLCCOMM.value();
-        }
-
-        if (rxData.csPowerMeterComm) {
-            return CsErrorCode.POWERMETERCOMM.value();
-        }
-
-        if (rxData.csChargerLeak) {
-            return CsErrorCode.CHARGERLEAK.value();
-        }
-
-        if (rxData.csCarLeak) {
-            return CsErrorCode.CARLEAK.value();
-        }
-
-        if (rxData.csOutOVR) {
+        if (rxData.csOVR) {
             return CsErrorCode.OUTOVR.value();
         }
 
-        if (rxData.csOutOCR) {
+        if (rxData.csOCR) {
             return CsErrorCode.OUTOCR.value();
         }
 
-        if (rxData.csCouplerTempSensor) {
-            return CsErrorCode.COUPLERTEMPSENSOR.value();
-        }
-
-        if (rxData.csCouplerOVT) {
-            return CsErrorCode.COUPLEROVT.value();
+        if (rxData.csUVR) {
+            // TODO
         }
 
         return 0;

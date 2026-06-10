@@ -45,7 +45,7 @@ public class PrePaymentAmtHandler implements OcppHandler {
     private void prePayment(int connectorId, JSONObject dataJson) {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             String idTag = dataJson.getString("idTag");
             double rechgKw = dataJson.getDouble("rechgKw");

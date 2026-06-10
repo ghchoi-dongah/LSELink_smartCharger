@@ -150,7 +150,7 @@ public class ChangeModeThread extends Thread {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             CpChangeMode cpChangeMode = new CpChangeMode();
             cpChangeMode.connectorId = connectorId;
@@ -184,14 +184,14 @@ public class ChangeModeThread extends Thread {
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
 
         try {
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             if (Objects.equals(chargingCurrentData.getChangeMode(), status)) return;
             chargingCurrentData.setChangeMode(status);
 
             ChargePointStatus currentStatus = chargingCurrentData.getChargePointStatus();
             StatusNotificationReq statusNotificationReq = new StatusNotificationReq(connectorId);
 
-            RxData rxData = activity.getControlBoard().getRxData(connectorId-1);
+            RxData rxData = activity.getControlBoard().getRxData();
             int priority = chargerConfiguration.getConnectorPriority();
             ChargePointStatus targetStatus;
 
@@ -215,7 +215,7 @@ public class ChangeModeThread extends Thread {
                             : rxData.isCsPilot() ? ChargePointStatus.Preparing : ChargePointStatus.Available;
                 }
 
-                UiSeq uiSeq = activity.getClassUiProcess(connectorId-1).getUiSeq();
+                UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
 
                 if (!Objects.equals(currentStatus, targetStatus)) {
                     boolean isCheck = uiSeq.equals(UiSeq.CHARGING) || uiSeq.equals(UiSeq.FINISH_WAIT) || uiSeq.equals(UiSeq.FINISH);
@@ -237,8 +237,8 @@ public class ChangeModeThread extends Thread {
             boolean isModeValid = Objects.equals(targetStatus, ChargePointStatus.Unavailable);
             chargingCurrentData.setConnectUse(!isModeValid);
 
-            if (Objects.equals(activity.getClassUiProcess(connectorId-1).getUiSeq(), UiSeq.INIT)) {
-                activity.getClassUiProcess(connectorId-1).onHome();
+            if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
+                activity.getClassUiProcess().onHome();
             }
         } catch (Exception e) {
             logger.error("setChgModeStatus error : {}", e.getMessage(), e);
@@ -254,16 +254,17 @@ public class ChangeModeThread extends Thread {
         SQLiteHelper helper = null;
 
         try {
-            ClassUiProcess classUiProcess = activity.getClassUiProcess(connectorId-1);
+            ClassUiProcess classUiProcess = activity.getClassUiProcess();
             helper = SQLiteHelper.getInstance(activity);
             CpChangeMode dto = new CpChangeMode();
             String tableName = dto.getTableName();
 
             // Check if the table exists
-            TxData txData = activity.getControlBoard().getTxData(connectorId-1);
+            TxData txData = activity.getControlBoard().getTxData();
             if (!helper.isTableExists(helper, tableName)) {
                 logger.warn("setChgModeElec {} doesn't exist", tableName);
-                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+                // TODO
+//                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
                 if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
                 return;
             }
@@ -273,19 +274,21 @@ public class ChangeModeThread extends Thread {
             // Cursor null 여부 확인, 조회 결과 존재 여부 확인
             if (cursor == null || !cursor.moveToFirst()) {
                 logger.warn("setChgModeElec {} cursor is null or no data. connectorId : {}", tableName, connectorId);
-                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+                // TODO
+//                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
                 if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
                 return;
             }
 
             int value = cursor.getInt(cursor.getColumnIndexOrThrow("RECHG_ELEC"));
+            // TODO
             if (value == 0) {
-                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+//                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
             } else {
-                txData.setOutPowerLimit((short) value);
+//                txData.setOutPowerLimit((short) value);
             }
 
-            logger.info("setChgModeElec connectorId[{}] outPowerLimit : {}", connectorId, txData.getOutPowerLimit());
+//            logger.info("setChgModeElec connectorId[{}] outPowerLimit : {}", connectorId, txData.getOutPowerLimit());
             if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
 
             cursor.close();
@@ -303,12 +306,12 @@ public class ChangeModeThread extends Thread {
         SQLiteHelper helper = null;
 
         try {
-            ClassUiProcess classUiProcess = activity.getClassUiProcess(connectorId-1);
+            ClassUiProcess classUiProcess = activity.getClassUiProcess();
             helper = SQLiteHelper.getInstance(activity);
             CpChangeMode dto = new CpChangeMode();
             String tableName = dto.getTableName();
 
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             if (!helper.isTableExists(helper, tableName)) {
                 logger.warn("setChgModeSoc {} doesn't exist", tableName);
                 chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());

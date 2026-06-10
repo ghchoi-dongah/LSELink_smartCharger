@@ -67,7 +67,7 @@ public class StatusNotiReq {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             StatusNotiData statusNotiData = new StatusNotiData();
             statusNotiData.setConnectorId(connectorId);

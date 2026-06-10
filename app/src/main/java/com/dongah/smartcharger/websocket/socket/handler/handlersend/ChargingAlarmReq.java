@@ -68,7 +68,7 @@ public class ChargingAlarmReq {
     private ChargingAlarmData createChargingAlarmData(int msgType) {
 
         MainActivity activity = (MainActivity) MainActivity.mContext;
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
         ChargingAlarmData chargingAlarmData = new ChargingAlarmData();
         chargingAlarmData.setConnectorId(getConnectorId());

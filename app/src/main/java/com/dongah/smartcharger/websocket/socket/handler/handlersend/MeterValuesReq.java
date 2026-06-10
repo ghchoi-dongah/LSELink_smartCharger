@@ -91,12 +91,7 @@ public class MeterValuesReq {
         MainActivity activity = (MainActivity) MainActivity.mContext;
         if (activity == null) return;
         // 충전 상태가 아니면 중지
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
-//        if (!Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Charging) ||
-//                !GlobalVariables.isTriggerSet()) {
-//            stopMeterValues();
-//            return;
-//        }
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
         ZonedDateTimeConvert zonedDateTimeConvert = new ZonedDateTimeConvert();
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();

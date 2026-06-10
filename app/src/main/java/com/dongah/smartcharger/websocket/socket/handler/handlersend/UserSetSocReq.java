@@ -58,7 +58,7 @@ public class UserSetSocReq {
     private UserSetSocData createUserSocData() {
         MainActivity activity = (MainActivity) MainActivity.mContext;
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
         UserSetSocData userSetSocData = new UserSetSocData();
         userSetSocData.setChargeBoxSerialNumber(chargerConfiguration.getChargeBoxSerialNumber());

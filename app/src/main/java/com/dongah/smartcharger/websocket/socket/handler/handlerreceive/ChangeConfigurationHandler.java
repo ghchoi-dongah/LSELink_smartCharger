@@ -79,34 +79,28 @@ public class ChangeConfigurationHandler implements OcppHandler {
                 activity.getChargerConfiguration().onSaveConfiguration();
 
                 // 충전 중이면 종료
-                for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                    UiSeq uiSeq = activity.getClassUiProcess(i).getUiSeq();
-                    if (UiSeq.CHARGING.equals(uiSeq)) {
-                        activity.getControlBoard().getTxData(i).setStart(false);
-                        activity.getControlBoard().getTxData(i).setStop(true);
-                    }
+                UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
+                if (UiSeq.CHARGING.equals(uiSeq)) {
+                    // TODO
+//                    activity.getControlBoard().getTxData().setStart(false);
+//                    activity.getControlBoard().getTxData().setStop(true);
                 }
 
                 // rebooting
-                for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                    activity.getChargingCurrentData(i).setStopReason(Reason.HardReset);
-                    activity.getChargingCurrentData(i).setReBoot(true);
-                }
+                activity.getChargingCurrentData().setStopReason(Reason.HardReset);
+                activity.getChargingCurrentData().setReBoot(true);
             } else if (Objects.equals(key, "UseBasicAuth") && Boolean.parseBoolean(value)) {
                 // 충전 중이면 종료
-                for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                    UiSeq uiSeq = activity.getClassUiProcess(i).getUiSeq();
-                    if (UiSeq.CHARGING.equals(uiSeq)) {
-                        activity.getControlBoard().getTxData(i).setStart(false);
-                        activity.getControlBoard().getTxData(i).setStop(true);
-                    }
+                UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
+                if (UiSeq.CHARGING.equals(uiSeq)) {
+                    // TODO
+//                    activity.getControlBoard().getTxData().setStart(false);
+//                    activity.getControlBoard().getTxData().setStop(true);
                 }
 
                 // rebooting
-                for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                    activity.getChargingCurrentData(i).setStopReason(Reason.HardReset);
-                    activity.getChargingCurrentData(i).setReBoot(true);
-                }
+                activity.getChargingCurrentData().setStopReason(Reason.HardReset);
+                activity.getChargingCurrentData().setReBoot(true);
             }
         } catch (Exception e) {
             logger.error("ChangeConfigurationHandler error :  {}", e.getMessage());
@@ -160,7 +154,7 @@ public class ChangeConfigurationHandler implements OcppHandler {
                 return value;
             }
         } catch (Exception e) {
-            logger.error(" doAuthorizationKeyConvert error : {}", e.getMessage());
+            logger.error("doAuthorizationKeyConvert error : {}", e.getMessage());
             return "0";
         }
     }

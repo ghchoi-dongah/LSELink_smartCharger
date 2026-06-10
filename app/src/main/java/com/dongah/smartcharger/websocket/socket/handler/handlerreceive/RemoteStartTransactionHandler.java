@@ -39,7 +39,7 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
 
         try {
             int connector = payload.getInt("connectorId");
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connector-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             chargingCurrentData.setConnectorId(payload.getInt("connectorId"));
             chargingCurrentData.setIdTag(payload.getString("idTag"));
@@ -56,8 +56,8 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
     private void sendResponse(int connectorId, String messageId) {
         try {
             MainActivity activity = ((MainActivity) MainActivity.mContext);
-            UiSeq uiSeq = activity.getClassUiProcess(connectorId-1).getUiSeq();
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             RemoteStartStopStatus status = !Objects.equals(uiSeq, UiSeq.INIT) ? RemoteStartStopStatus.Rejected
                     : connectorId == 0 ? RemoteStartStopStatus.Rejected : RemoteStartStopStatus.Accepted;
@@ -71,7 +71,7 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
             );
 
             if (Objects.equals(status, RemoteStartStopStatus.Accepted)) {
-                chargingCurrentData.setAuthType("C");
+                chargingCurrentData.setAuthType("C");   // TODO
 
                 // Authorize
                 AuthorizeReq authorizeReq = new AuthorizeReq(connectorId);

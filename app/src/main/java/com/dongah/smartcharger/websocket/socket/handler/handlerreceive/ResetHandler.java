@@ -36,14 +36,12 @@ public class ResetHandler implements OcppHandler {
         );
 
         //charging ==> Stop
-        for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-            uiSeq = activity.getClassUiProcess(i).getUiSeq();
-            if (Objects.equals(uiSeq, UiSeq.CHARGING)) {
-                activity.getClassUiProcess(i).onResetStop(type);
-            }
-            activity.getChargingCurrentData(i).setStopReason(type == ResetType.Hard ?
-                    Reason.HardReset : Reason.SoftReset);
-            activity.getChargingCurrentData(i).setReBoot(true);
+        uiSeq = activity.getClassUiProcess().getUiSeq();
+        if (Objects.equals(uiSeq, UiSeq.CHARGING)) {
+            activity.getClassUiProcess().onResetStop(type);
         }
+        activity.getChargingCurrentData().setStopReason(type == ResetType.Hard ?
+                Reason.HardReset : Reason.SoftReset);
+        activity.getChargingCurrentData().setReBoot(true);
     }
 }

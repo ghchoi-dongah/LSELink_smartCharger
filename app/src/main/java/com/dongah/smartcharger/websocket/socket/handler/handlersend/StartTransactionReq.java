@@ -45,7 +45,7 @@ public class StartTransactionReq {
 
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             double meterStart = chargingCurrentData.getPowerMeterStart();
             String idTag = chargingCurrentData.getIdTag();
@@ -81,9 +81,9 @@ public class StartTransactionReq {
 
                 //화면 전환
                 chargingCurrentData.setChargePointStatus(ChargePointStatus.Charging);
-                activity.getClassUiProcess(getConnectorId()-1).setUiSeq(UiSeq.CHARGING);
+                activity.getClassUiProcess().setUiSeq(UiSeq.CHARGING);
                 FragmentChange fragmentChange = new FragmentChange();
-                fragmentChange.onFragmentChange(getConnectorId()-1, UiSeq.CHARGING, "CHARGING", null);
+                fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
             }
 
         } catch (Exception e) {

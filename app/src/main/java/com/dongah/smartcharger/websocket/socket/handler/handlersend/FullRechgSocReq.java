@@ -34,7 +34,7 @@ public class FullRechgSocReq {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             FullRechgSocData fullRechgSocData = createFullRechgSocData();
 
@@ -62,7 +62,7 @@ public class FullRechgSocReq {
 
         MainActivity activity = (MainActivity) MainActivity.mContext;
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(getConnectorId()-1);
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
         FullRechgSocData fullRechgSocData = new FullRechgSocData();
         fullRechgSocData.setChargeBoxSerialNumber(chargerConfiguration.getChargeBoxSerialNumber());

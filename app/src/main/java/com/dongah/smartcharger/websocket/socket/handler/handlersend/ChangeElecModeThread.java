@@ -129,17 +129,18 @@ public class ChangeElecModeThread extends Thread {
                     System.out.println("processRechgElec " + hourKey + " : " + value);
 
                     // 시간대 전력 설정
-                    TxData txData = activity.getControlBoard().getTxData(i-1);
-                    if (value == 0) {
-                        txData.setOutPowerLimit((short) chargerConfiguration.getDr());
-                    } else {
-                        txData.setOutPowerLimit((short) value);
-                    }
+                    TxData txData = activity.getControlBoard().getTxData();
+                    // TODO
+//                    if (value == 0) {
+//                        txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+//                    } else {
+//                        txData.setOutPowerLimit((short) value);
+//                    }
+//
+//                    logger.info("processRechgElec connectorId[{}] outPowerLimit : {}", i, txData.getOutPowerLimit());
 
-                    logger.info("processRechgElec connectorId[{}] outPowerLimit : {}", i, txData.getOutPowerLimit());
-
-                    if (Objects.equals(activity.getClassUiProcess(i-1).getUiSeq(), UiSeq.INIT)) {
-                        activity.getClassUiProcess(i-1).onHome();
+                    if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
+                        activity.getClassUiProcess().onHome();
                     }
 
                     cursor.close();
@@ -158,7 +159,7 @@ public class ChangeElecModeThread extends Thread {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-            ClassUiProcess classUiProcess = activity.getClassUiProcess(connectorId-1);
+            ClassUiProcess classUiProcess = activity.getClassUiProcess();
 
             // config dr setting
             CpChgElecmode cpChgElecmode = new CpChgElecmode();
@@ -175,9 +176,10 @@ public class ChangeElecModeThread extends Thread {
             // insert
             sqLiteHelper.insert(cpChgElecmode);
 
-            TxData txData = activity.getControlBoard().getTxData(connectorId-1);
-            txData.setOutPowerLimit((short) chargerConfiguration.getDr());
-            logger.info("insertChgElecMode connectorId[{}] outPowerLimit : {}", connectorId, txData.getOutPowerLimit());
+            TxData txData = activity.getControlBoard().getTxData();
+            // TODO
+//            txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+//            logger.info("insertChgElecMode connectorId[{}] outPowerLimit : {}", connectorId, txData.getOutPowerLimit());
 
             if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) {
                 classUiProcess.onHome();
