@@ -214,13 +214,12 @@ public class MainActivity extends AppCompatActivity {
 
         // 2. fragment change management
 //        fragmentSeq = new UiSeq[GlobalVariables.maxChannel];
+        chargingCurrentData = new ChargingCurrentData();
+        chargingCurrentData.onCurrentDataClear();
 
         fragmentChange = new FragmentChange();
         fragmentChange.onFragmentChange(UiSeq.INIT, "INIT", "");
         fragmentChange.onFragmentHeaderChange("Header");
-
-        chargingCurrentData = new ChargingCurrentData();
-        chargingCurrentData.onCurrentDataClear();
 
         // 3. control board
         controlBoard = new ControlBoard(GlobalVariables.maxChannel, chargerConfiguration.getControlCom());
@@ -270,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 7. classUiProcess
-        classUiProcess = new ClassUiProcess();
+        classUiProcess = new ClassUiProcess(0);
         classUiProcess.setUiSeq(UiSeq.INIT);
 
         // 8. PLC Modem

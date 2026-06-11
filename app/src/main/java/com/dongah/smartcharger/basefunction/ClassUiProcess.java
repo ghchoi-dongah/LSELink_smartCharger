@@ -33,6 +33,7 @@ import com.dongah.smartcharger.websocket.socket.handler.handlersend.StopTransact
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -62,6 +63,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     boolean chargingAlarm = true;
     boolean startCheck = true;
     boolean finishWaitScheduled = false;
+    ZonedDateTime startTime;
 
     /** OCPP     */
     StatusNotificationReq statusNotificationReq;
@@ -101,7 +103,8 @@ public class ClassUiProcess implements RfCardReaderListener {
     }
 
 
-    public ClassUiProcess() {
+    public ClassUiProcess(int ch) {
+        this.ch = ch;
         try {
             setUiSeq(UiSeq.INIT);
             zonedDateTimeConvert = new ZonedDateTimeConvert();
@@ -119,8 +122,10 @@ public class ClassUiProcess implements RfCardReaderListener {
             notifyFaultCheck = new NotifyFaultCheck();
             // process handler
             processHandler = ((MainActivity) MainActivity.mContext).getProcessHandler();
+            // chargingCurrent
+            chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
 
-            statusNotificationReq = new StatusNotificationReq(1);
+            statusNotificationReq = new StatusNotificationReq(ch+1);
 
             // loop
             startEventLoop();
@@ -129,8 +134,6 @@ public class ClassUiProcess implements RfCardReaderListener {
         }
     }
 
-    int getId = 0;
-    int channel;
     boolean check;
 
     /**
@@ -143,8 +146,11 @@ public class ClassUiProcess implements RfCardReaderListener {
             RxData rxData = controlBoard.getRxData();
             TxData txData = controlBoard.getTxData();
             check = rxData.isCsFault();
-            chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
+
+            // 현재 전력량 값
             chargingCurrentData.setIntegratedPower(rxData.getActiveEnergy());
+
+            // fault check
             if (getUiSeq().getValue() < 18) onFaultCheck(rxData);
 
             // sequence check
@@ -160,6 +166,8 @@ public class ClassUiProcess implements RfCardReaderListener {
 
                 case MEMBER_CARD:
                 case MEMBER_CHECK_WAIT:
+                case CREDIT_CARD:
+                case CREDIT_CARD_WAIT:
                     break;
 
                 case CONNECTION_FAILED:
@@ -477,6 +485,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     // plug check
     private void handlePlugCheck(RxData rxData, TxData txData) {
         if (rxData.isCsPilot()) {
+            // plug
             txData.setPwmDuty((short) chargerConfiguration.getDuty());
             setUiSeq(UiSeq.CONNECT_CHECK);
         }
@@ -497,6 +506,7 @@ public class ClassUiProcess implements RfCardReaderListener {
             chargingCurrentData.setPowerMeterStart(rxData.getActiveEnergy());                       // 전력량 와트(w) 기준
             chargingCurrentData.setPowerMeterCalculate(chargingCurrentData.getPowerMeterStart());   // 전력량 와트(w) 기준
             chargingCurrentData.setChargingStartTime(zonedDateTimeConvert.getStringCurrentTimeZone());
+            startTime = zonedDateTimeConvert.doZonedDateTimeToDatetime(chargingCurrentData.getChargingStartTime());
 
             // Auto 및 Test mode
             // socket receive message get instance
@@ -515,30 +525,20 @@ public class ClassUiProcess implements RfCardReaderListener {
                 startCheck = false;
             }
         }
-//        else if (rxData.isCsStop() || rxData.getCsmStatusCode() == (byte) 0x10) {
-//            controlBoard.getTxData(getCh()).setStop(true);
-//            controlBoard.getTxData(getCh()).setStart(false);
-//        }
     }
 
     // charging
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void handleCharging(RxData rxData, TxData txData) {
         try {
-            // 충전 사용량 계산
-            onUsePowerMeter(rxData);
-            txData.setUiSequence((short) 2);
-
             txData.setPwmDuty((short) chargerConfiguration.getDuty());
             txData.setMainMC(true);
 
-            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-
-//            if (chargingCurrentData.isExtendedRemoteStart()) {
-//                checkExtendedStop(now);
-//            } else {
-//                checkNormalStop(rxData, now);
-//            }
+            // 충전 사용량 계산
+            onUsePowerMeter(rxData);
+            txData.setUiSequence((short) 2);
+            boolean isStopped = rxData.isCsStop();
+            boolean isPilotDisconnected = rxData.getCsCPStatus() == 1 || rxData.getCsCPStatus() == 0;
 
             // target soc
             int targetSoc = Math.min(chargingCurrentData.getLimitSoc(), chargingCurrentData.getFullrechgsoc());
@@ -547,6 +547,15 @@ public class ClassUiProcess implements RfCardReaderListener {
             }
             boolean isSocReached = (chargingCurrentData.getSoc() != 0
                     && chargingCurrentData.getSoc() >= targetSoc);
+
+            boolean isPrePaymentEnabled = chargingCurrentData.isPrePaymentResult();
+            boolean isPaymentDepleted = chargingCurrentData.getPrePayment() <= chargingCurrentData.getPowerMeterUsePay();
+
+            // 최대 충전 시간
+            ZonedDateTime now = zonedDateTimeConvert.doGetCurrentTime();
+            long maxChargingTime = Duration.between(startTime, now).toMinutes();
+            boolean isLimitTime = Objects.equals(GlobalVariables.PersonUtztnLmtYn, "Y")
+                    && GlobalVariables.PersonUtztnLmtHr <= maxChargingTime;
 
             // 충전율 90%
             if (Objects.equals(chargingCurrentData.getSoc(), 90) && chargingAlarm) {
@@ -558,29 +567,28 @@ public class ClassUiProcess implements RfCardReaderListener {
             // stop 조건
             if (!GlobalVariables.isStopTransactionOnEVSideDisconnect() &&
                     !GlobalVariables.isUnlockConnectorOnEVSideDisconnect()) {
-                if (rxData.isCsStop() || !rxData.isCsPilot() || isSocReached) {
+                if (isStopped || isPilotDisconnected || isSocReached || isLimitTime) {
                     if (chargingCurrentData.getStopReason() == Reason.Remote || chargingCurrentData.isUserStop()) {
-//                        controlBoard.getTxData().setStop(true);
-//                        controlBoard.getTxData().setStart(false);
-                        if (!rxData.isCsPilot()) {
-                            // status notification send to server : ChargePointStatus.SuspendedEV
-                            // 2.4.5. EV Side Disconnected
-                            chargingCurrentData.setStopReason(Reason.EVDisconnected);
-                        }
+                        // status notification send to server : ChargePointStatus.SuspendedEV
+                        // 2.4.5. EV Side Disconnected
+                        chargingCurrentData.setStopReason(Reason.EVDisconnected);
                         setUiSeq(UiSeq.FINISH_WAIT);
                         fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                     }
                 }
             } else {
-                if (rxData.isCsStop() || !rxData.isCsPilot() || chargingCurrentData.isUserStop() || isSocReached
+                if (isStopped || isPilotDisconnected || isSocReached || isLimitTime
                         || !GlobalVariables.ChargerOperation[getCh()+1]) {
-//                    controlBoard.getTxData().setStop(true);
-//                    controlBoard.getTxData().setStart(false);
-                    if (!rxData.isCsPilot()) {
-                        // status notification send to server : ChargePointStatus.SuspendedEV
-                        // 2.4.5. EV Side Disconnected
+                    // status notification send to server : ChargePointStatus.SuspendedEV
+                    // 2.4.5. EV Side Disconnected
+                    if (Objects.equals(chargerConfiguration.getOpMode(), 1)) {
                         chargingCurrentData.setStopReason(Reason.EVDisconnected);
                     }
+                    setUiSeq(UiSeq.FINISH_WAIT);
+                    fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                } else if (isPrePaymentEnabled && isPaymentDepleted) {
+                    chargingCurrentData.setPowerMeterUsePay(chargingCurrentData.getPrePayment());
+                    chargingCurrentData.setStopReason(Reason.Other);
                     setUiSeq(UiSeq.FINISH_WAIT);
                     fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                 }
