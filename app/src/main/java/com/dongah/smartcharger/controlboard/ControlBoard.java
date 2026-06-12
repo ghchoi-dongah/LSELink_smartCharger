@@ -1,6 +1,5 @@
 package com.dongah.smartcharger.controlboard;
 
-import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.utils.BitUtilities;
 import com.dongah.smartcharger.utils.CRC16;
 
@@ -62,20 +61,6 @@ public class ControlBoard implements Runnable {
     short command = 0;
     byte[] headParse = new byte[2];
 
-    /**
-     *  controlBoard Listener register
-     **/
-    private final java.util.List<ControlBoardListener> listeners = new java.util.ArrayList<>();
-
-    public void addControlBoardListener(ControlBoardListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
-    }
-
-    public void removeControlBoardListener(ControlBoardListener listener) {
-        listeners.remove(listener);
-    }
 
     /**
      * Getter & Setter

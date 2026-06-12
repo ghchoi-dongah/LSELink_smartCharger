@@ -46,12 +46,10 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     Button btnChargingStop;
     TextView textViewSocValue, textViewLimitSocValue, textViewChargingAmtValue, txtChargePay, textViewChargingTimeValue, txtPowerUnitPrice;
@@ -98,7 +96,6 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -108,8 +105,8 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_charging, container, false);
         activity = ((MainActivity) MainActivity.mContext);
         chargerConfiguration = activity.getChargerConfiguration();
-        chargingCurrentData = activity.getChargingCurrentData(mChannel);
-        txData = activity.getControlBoard().getTxData(mChannel);
+        chargingCurrentData = activity.getChargingCurrentData();
+        txData = activity.getControlBoard().getTxData();
         btnChargingStop = view.findViewById(R.id.btnChargingStop);
         btnChargingStop.setOnClickListener(this);
         textViewSocValue = view.findViewById(R.id.textViewSocValue);
@@ -127,7 +124,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         try {
             sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
-            requestStrings[0] = String.valueOf(mChannel);
+            requestStrings[0] = String.valueOf(0);
             sharedModel.setMutableLiveData(requestStrings);
             mediaPlayer();      // media player
 
@@ -147,7 +144,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (Objects.equals(v.getId(), R.id.btnChargingStop)) {
-            ((MainActivity) MainActivity.mContext).getChargingCurrentData(mChannel).setUserStop(true);
+            ((MainActivity) MainActivity.mContext).getChargingCurrentData().setUserStop(true);
         }
     }
     
@@ -227,7 +224,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     public void onDetach() {
         super.onDetach();
         try {
-            requestStrings[0] = String.valueOf(mChannel);
+            requestStrings[0] = String.valueOf(0);
             sharedModel.setMutableLiveData(requestStrings);
         } catch (Exception e) {
             logger.error("onDetach error : {}", e.getMessage());

@@ -7,7 +7,7 @@ public abstract class RfCardReader {
         this.rfCardReaderListener = rfCardReaderListener;
     }
 
-    public abstract void rfCardReadRequest(int ch);
+    public abstract void rfCardReadRequest();
     public abstract void rfCardReadRelease();
     public abstract void destroyThread();
     public abstract void stopThread();

@@ -38,12 +38,10 @@ public class MemberCardFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     int timer = 20;
     TextView textViewTagTimer;
@@ -80,7 +78,6 @@ public class MemberCardFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -94,11 +91,11 @@ public class MemberCardFragment extends Fragment {
         animationDrawable = (AnimationDrawable) imageViewMemberCard.getBackground();
         String[] requestStrings = new String[1];
         SharedModel sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
-        requestStrings[0] = String.valueOf(mChannel);
+        requestStrings[0] = String.valueOf(0);
         sharedModel.setMutableLiveData(requestStrings);
 
         // rfCard ready
-        ((MainActivity) MainActivity.mContext).getRfCardReaderReceive().rfCardReadRequest(mChannel);
+        ((MainActivity) MainActivity.mContext).getRfCardReaderReceive().rfCardReadRequest();
 
         return view;
     }
@@ -117,7 +114,7 @@ public class MemberCardFragment extends Fragment {
                 public void run() {
                     timer--;
                     if (timer <= 0) {
-                        ((MainActivity) MainActivity.mContext).getClassUiProcess(mChannel).onHome();
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
                     } else {
                         countHandler.postDelayed(countRunnable, 1000);
                         textViewTagTimer.setText(timer + "초");

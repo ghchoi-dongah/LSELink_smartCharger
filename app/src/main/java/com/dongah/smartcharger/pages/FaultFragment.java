@@ -40,13 +40,11 @@ public class FaultFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_PARAM3 = "param3";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private String mParam3;
-    private int mChannel;
 
     TextView textViewFailed, textViewFaultCode;
     ObjectAnimator fadeAnimator;
@@ -88,7 +86,6 @@ public class FaultFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
             mParam3 = getArguments().getString(ARG_PARAM3);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -108,7 +105,7 @@ public class FaultFragment extends Fragment {
         fadeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         fadeAnimator.start();
 
-        chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(mChannel);
+        chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
         return view;
     }
 
@@ -163,7 +160,7 @@ public class FaultFragment extends Fragment {
                                         rebootHandler.removeCallbacks(rebootRunnable);
                                         rebootHandler.removeCallbacksAndMessages(null);
                                         rebootHandler.removeMessages(0);
-                                        ((MainActivity) MainActivity.mContext).getChargingCurrentData(mChannel).setReBoot(true);
+                                        ((MainActivity) MainActivity.mContext).getChargingCurrentData().setReBoot(true);
                                         ((MainActivity) MainActivity.mContext).onRebooting(mParam3);
                                     }
                                     rebootCount--;

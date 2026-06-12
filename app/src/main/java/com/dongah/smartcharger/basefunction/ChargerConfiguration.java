@@ -122,6 +122,7 @@ public class ChargerConfiguration {
                 setAuthModeId(obj.getInt("AUTH_MODE_ID"));
                 setOpMode(obj.getInt("OP_MODE"));
                 setOpModeId(obj.getInt("OP_MODE_ID"));
+                setPlcCom(obj.getString("PLC_COM"));
                 setControlCom(obj.getString("CONTROL_COM"));
                 setRfCom(obj.getString("RF_COM"));
                 setCreditCom(obj.getString("CREDIT_COM"));
@@ -137,11 +138,9 @@ public class ChargerConfiguration {
                 setImsi(obj.getString("IMSI"));
                 setMeterSerialNumber(obj.getString("METER_SERIAL_NUMBER"));
                 setMeterType(obj.getString("METER_TYPE"));
-                setConnectorPriority(obj.getInt("CONNECTOR_PRIORITY"));
                 setStopConfirm(obj.getBoolean("STOP_CONFIRM"));
                 setTargetSoc(obj.getInt("TARGET_SOC"));
-                setDr(obj.getInt("DR"));
-                setStartMode(obj.getInt("START_MODE"));
+                setDuty(obj.getInt("DUTY"));
                 setSigned(obj.getBoolean("SIGNED"));
                 setControlMonitor(obj.getBoolean("CONTROL_MONITOR"));
                 setInitInfo(obj.getBoolean("INIT_INFO"));
@@ -161,6 +160,7 @@ public class ChargerConfiguration {
             obj.put("AUTH_MODE_ID", getAuthModeId());
             obj.put("OP_MODE", getOpMode());
             obj.put("OP_MODE_ID", getOpModeId());
+            obj.put("PLC_COM", getPlcCom());
             obj.put("CONTROL_COM", getControlCom());
             obj.put("RF_COM", getRfCom());
             obj.put("CREDIT_COM", getCreditCom());
@@ -176,11 +176,9 @@ public class ChargerConfiguration {
             obj.put("IMSI", getImsi());
             obj.put("METER_SERIAL_NUMBER", getMeterSerialNumber());
             obj.put("METER_TYPE", getMeterType());
-            obj.put("CONNECTOR_PRIORITY", getConnectorPriority());
             obj.put("STOP_CONFIRM", isStopConfirm());
             obj.put("TARGET_SOC", getTargetSoc());
-            obj.put("DR", getDr());
-            obj.put("START_MODE", getStartMode());
+            obj.put("DUTY", getDuty());
             obj.put("SIGNED", isSigned());
             obj.put("CONTROL_MONITOR", isControlMonitor());
             obj.put("INIT_INFO", isInitInfo());

@@ -38,12 +38,10 @@ public class AdminPasswordFragment extends Fragment implements View.OnClickListe
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     Button btnCancel, btnCheck;
     EditText editPassword;
@@ -76,7 +74,6 @@ public class AdminPasswordFragment extends Fragment implements View.OnClickListe
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -107,13 +104,13 @@ public class AdminPasswordFragment extends Fragment implements View.OnClickListe
             int day = Integer.parseInt(simpleDay.format(System.currentTimeMillis())) + 8;
             @SuppressLint("DefaultLocale") String passWord = String.format("%02d", month) + String.format("%02d", day);
             if (Objects.equals(passWord, editPassword.getText().toString()) | Objects.equals("5500", editPassword.getText().toString())) {
-                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel, UiSeq.ENVIRONMENT, "ENVIRONMENT", null);
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.ENVIRONMENT, "ENVIRONMENT", null);
             } else {
                 editPassword.setText("");
                 Toast.makeText(getActivity(), "비밀번호 불일치", Toast.LENGTH_SHORT).show();
             }
         } else if (Objects.equals(getId, R.id.btnCancel)) {
-            ((MainActivity) MainActivity.mContext).getClassUiProcess(mChannel).onHome();
+            ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
         }
     }
 

@@ -23,7 +23,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final Logger logger = LoggerFactory.getLogger(SQLiteHelper.class);
 
     private static final String DATABASE_NAME = "dongah.db";
-    private static final  int DATABASE_VERSION = 1;
+    private static final  int DATABASE_VERSION = 2;
 
     private static SQLiteHelper instance;
 
@@ -79,9 +79,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        String sql = "DROP TABLE if exists mytable";
-        sqLiteDatabase.execSQL(sql);
-        onCreate(sqLiteDatabase);
+        if (oldVersion < 2) {
+            try {
+                sqLiteDatabase.execSQL(
+                    "ALTER TABLE CP_UNIT_PRICE ADD COLUMN RE_CHG_TYPE TEXT NOT NULL DEFAULT ''"
+                );
+            } catch (Exception ignored) {
+                // 이미 컬럼이 존재하는 경우 무시
+            }
+        }
     }
 
     // insert

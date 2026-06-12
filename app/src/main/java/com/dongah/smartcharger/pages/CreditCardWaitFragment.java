@@ -36,12 +36,10 @@ public class CreditCardWaitFragment extends Fragment implements View.OnClickList
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     int TIME_MAX = 20;
     int cnt = 0;
@@ -84,7 +82,6 @@ public class CreditCardWaitFragment extends Fragment implements View.OnClickList
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -168,7 +165,7 @@ public class CreditCardWaitFragment extends Fragment implements View.OnClickList
     public void onClick(View v) {
         try {
             if (!isAdded() && !isFlag) return;
-            activity.getClassUiProcess(mChannel).onHome();
+            activity.getClassUiProcess().onHome();
         } catch (Exception e) {
             logger.error("onClick error : {}", e.getMessage());
         }

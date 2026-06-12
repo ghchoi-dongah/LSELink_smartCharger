@@ -85,9 +85,9 @@ public class UnitPriceHandler implements OcppHandler  {
                 }
 
                 ContentValues cv = new ContentValues();
-                cv.put("UnitPrice", unitPrice);
-                cv.put("CrtrUnitPrice", crtrUnitPrice);
-                cv.put("RechgType", rechgType);
+                cv.put("UNIT_PRICE", unitPrice);
+                cv.put("CRTR_UNIT_PRICE", crtrUnitPrice);
+                cv.put("RE_CHG_TYPE", rechgType);
                 ZonedDateTimeConvert convert = new ZonedDateTimeConvert();
                 cv.put("REG_DT", convert.doGetKstDatetimeAsString());
 

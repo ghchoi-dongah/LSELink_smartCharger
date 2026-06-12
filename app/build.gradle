@@ -10,36 +10,16 @@ android {
         version = release(36)
     }
 
-    // clear
+    // clear 4.3''
     signingConfigs {
-        platformkeystore {
-            keyAlias "platform"
-            keyPassword "android"
-            storeFile file("D:\\AndroidDongah\\PlatformKeyClear\\keystore\\platform.jks")
-            storePassword "android"
+        getByName("debug") {
+            keyAlias = "systemkey"
+            keyPassword = "123456"
+            storeFile = file("D:\\AndroidDongah\\PlatformKeyClear\\platform.jks")
+            storePassword = "123456"
         }
     }
-
-    // senke
-//    signingConfigs {
-//        getByName("debug") {
-//            keyAlias = "system-lztek"
-//            keyPassword = "123456"
-//            storeFile = file("D:\\AndroidDongah\\JSK_senke\\platform.jks")
-//            storePassword = "123456"
-//        }
-//    }
-
-    // hola
-//    signingConfigs {
-//        getByName("debug") {
-//            keyAlias = "androiddebugkey"
-//            keyPassword = "android"
-//            storeFile = file("D:\\AndroidDongah\\JKS_hola\\platform.jks")
-//            storePassword = "android"
-//        }
-//    }
-
+    
     defaultConfig {
         applicationId "com.dongah.smartcharger"
         minSdk 24

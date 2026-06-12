@@ -38,12 +38,10 @@ public class RemoteTestFragment extends Fragment implements View.OnClickListener
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     Button btnResetHard, btnResetSoft, btnInoperative, btnOperative, btnInoperativeAll, btnOperativeAll;
     Button btnTestChangeModeDM, btnTestChangeModeIM, btnTestChangeElecMode, btnRechgrsocschedule;
@@ -83,7 +81,6 @@ public class RemoteTestFragment extends Fragment implements View.OnClickListener
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -93,7 +90,7 @@ public class RemoteTestFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_remote_test, container, false);
         activity = (MainActivity) MainActivity.mContext;
-        chargingCurrentData = activity.getChargingCurrentData(mChannel);
+        chargingCurrentData = activity.getChargingCurrentData();
 
         btnExit = view.findViewById(R.id.btnExit);
         btnExit.setOnClickListener(this);
@@ -142,10 +139,8 @@ public class RemoteTestFragment extends Fragment implements View.OnClickListener
             transaction.replace(R.id.frameFull, environmentFragment);
             transaction.commit();
         } else if (Objects.equals(getId, R.id.btnResetHard) || Objects.equals(getId, R.id.btnResetSoft)) {
-            for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                activity.getChargingCurrentData(i).setStopReason(Objects.equals(getId, R.id.btnResetHard) ? Reason.HardReset : Reason.SoftReset);
-                activity.getChargingCurrentData(i).setReBoot(true);
-            }
+            activity.getChargingCurrentData().setStopReason(Objects.equals(getId, R.id.btnResetHard) ? Reason.HardReset : Reason.SoftReset);
+            activity.getChargingCurrentData().setReBoot(true);
         } else if (Objects.equals(getId, R.id.btnInoperative) || Objects.equals(getId, R.id.btnOperative)) {
             String type = Objects.equals(getId, R.id.btnInoperative) ? "Inoperative" : "Operative";
             onTestChangeAvailability(1, type);

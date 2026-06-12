@@ -130,13 +130,13 @@ public class RechgrsocscheduleThread extends Thread {
                     int value = cursor.getInt(cursor.getColumnIndexOrThrow(hourKey));
                     System.out.println("processRechgSoc " + hourKey + " : " + value);
 
-                    ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(i-1);
+                    ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
                     chargingCurrentData.setLimitSoc(value);
 
                     logger.info("processRechgElec connectorId[{}] limitSoc : {}", i, chargingCurrentData.getLimitSoc());
 
-                    if (Objects.equals(activity.getClassUiProcess(i-1).getUiSeq(), UiSeq.INIT)) {
-                        activity.getClassUiProcess(i-1).onHome();
+                    if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
+                        activity.getClassUiProcess().onHome();
                     }
 
                     cursor.close();
@@ -154,9 +154,9 @@ public class RechgrsocscheduleThread extends Thread {
     public static void insertRechgSoc(SQLiteHelper sqLiteHelper, int connectorId) {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
-            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData(connectorId-1);
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
-            ClassUiProcess classUiProcess = activity.getClassUiProcess(connectorId-1);
+            ClassUiProcess classUiProcess = activity.getClassUiProcess();
 
             CpRechgSoc cpRechgSoc = new CpRechgSoc();
             cpRechgSoc.connectorId = connectorId;

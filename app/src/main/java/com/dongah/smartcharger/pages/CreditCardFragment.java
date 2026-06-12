@@ -38,12 +38,10 @@ public class CreditCardFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     int timer = 40;
     TextView txtInputAmt, textViewTagTimer;
@@ -86,7 +84,6 @@ public class CreditCardFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -95,7 +92,7 @@ public class CreditCardFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_credit_card, container, false);
         activity= (MainActivity) MainActivity.mContext;
-        chargingCurrentData = activity.getChargingCurrentData(mChannel);
+        chargingCurrentData = activity.getChargingCurrentData();
 
         txtInputAmt = view.findViewById(R.id.txtInputAmt);
         imageViewCreditCard = view.findViewById(R.id.imageViewCreditCard);
@@ -130,7 +127,7 @@ public class CreditCardFragment extends Fragment {
                             //TODO: 선 결제에 의한 무카드 취소
                         }
 
-                        ((MainActivity) MainActivity.mContext).getClassUiProcess(mChannel).onHome();
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
                     } else {
                         countHandler.postDelayed(countRunnable, 1000);
                         textViewTagTimer.setText(timer + "초");

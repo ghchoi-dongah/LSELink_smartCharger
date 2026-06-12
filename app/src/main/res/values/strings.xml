@@ -76,12 +76,15 @@
     <string name="chargerId"><font color="#000">충전기ID</font></string>
     <string name="serverUrl"><font color="#000">서버 URL</font></string>
     <string name="serverPort"><font color="#000">서버 Port</font></string>
-    <string name="controlPort"><font color="#000">Control Port</font></string>
-    <string name="rfPort"><font color="#000">RF-Card Port</font></string>
-    <string name="creditCardPort"><font color="#000">CreditCard Port</font></string>
+    <string name="plc"><font color="#000">PLC Port</font></string>
+    <string name="controlPort"><font color="#000">Ctl Port</font></string>
+    <string name="rfPort"><font color="#000">RF Port</font></string>
+    <string name="creditCardPort"><font color="#000">Credit Port</font></string>
     <string name="vendorId"><font color="#000">제조사 코드</font></string>
     <string name="testPrice"><font color="#000">테스트 단가</font></string>
     <string name="connectorPriority"><font color="#000">커넥터 우선순위</font></string>
+    <string name="duty"><font color="#000">Duty (%)</font></string>
+    <string name="dutyInfo">(7kW:50%, 3.3kW:25%)</string>
     <string name="chargeMode"><font color="#000">충전기 모드</font></string>
     <string name="mid"><font color="#000">결제MID</font></string>
     <string name="chargePointSerialNumber"><font color="#000">충전기 Serial</font></string>

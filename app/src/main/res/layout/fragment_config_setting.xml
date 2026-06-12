@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="46dp"
+        android:layout_marginStart="16dp"
         android:text="@string/chargePointType"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,25 +139,48 @@
         tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck" />
 
     <TextView
-        android:id="@+id/textViewControlPort"
+        android:id="@+id/textViewPlc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="@string/controlPort"
+        android:text="@string/plc"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@id/textViewChargePointType"
         app:layout_constraintTop_toBottomOf="@id/textViewServerPort" />
 
     <EditText
-        android:id="@+id/editControlPort"
-        android:layout_width="260dp"
+        android:id="@+id/editPlc"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_edit_text_required"
         android:textSize="18sp"
         android:textColor="#000"
         android:inputType="text"
-        app:layout_constraintTop_toTopOf="@id/textViewControlPort"
+        app:layout_constraintTop_toTopOf="@id/textViewPlc"
         app:layout_constraintStart_toStartOf="@id/spinnerChargePointType"
+        tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/textViewControlPort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="26dp"
+        android:text="@string/controlPort"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@id/editPlc"
+        app:layout_constraintTop_toTopOf="@id/textViewPlc" />
+
+    <EditText
+        android:id="@+id/editControlPort"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:inputType="text"
+        android:background="@drawable/selector_edit_text_required"
+        app:layout_constraintTop_toTopOf="@id/textViewControlPort"
+        app:layout_constraintStart_toEndOf="@id/textViewControlPort"
         tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck" />
 
     <TextView
@@ -168,11 +191,11 @@
         android:text="@string/rfPort"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@id/textViewChargePointType"
-        app:layout_constraintTop_toBottomOf="@id/textViewControlPort" />
+        app:layout_constraintTop_toBottomOf="@id/textViewPlc" />
 
     <EditText
         android:id="@+id/editRfPort"
-        android:layout_width="260dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_edit_text_required"
         android:textSize="18sp"
@@ -186,22 +209,22 @@
         android:id="@+id/textViewCreditCardPort"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
         android:text="@string/creditCardPort"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@id/textViewChargePointType"
-        app:layout_constraintTop_toBottomOf="@id/textViewRfPort" />
+        app:layout_constraintEnd_toEndOf="@id/textViewControlPort"
+        app:layout_constraintTop_toTopOf="@id/textViewRfPort" />
 
     <EditText
         android:id="@+id/editCreditCardPort"
-        android:layout_width="260dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/selector_edit_text_required"
+        android:layout_marginStart="6dp"
         android:textSize="18sp"
         android:textColor="#000"
         android:inputType="text"
+        android:background="@drawable/selector_edit_text_required"
         app:layout_constraintTop_toTopOf="@id/textViewCreditCardPort"
-        app:layout_constraintStart_toStartOf="@id/spinnerChargePointType"
+        app:layout_constraintStart_toEndOf="@id/textViewCreditCardPort"
         tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck" />
 
     <TextView
@@ -230,10 +253,9 @@
         android:id="@+id/textViewSoc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="17dp"
         android:text="@string/soc"
         android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@id/editTestPrice"
+        app:layout_constraintEnd_toEndOf="@id/textViewControlPort"
         app:layout_constraintTop_toTopOf="@id/textViewTestPrice"
         app:layout_constraintBottom_toBottomOf="@id/textViewTestPrice" />
 
@@ -242,7 +264,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_edit_text_required"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="6dp"
         android:textSize="18sp"
         android:textColor="#000"
         android:inputType="text"
@@ -252,24 +274,24 @@
         tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck" />
 
     <TextView
-        android:id="@+id/textViewConnectorPriority"
+        android:id="@+id/textViewDuty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="@string/connectorPriority"
+        android:text="@string/duty"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@id/textViewChargePointType"
         app:layout_constraintTop_toBottomOf="@id/textViewSoc" />
 
     <EditText
-        android:id="@+id/editConnectorPriority"
+        android:id="@+id/editDuty"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_edit_text_required"
         android:textSize="18sp"
         android:textColor="#000"
         android:inputType="text"
-        app:layout_constraintTop_toTopOf="@id/textViewConnectorPriority"
+        app:layout_constraintTop_toTopOf="@id/textViewDuty"
         app:layout_constraintStart_toStartOf="@id/spinnerChargePointType"
         tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck" />
 
@@ -277,11 +299,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:text="[1 또는 2 입력]"
+        android:text="@string/dutyInfo"
         android:textSize="15sp"
         android:textColor="@color/gin_grey"
-        app:layout_constraintTop_toTopOf="@id/editConnectorPriority"
-        app:layout_constraintStart_toEndOf="@id/editConnectorPriority" />
+        app:layout_constraintTop_toTopOf="@id/editDuty"
+        app:layout_constraintStart_toEndOf="@id/editDuty" />
 
     <TextView
         android:id="@+id/textViewChargePointSerialNumber"
@@ -434,10 +456,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:layout_marginEnd="10dp"
         android:text="@string/meterSerialNumber"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@id/editMeterSerialNumber"
+        app:layout_constraintEnd_toEndOf="@id/textViewImsi"
         app:layout_constraintTop_toBottomOf="@id/textViewImsi" />
 
     <EditText
@@ -482,7 +503,7 @@
         android:layout_marginTop="6dp"
         android:text="@string/authMode"
         android:textSize="18sp"
-        app:layout_constraintTop_toTopOf="@id/textViewTestPrice"
+        app:layout_constraintTop_toBottomOf="@id/textViewMeterType"
         app:layout_constraintEnd_toEndOf="@id/textViewMeterType"/>
 
     <Spinner
@@ -518,48 +539,6 @@
         app:layout_constraintStart_toStartOf="@id/editChargePointSerialNumber"/>
 
     <TextView
-        android:id="@+id/textViewStartMode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="@string/startMode"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/textViewOpMode"
-        app:layout_constraintEnd_toEndOf="@id/textViewOpMode"/>
-
-    <Spinner
-        android:id="@+id/spinnerStartMode"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:dropDownWidth="300dp"
-        android:spinnerMode="dropdown"
-        android:theme="@style/SpinnerTheme"
-        android:background="@drawable/spinner_background"
-        app:layout_constraintTop_toTopOf="@id/textViewStartMode"
-        app:layout_constraintStart_toStartOf="@id/spinnerOpMode"/>
-
-    <TextView
-        android:id="@+id/textDR"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="@string/dr"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/textViewConnectorPriority"
-        app:layout_constraintEnd_toEndOf="@id/textViewConnectorPriority" />
-
-    <EditText
-        android:id="@+id/editDR"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/selector_edit_text_required"
-        android:textSize="18sp"
-        android:textColor="#000"
-        android:inputType="text"
-        app:layout_constraintTop_toTopOf="@id/textDR"
-        app:layout_constraintStart_toStartOf="@id/editConnectorPriority" />
-
-    <TextView
         android:id="@+id/textViewControlMonitor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -578,8 +557,8 @@
         android:checked="true"
         android:scaleX="1.3"
         android:scaleY="1.3"
-        app:layout_constraintTop_toBottomOf="@id/editDR"
-        app:layout_constraintStart_toStartOf="@id/editDR" />
+        app:layout_constraintTop_toBottomOf="@id/editDuty"
+        app:layout_constraintStart_toStartOf="@id/editDuty" />
 
     <TextView
         android:id="@+id/textViewInitInfo"

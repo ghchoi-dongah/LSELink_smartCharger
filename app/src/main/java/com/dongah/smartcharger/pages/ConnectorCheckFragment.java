@@ -139,9 +139,9 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
         fadeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
         activity = ((MainActivity) MainActivity.mContext);
-        classUiProcess = activity.getClassUiProcess(mChannel);
+        classUiProcess = activity.getClassUiProcess();
         chargerConfiguration = activity.getChargerConfiguration();
-        chargingCurrentData = activity.getChargingCurrentData(mChannel);
+        chargingCurrentData = activity.getChargingCurrentData();
         fragmentChange = activity.getFragmentChange();
         return view;
     }
@@ -152,10 +152,10 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
         super.onViewCreated(view, savedInstanceState);
         try {
             sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
-            requestStrings[0] = String.valueOf(mChannel);
+            requestStrings[0] = String.valueOf(0);
             sharedModel.setMutableLiveData(requestStrings);
-            rxData = activity.getControlBoard().getRxData(mChannel);
-            txData = activity.getControlBoard().getTxData(mChannel);
+            rxData = activity.getControlBoard().getRxData();
+            txData = activity.getControlBoard().getTxData();
             cnt = 0;
             isFlag = false;
             isFlagAuthorize = true;
@@ -172,14 +172,12 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
                             cnt++;
                             if (cnt >= GlobalVariables.getConnectionTimeOut()) {
                                 // 충전기 종료
-                                txData.setStart(false);
-                                txData.setStop(true);
                                 countHandler.removeCallbacks(countRunnable);
 
                                 // preparing
                                 if (Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Preparing) &&
                                         Objects.equals(chargerConfiguration.getOpMode(), 1) &&
-                                        !((MainActivity) MainActivity.mContext).getControlBoard().getRxData(mChannel).isCsPilot()) {
+                                        !((MainActivity) MainActivity.mContext).getControlBoard().getRxData().isCsPilot()) {
                                     chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
                                     chargingCurrentData.setChargePointErrorCode(ChargePointErrorCode.NoError);
 
@@ -190,7 +188,7 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
 
                                 // 통신 실패
                                 classUiProcess.setUiSeq(UiSeq.CONNECTION_FAILED);
-                                fragmentChange.onFragmentChange(mChannel, UiSeq.CONNECTION_FAILED, "CONNECTION_FAILED", null);
+                                fragmentChange.onFragmentChange(UiSeq.CONNECTION_FAILED, "CONNECTION_FAILED", null);
                             } else {
                                 countHandler.postDelayed(countRunnable, 1000);
                             }
@@ -235,7 +233,8 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
         UiSeq uiSeq = classUiProcess.getUiSeq();
         SocketReceiveMessage socketReceiveMessage = ((MainActivity) MainActivity.mContext).getSocketReceiveMessage();
 
-        String evccId = BitUtilities.toHexString(rxData.getCsmVehicleEvccId());
+//        String evccId = BitUtilities.toHexString(rxData.getCsmVehicleEvccId());
+        String evccId = "000000000000";
         Log.d("ConnectorCheckFragment", "mac address : " + evccId);
         chargingCurrentData.setIdTag(evccId);
 //        chargingCurrentData.setIdTag("1364747EE708"); // failed
@@ -254,10 +253,10 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
                 if (Objects.equals(chargingCurrentData.getParentIdTag(), idTagInfo[1]) ||
                         Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                     classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel, UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                 } else  {
                     classUiProcess.setUiSeq(UiSeq.CHARGING);
-                    fragmentChange.onFragmentChange(mChannel, UiSeq.CHARGING, "CHARGING", null);
+                    fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                 }
             } else {
                 if (!Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Preparing) &&
@@ -275,9 +274,9 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
                     authorizeReq.sendAuthorize(chargingCurrentData.getIdTag());
                 } else {
                     // 인증 실패
-                    ((MainActivity) MainActivity.mContext).getChargingCurrentData(mChannel).setAuthorizeResult(false);
+                    ((MainActivity) MainActivity.mContext).getChargingCurrentData().setAuthorizeResult(false);
                     authorizedFailed();
-                    RxData rxData = ((MainActivity) MainActivity.mContext).getControlBoard().getRxData(mChannel);
+                    RxData rxData = ((MainActivity) MainActivity.mContext).getControlBoard().getRxData();
                     if (!rxData.isCsPilot() && Objects.equals(chargerConfiguration.getOpMode(), 1)) {
                         chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
                         StatusNotificationReq statusNotificationReq = new StatusNotificationReq(chargingCurrentData.getConnectorId());
@@ -290,7 +289,7 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
             SocketState state = socketReceiveMessage.getSocket().getState();
             if (state == SocketState.OPEN) {
                 if (Objects.equals(UiSeq.CHARGING, uiSeq) && Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
-                    fragmentChange.onFragmentChange(mChannel, UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                    fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                 } else {
                     if (chargingCurrentData.getChargePointStatus() == ChargePointStatus.Reserved) {
                         if (!Objects.equals(chargingCurrentData.getResIdTag(), chargingCurrentData.getIdTag())) {
@@ -311,10 +310,10 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
                         if (Objects.equals(chargingCurrentData.getParentIdTag(), idTagInfo[1]) ||
                                 Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                             classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-                            fragmentChange.onFragmentChange(mChannel, UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                            fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                         } else {
                             classUiProcess.setUiSeq(UiSeq.CHARGING);
-                            fragmentChange.onFragmentChange(mChannel, UiSeq.CHARGING, "CHARGING", null);
+                            fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                         }
                     } else {
                         // isAllowOfflineTxForUnknownId: 오프라인에서 미등록 IdTag도 거래 허용
@@ -342,7 +341,7 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
                     Toast.makeText(getActivity(), "서버와 통신 DISCONNECT!!! 인증 실패. ", Toast.LENGTH_SHORT).show();
                     if (Objects.equals(UiSeq.CHARGING, uiSeq)) {
                         classUiProcess.setUiSeq(UiSeq.CHARGING);
-                        fragmentChange.onFragmentChange(mChannel,UiSeq.CHARGING, "CHARGING", null);
+                        fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                     } else {
                         authorizedFailed();
                     }
@@ -354,14 +353,12 @@ public class ConnectorCheckFragment extends Fragment implements View.OnClickList
     private void authorizedFailed() {
         try {
             // charging stop
-            activity.getControlBoard().getTxData(mChannel).setStop(true);
-            activity.getControlBoard().getTxData(mChannel).setStart(false);
-            activity.getControlBoard().getTxData(mChannel).setUiSequence((short) 3);
+            activity.getControlBoard().getTxData().setUiSequence((short) 3);
 
             // member check failed fragment
             countHandler.removeCallbacks(countRunnable);
             classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-            fragmentChange.onFragmentChange(mChannel, UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+            fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
         } catch (Exception e) {
             logger.error("ConnectorCheckFragment authorizedFailed error : {}", e.getMessage());
         }

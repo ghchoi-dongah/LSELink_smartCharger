@@ -145,7 +145,7 @@ public class ClassUiProcess implements RfCardReaderListener {
         try {
             RxData rxData = controlBoard.getRxData();
             TxData txData = controlBoard.getTxData();
-            check = rxData.isCsFault();
+            if (rxData == null || txData == null) return;
 
             // 현재 전력량 값
             chargingCurrentData.setIntegratedPower(rxData.getActiveEnergy());
@@ -407,12 +407,12 @@ public class ClassUiProcess implements RfCardReaderListener {
         if (b) {
             try {
                 if (Objects.equals(cardNum,"0000000000000000")) {
-                    rfCardReaderReceive.rfCardReadRequest(ch);
+                    rfCardReaderReceive.rfCardReadRequest();
                 } else if (!cardNum.isEmpty()) {
                     MainActivity activity = ((MainActivity) MainActivity.mContext);
                     ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
-                    chargingCurrentData.setAuthType("C");
+                    chargingCurrentData.setAuthType("M");
                     chargingCurrentData.setIdTag(cardNum);
 
                     activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CHECK_WAIT);

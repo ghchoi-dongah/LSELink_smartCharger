@@ -75,8 +75,8 @@ public class MonitorHttpServer extends Thread {
         Map<String, Object>[] channels = new Map[maxCh];
         for (int i = 0; i < maxCh; i++) {
             Map<String, Object> chData = new HashMap<>();
-            chData.put("rx", activity.getControlBoard().getRxData(i));
-            chData.put("tx", activity.getControlBoard().getTxData(i));
+            chData.put("rx", activity.getControlBoard().getRxData());
+            chData.put("tx", activity.getControlBoard().getTxData());
             channels[i] = chData;
         }
         data.put("channels", channels);

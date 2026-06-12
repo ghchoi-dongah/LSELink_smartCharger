@@ -54,17 +54,17 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
 
     ChargerConfiguration chargerConfiguration;
     InputMethodManager imm;
-    Spinner spinnerChargePointType, spinnerChargePointModel, spinnerAuthMode, spinnerOpMode, spinnerStartMode;
-    int spPosition = 0, spChargerPointModelCode = 0, spAuthMode = 0, spOpMode = 0, spStartMode = 0;
+    Spinner spinnerChargePointType, spinnerChargePointModel, spinnerAuthMode, spinnerOpMode;
+    int spPosition = 0, spChargerPointModelCode = 0, spAuthMode = 0, spOpMode = 0;
     EditText editChargeBoxSerialNumber, editChargerId;
-    EditText editServerUrl, editServerPort, editControlPort, editRfPort, editCreditCardPort;
-    EditText editTestPrice, editConnectorPriority;
+    EditText editServerUrl, editServerPort, editControlPort, editRfPort, editCreditCardPort, editPlc;
+    EditText editTestPrice;
     EditText editChargePointSerialNumber, editChargePointVendor;
     EditText editMid;
     EditText editFirmwareVersion;
     EditText editIccid, editImsi;
     EditText editMeterSerialNumber, editMeterType;
-    EditText editSoc, editDR;
+    EditText editSoc, editDuty;
     Button btnExit, btnSave, btnRebooting, btnKeyboardControl;
     CheckBox checkboxControlMonitor, checkboxInitInfo;
 
@@ -194,29 +194,10 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
                 }
             });
 
-            // startMode
-            spinnerStartMode = view.findViewById(R.id.spinnerStartMode);
-            ArrayAdapter<CharSequence> startAdapter = ArrayAdapter.createFromResource(MainActivity.mContext, R.array.startMode, R.layout.spinner_item);
-            startAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerStartMode.setAdapter(startAdapter);
-            spinnerStartMode.setSelection(chargerConfiguration.getStartMode());
-            spinnerStartMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    spStartMode = position;
-                    chargerConfiguration.setStartMode(spStartMode);
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
             InitializationComponents(view);
 
         } catch (Exception e) {
-            logger.error("ConfigSettingFragment onCreateView error : {}", e.getMessage());
+            logger.error("onCreateView error : {}", e.getMessage());
         }
         return view;
     }
@@ -230,7 +211,7 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
                 transaction.replace(R.id.frameFull, environmentFragment);
                 transaction.commit();
             } catch (Exception e) {
-                logger.error("ConfigSettingFragment fragment change fail : {}", e.getMessage());
+                logger.error("fragment change fail : {}", e.getMessage());
             }
         } else if (Objects.equals(v.getId(), R.id.btnSave)) {
             // 필수값 확인
@@ -254,6 +235,12 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
                 editServerPort.requestFocus();
                 Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.serverPort)), Toast.LENGTH_SHORT).show();
                 return;
+            } else if (TextUtils.isEmpty(editPlc.getText().toString())) {
+                editPlc.setFocusableInTouchMode(true);
+                editPlc.requestFocus();
+                Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.plc)), Toast.LENGTH_SHORT).show();
+                return;
+
             } else if (TextUtils.isEmpty(editControlPort.getText().toString())) {
                 editControlPort.setFocusableInTouchMode(true);
                 editControlPort.requestFocus();
@@ -274,11 +261,6 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
                 editTestPrice.setFocusableInTouchMode(true);
                 editTestPrice.requestFocus();
                 Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.testPrice)), Toast.LENGTH_SHORT).show();
-                return;
-            } else if (TextUtils.isEmpty(editConnectorPriority.getText().toString())) {
-                editConnectorPriority.setFocusableInTouchMode(true);
-                editConnectorPriority.requestFocus();
-                Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.connectorPriority)), Toast.LENGTH_SHORT).show();
                 return;
             } else if (TextUtils.isEmpty(editChargePointSerialNumber.getText().toString())) {
                 editChargePointSerialNumber.setFocusableInTouchMode(true);
@@ -305,10 +287,10 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
                 editSoc.requestFocus();
                 Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.soc)), Toast.LENGTH_SHORT).show();
                 return;
-            } else if (TextUtils.isEmpty(editDR.getText().toString())) {
-                editDR.setFocusableInTouchMode(true);
-                editDR.requestFocus();
-                Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.dr)), Toast.LENGTH_SHORT).show();
+            } else if (TextUtils.isEmpty(editDuty.getText().toString())) {
+                editDuty.setFocusableInTouchMode(true);
+                editDuty.requestFocus();
+                Toast.makeText(requireContext(), getString(R.string.configRequired, getString(R.string.duty)), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -322,15 +304,13 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
 
                             try {
                                 if (Objects.equals(chargerConfiguration.getOpMode(), 0)) {
-                                    for (int j = 0; j < GlobalVariables.maxChannel; j++) {
-                                        // 전류 제한 설정
-                                        ((MainActivity) MainActivity.mContext).getControlBoard().getTxData(j).setOutPowerLimit((short) Integer.parseInt(editDR.getText().toString()));
+                                    // 전류 제한 설정
+//                                        ((MainActivity) MainActivity.mContext).getControlBoard().getTxData().setOutPowerLimit((short) Integer.parseInt(editDR.getText().toString()));
 
-                                        // SoC 제한 설정
-                                        String socText = editSoc.getText().toString().trim();
-                                        if (!socText.isEmpty()) {
-                                            ((MainActivity) MainActivity.mContext).getChargingCurrentData(j).setLimitSoc(Integer.parseInt(socText));
-                                        }
+                                    // SoC 제한 설정
+                                    String socText = editSoc.getText().toString().trim();
+                                    if (!socText.isEmpty()) {
+                                        ((MainActivity) MainActivity.mContext).getChargingCurrentData().setLimitSoc(Integer.parseInt(socText));
                                     }
                                 }
                             } catch (Exception e) {
@@ -373,7 +353,6 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             spChargerPointModelCode = chargerConfiguration.getChargerPointModelCode();
             spAuthMode = chargerConfiguration.getAuthMode();
             spOpMode = chargerConfiguration.getOpMode();
-            spStartMode = chargerConfiguration.getStartMode();
 
             editChargeBoxSerialNumber = v.findViewById(R.id.editChargeBoxSerialNumber);
             editChargeBoxSerialNumber.setText(chargerConfiguration.getChargeBoxSerialNumber());
@@ -385,6 +364,8 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             editServerPort = v.findViewById(R.id.editServerPort);
             editServerPort.setText(String.valueOf(chargerConfiguration.getServerPort()));
 
+            editPlc = v.findViewById(R.id.editPlc);
+            editPlc.setText(chargerConfiguration.getPlcCom());
             editControlPort = v.findViewById(R.id.editControlPort);
             editControlPort.setText(chargerConfiguration.getControlCom());
             editRfPort = v.findViewById(R.id.editRfPort);
@@ -394,8 +375,6 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
 
             editTestPrice = v.findViewById(R.id.editTestPrice);
             editTestPrice.setText(chargerConfiguration.getTestPrice());
-            editConnectorPriority = v.findViewById(R.id.editConnectorPriority);
-            editConnectorPriority.setText(String.valueOf(chargerConfiguration.getConnectorPriority()));
 
             editChargePointSerialNumber = v.findViewById(R.id.editChargePointSerialNumber);
             editChargePointSerialNumber.setText(chargerConfiguration.getChargePointSerialNumber());
@@ -415,14 +394,14 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             editMeterType.setText(chargerConfiguration.getMeterType());
             editSoc = v.findViewById(R.id.editSoc);
             editSoc.setText(String.valueOf(chargerConfiguration.getTargetSoc()));
-            editDR = v.findViewById(R.id.editDR);
-            editDR.setText(String.valueOf(chargerConfiguration.getDr()));
+            editDuty = v.findViewById(R.id.editDuty);
+            editDuty.setText(String.valueOf(chargerConfiguration.getDr()));
             checkboxControlMonitor = v.findViewById(R.id.checkboxControlMonitor);
             checkboxControlMonitor.setChecked(chargerConfiguration.isControlMonitor());
             checkboxInitInfo = v.findViewById(R.id.checkboxInitInfo);
             checkboxInitInfo.setChecked(chargerConfiguration.isInitInfo());
         } catch (Exception e) {
-            logger.error("ConfigSettingFragment InitializationComponents error : {}",  e.getMessage());
+            logger.error("InitializationComponents error : {}",  e.getMessage());
         }
     }
 
@@ -432,7 +411,7 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             chargerConfiguration.onSaveConfiguration();
             chargerConfiguration.onLoadConfiguration();
         } catch (Exception e) {
-            logger.error("ConfigSettingFragment onSaveConfiguration error : {}",  e.getMessage());
+            logger.error("onSaveConfiguration error : {}",  e.getMessage());
         }
     }
 
@@ -442,18 +421,18 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             chargerConfiguration.setChargerPointModelCode(spChargerPointModelCode);
             chargerConfiguration.setAuthMode(spAuthMode);
             chargerConfiguration.setOpMode(spOpMode);
-            chargerConfiguration.setStartMode(spStartMode);
 
             chargerConfiguration.setChargeBoxSerialNumber(editChargeBoxSerialNumber.getText().toString());
             chargerConfiguration.setChargerId(editChargerId.getText().toString());
             chargerConfiguration.setServerConnectingString(editServerUrl.getText().toString());
             chargerConfiguration.setServerPort(Integer.parseInt(editServerPort.getText().toString()));
+            chargerConfiguration.setPlcCom(editPlc.getText().toString());
             chargerConfiguration.setControlCom(editControlPort.getText().toString());
             chargerConfiguration.setRfCom(editRfPort.getText().toString());
             chargerConfiguration.setCreditCom(editCreditCardPort.getText().toString());
 
             chargerConfiguration.setTestPrice(editTestPrice.getText().toString());
-            chargerConfiguration.setConnectorPriority(Integer.parseInt(editConnectorPriority.getText().toString()));
+            chargerConfiguration.setDuty(Integer.parseInt(editDuty.getText().toString()));
 
             chargerConfiguration.setChargePointSerialNumber(editChargePointSerialNumber.getText().toString());
             chargerConfiguration.setChargePointVendor(editChargePointVendor.getText().toString());
@@ -464,12 +443,11 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             chargerConfiguration.setMeterSerialNumber(editMeterSerialNumber.getText().toString());
             chargerConfiguration.setMeterType(editMeterType.getText().toString());
             chargerConfiguration.setTargetSoc(Integer.parseInt(editSoc.getText().toString()));
-            chargerConfiguration.setDr(Integer.parseInt(editDR.getText().toString()));
 
             chargerConfiguration.setControlMonitor(checkboxControlMonitor.isChecked());
             chargerConfiguration.setInitInfo(checkboxInitInfo.isChecked());
         } catch (Exception e) {
-            logger.error("ConfigSettingFragment onConfigurationUpdate error : {}",  e.getMessage());
+            logger.error("onConfigurationUpdate error : {}",  e.getMessage());
         }
     }
 

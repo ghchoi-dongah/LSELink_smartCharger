@@ -29,12 +29,10 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     Button btnConfig, btnWebSocket, btnControl, btnDbControl, btnMember, btnUi, btnSystemExit, btnRemoteTest;
 
@@ -66,7 +64,6 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -97,42 +94,38 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         int getId = v.getId();
         if (Objects.equals(getId, R.id.btnConfig)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel, UiSeq.CONFIG_SETTING, "CONFIG_SETTING", null);
+            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CONFIG_SETTING, "CONFIG_SETTING", null);
         } else if (Objects.equals(getId, R.id.btnWebSocket)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel,UiSeq.WEB_SOCKET, "WEB_SOCKET", null);
+            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.WEB_SOCKET, "WEB_SOCKET", null);
         } else if (Objects.equals(getId, R.id.btnControl)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel,UiSeq.CONTROL_BOARD_DEBUGGING, "CONTROL_BOARD_DEBUGGING", null);
+            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CONTROL_BOARD_DEBUGGING, "CONTROL_BOARD_DEBUGGING", null);
         } else if (Objects.equals(getId, R.id.btnDbControl)) {
             // TODO: database control fragment change
         } else if (Objects.equals(getId, R.id.btnMember)) {
             // TODO: insert member
         } else if (Objects.equals(getId, R.id.btnUi)) {
-            UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess(mChannel).getUiSeq();
+            UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
             switch (uiSeq) {
                 case CHARGING:
-                    ((MainActivity) MainActivity.mContext).getClassUiProcess(mChannel).setUiSeq(UiSeq.CHARGING);
-                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel,UiSeq.CHARGING, "CHARGING", null);
+                    ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.CHARGING);
+                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                     break;
                 case FAULT:
-                    ((MainActivity) MainActivity.mContext).getClassUiProcess(mChannel).setUiSeq(UiSeq.FAULT);
-                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel,UiSeq.FAULT, "FAULT", null);
+                    ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.FAULT);
+                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.FAULT, "FAULT", null);
                     break;
                 default:
                     MainActivity activity = (MainActivity) MainActivity.mContext;
-                    for (int ch = 0; ch < GlobalVariables.maxChannel; ch++) {
-                        activity.getClassUiProcess(ch).setUiSeq(UiSeq.INIT);
-                        ((MainActivity) MainActivity.mContext).getClassUiProcess(ch).onHome();
-                    }
+                    activity.getClassUiProcess().setUiSeq(UiSeq.INIT);
+                    ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
                     break;
             }
         } else if (Objects.equals(getId, R.id.btnSystemExit)) {
             ActivityCompat.finishAffinity((MainActivity) MainActivity.mContext);
             System.exit(0);
         } else if (Objects.equals(getId, R.id.btnRemoteTest)) {
-            for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                ((MainActivity) MainActivity.mContext).getClassUiProcess(i).setUiSeq(UiSeq.REMOTE_TEST);
-            }
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel,UiSeq.REMOTE_TEST, "REMOTE_TEST", null);
+            ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.REMOTE_TEST);
+            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.REMOTE_TEST, "REMOTE_TEST", null);
         }
     }
 }

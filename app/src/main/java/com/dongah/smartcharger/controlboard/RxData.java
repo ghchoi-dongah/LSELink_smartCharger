@@ -21,7 +21,7 @@ public class RxData {
     //405
     public boolean csEmergency = false; // 1: 비상버튼 눌림, 0: 정상
     //406
-    public boolean csMcStatus = false;  // 0: open, a: close
+    public boolean csMcStatus = false;  // 0: open, 1: close
     //407
     public short csSequenceStatus = 0;  // 0: 대기, 1: 충전 중, 2: 종료
     public short reserve0 = 0;

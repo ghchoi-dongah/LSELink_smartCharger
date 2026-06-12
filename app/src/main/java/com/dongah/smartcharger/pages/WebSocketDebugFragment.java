@@ -27,12 +27,10 @@ public class WebSocketDebugFragment extends Fragment implements View.OnClickList
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     Button btnWebClose, btnWebClear;
     TextView textViewDebugMessage;
@@ -65,7 +63,6 @@ public class WebSocketDebugFragment extends Fragment implements View.OnClickList
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -85,7 +82,7 @@ public class WebSocketDebugFragment extends Fragment implements View.OnClickList
     public void onClick(View v) {
         int getId = v.getId();
         if (Objects.equals(getId, R.id.btnWebClose)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(mChannel, UiSeq.ENVIRONMENT, "ENVIRONMENT", null);
+            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.ENVIRONMENT, "ENVIRONMENT", null);
         } else if (Objects.equals(getId, R.id.btnWebClear)) {
             textViewDebugMessage.setText(null);
         }

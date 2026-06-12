@@ -210,7 +210,7 @@ public class Socket extends WebSocketListener {
                         .hostnameVerifier((hostname, session) -> true)
                         .connectionSpecs(Collections.singletonList(tlsSpec))
                         .protocols(Collections.singletonList(Protocol.HTTP_1_1))                //2025.12.09 add
-                        .pingInterval(15, TimeUnit.SECONDS)
+                        .pingInterval(30, TimeUnit.SECONDS)
                         .readTimeout(30, TimeUnit.SECONDS)
                         .connectTimeout(30, TimeUnit.SECONDS)
                         .addInterceptor(new SSLHandshakeInterceptor())
@@ -218,7 +218,7 @@ public class Socket extends WebSocketListener {
                         .build();
             } else {
                 client = new OkHttpClient.Builder()
-                        .pingInterval(15, TimeUnit.SECONDS)
+                        .pingInterval(30, TimeUnit.SECONDS)
                         .readTimeout(30, TimeUnit.SECONDS)
                         .retryOnConnectionFailure(true)
                         .connectTimeout(30, TimeUnit.SECONDS)
@@ -289,15 +289,16 @@ public class Socket extends WebSocketListener {
     }
 
     private void reconnect() {
-        if (reconnectingAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            logger.error("Reconnect max attempts reached");
-            reconnectingAttempts = 0;
-            return;
-        }
         setState(SocketState.RECONNECT_ATTEMPT);
 
-        long delay = BASE_RECONNECT_DELAY_MS * (reconnectingAttempts + 1);
-        delay = Math.min(5000, 30000); // 최대 30초
+        long delay;
+        if (reconnectingAttempts >= MAX_RECONNECT_ATTEMPTS) {
+            logger.warn("Reconnect max attempts reached, retrying every 30s");
+            delay = 30000;
+        } else {
+            delay = BASE_RECONNECT_DELAY_MS * (reconnectingAttempts + 1);
+            delay = Math.min(delay, 30000); // 최대 30초
+        }
 
         reconnectHandler.removeCallbacks(reconnectRunnable);
         reconnectHandler.postDelayed(reconnectRunnable, delay);

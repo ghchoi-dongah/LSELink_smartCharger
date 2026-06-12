@@ -57,12 +57,10 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String CHANNEL = "CHANNEL";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private int mChannel;
 
     int TIME_MAX = 20;
     int cnt = 0;
@@ -112,7 +110,6 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            mChannel = getArguments().getInt(CHANNEL);
         }
     }
 
@@ -138,9 +135,9 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
         fadeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
         activity = ((MainActivity) MainActivity.mContext);
-        classUiProcess = activity.getClassUiProcess(mChannel);
+        classUiProcess = activity.getClassUiProcess();
         chargerConfiguration = activity.getChargerConfiguration();
-        chargingCurrentData = activity.getChargingCurrentData(mChannel);
+        chargingCurrentData = activity.getChargingCurrentData();
         fragmentChange = activity.getFragmentChange();
         return view;
     }
@@ -150,7 +147,7 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            rxData = activity.getControlBoard().getRxData(mChannel);
+            rxData = activity.getControlBoard().getRxData();
             isFlag = false;
             animationDrawable.start();
             mediaPlayer();   // media player
@@ -169,7 +166,7 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
 
                                     // 회원 인증 실패
                                     classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-                                    fragmentChange.onFragmentChange(mChannel, UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                                    fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
                                 } else {
                                     countHandler.postDelayed(countRunnable, 1000);
                                 }
@@ -196,10 +193,10 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
                     if (Objects.equals(chargingCurrentData.getParentIdTag(), idTagInfo[1]) ||
                             Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                         classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-                        activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                        activity.getFragmentChange().onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                     } else  {
                         classUiProcess.setUiSeq(UiSeq.CHARGING);
-                        activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.CHARGING, "CHARGING", null);
+                        activity.getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                     }
                 } else {
                     if (!Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Preparing) &&
@@ -212,17 +209,17 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
                     if (Objects.equals(idTagInfo[0], chargingCurrentData.getIdTag())) {
                         chargingCurrentData.setAuthorizeResult(true);
                         chargingCurrentData.setParentIdTag(idTagInfo[1]);
-                        activity.getClassUiProcess(mChannel).setUiSeq(UiSeq.PLUG_CHECK);
-                        activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
+                        activity.getClassUiProcess().setUiSeq(UiSeq.PLUG_CHECK);
+                        activity.getFragmentChange().onFragmentChange(UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
                     } else if (Objects.equals(idTagInfo[0], "notFound")) {
                         AuthorizeReq authorizeReq = new AuthorizeReq(chargingCurrentData.getConnectorId());
                         authorizeReq.sendAuthorize(chargingCurrentData.getIdTag());
                     } else {
                         // 인증 실패
-                        activity.getChargingCurrentData(mChannel).setAuthorizeResult(false);
+                        activity.getChargingCurrentData().setAuthorizeResult(false);
                         classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-                        fragmentChange.onFragmentChange(mChannel, UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
-                        RxData rxData = activity.getControlBoard().getRxData(mChannel);
+                        fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                        RxData rxData = activity.getControlBoard().getRxData();
                         if (!rxData.isCsPilot() && Objects.equals(chargerConfiguration.getOpMode(), 1)) {
                             chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
                             StatusNotificationReq statusNotificationReq = new StatusNotificationReq(chargingCurrentData.getConnectorId());
@@ -235,7 +232,7 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
                 SocketState state = socketReceiveMessage.getSocket().getState();
                 if (state == SocketState.OPEN) {
                     if (Objects.equals(UiSeq.CHARGING, uiSeq) && Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
-                        activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                        activity.getFragmentChange().onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                     } else {
                         if (chargingCurrentData.getChargePointStatus() == ChargePointStatus.Reserved) {
                             if (!Objects.equals(chargingCurrentData.getResIdTag(), chargingCurrentData.getIdTag())) {
@@ -256,10 +253,10 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
                             if (Objects.equals(chargingCurrentData.getParentIdTag(), idTagInfo[1]) ||
                                     Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                                 classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-                                activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                                activity.getFragmentChange().onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                             } else {
                                 classUiProcess.setUiSeq(UiSeq.CHARGING);
-                                activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.CHARGING, "CHARGING", null);
+                                activity.getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                             }
                         } else {
                             // isAllowOfflineTxForUnknownId: 오프라인에서 미등록 IdTag도 거래 허용
@@ -278,22 +275,22 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
                                 // isStopTransactionOnInvalidId: 미등록 IdTag로 시작했으면 나중에 중단 사유 세팅
                                 chargingCurrentData.setStopReason(!Objects.equals(idTagInfo[0], chargingCurrentData.getIdTag()) &&
                                         GlobalVariables.isStopTransactionOnInvalidId() ? Reason.DeAuthorized : chargingCurrentData.getStopReason());
-                                activity.getClassUiProcess(mChannel).setUiSeq(UiSeq.PLUG_CHECK);
-                                activity.getFragmentChange().onFragmentChange(mChannel, UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
+                                activity.getClassUiProcess().setUiSeq(UiSeq.PLUG_CHECK);
+                                activity.getFragmentChange().onFragmentChange(UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
                             } else {
                                 // 인증 실패
                                 classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-                                fragmentChange.onFragmentChange(mChannel, UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                                fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
                             }
                         }
                     } else {
                         Toast.makeText(getActivity(), "서버와 통신 DISCONNECT!!! 인증 실패. ", Toast.LENGTH_SHORT).show();
                         if (Objects.equals(UiSeq.CHARGING, uiSeq)) {
-                            activity.getClassUiProcess(mChannel).setUiSeq(UiSeq.CHARGING);
-                            activity.getFragmentChange().onFragmentChange(mChannel,UiSeq.CHARGING, "CHARGING", null);
+                            activity.getClassUiProcess().setUiSeq(UiSeq.CHARGING);
+                            activity.getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                         } else {
                             classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-                            fragmentChange.onFragmentChange(mChannel, UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                            fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
                         }
                     }
                 }

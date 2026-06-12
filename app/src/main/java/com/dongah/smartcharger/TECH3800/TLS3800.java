@@ -149,7 +149,7 @@ public class TLS3800 extends TLS3800Reader implements Runnable {
                     break;
                 case CMD_TX_PAY:
 //                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getClassUiProcess(getCh()).getChargingCurrentData();
-                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(getCh());
+                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
                     PacketPay packetPay = new PacketPay();
                     packetPay.setTerminalID(convertDataType.padRightChar(chargerConfiguration.getMID(), 16, (char) 0x00));
                     packetPay.setDateTime((sdf.format(new Date())).toCharArray());
@@ -165,7 +165,7 @@ public class TLS3800 extends TLS3800Reader implements Runnable {
                     outputStream.write(packetPay.onPayDataSet());
                     break;
                 case CMD_TX_PAYCANCEL:
-                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(getCh());
+                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
                     PacketPayCancel packetPayCancel = new PacketPayCancel(cancelType);
                     packetPayCancel.setSTX(STX);
                     packetPayCancel.setTerminalID(convertDataType.padRightChar(chargerConfiguration.getMID(), 16, (char) 0x00));
@@ -200,7 +200,7 @@ public class TLS3800 extends TLS3800Reader implements Runnable {
                     outputStream.write(packetPayCancel.onPayCancelDataSet());
                     break;
                 case CMD_TX_PAY_G:
-                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(getCh());
+                    chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
                     PacketPayG packetPayG = new PacketPayG();
                     packetPayG.setSTX((byte) 0x02);
                     packetPayG.setTerminalID(convertDataType.padRightChar(chargerConfiguration.getMID(), 16, (char) 0x00));
@@ -388,7 +388,7 @@ public class TLS3800 extends TLS3800Reader implements Runnable {
                             break;
                         case CMD_RX_PAY_G:
                             // 부가 정보가 있는 결제로 실행 
-                            chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData(getCh());
+                            chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
                             //data parsing
                             System.arraycopy(buffer, 35, byteResult, 0, dataLength);
                             // 거래 구분 코드

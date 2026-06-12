@@ -28,7 +28,6 @@ public class RfCardReaderReceive extends RfCardReader implements Runnable {
     private boolean isOpen = false;
     private boolean endFlag = false;
     private byte[] src_data = new byte[8];
-    int ch;
 
     public RfCardReaderReceive(String deviceComportName) {
         try {
@@ -44,8 +43,7 @@ public class RfCardReaderReceive extends RfCardReader implements Runnable {
     }
 
     @Override
-    public void rfCardReadRequest(int ch) {
-        setCh(ch);
+    public void rfCardReadRequest() {
         send(RfMode.RF_CARD_CONTINUE_TMONEY);
     }
 
@@ -187,13 +185,5 @@ public class RfCardReaderReceive extends RfCardReader implements Runnable {
         SIO_TX_Buff[10] = (byte)(crc & 0xff);
         //ETX
         SIO_TX_Buff[11] = 0x03;
-    }
-
-    public int getCh() {
-        return ch;
-    }
-
-    public void setCh(int ch) {
-        this.ch = ch;
     }
 }
