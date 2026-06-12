@@ -36,6 +36,7 @@
         android:id="@+id/textViewChargerId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
         android:text="| ID-DA000101"
         android:textColor="@color/black"
         android:textSize="28sp"

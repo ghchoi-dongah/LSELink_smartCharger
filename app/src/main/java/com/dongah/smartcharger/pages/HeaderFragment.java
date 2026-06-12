@@ -3,7 +3,11 @@ package com.dongah.smartcharger.pages;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -17,6 +21,7 @@ import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.UiSeq;
+import com.dongah.smartcharger.utils.SharedModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +48,10 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     int clickedCnt = 0;
-    ImageButton btnLogo;
+    ImageButton btnHome, btnLogo;
     TextView textViewChargerId;
     ChargerConfiguration chargerConfiguration;
+    SharedModel sharedModel;
 
     public HeaderFragment() {
         // Required empty public constructor
@@ -83,6 +89,8 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_header, container, false);
+        btnHome = view.findViewById(R.id.btnHome);
+        btnHome.setOnClickListener(this);
         btnLogo = view.findViewById(R.id.btnLogo);
         btnLogo.setOnClickListener(this);
         textViewChargerId = view.findViewById(R.id.textViewChargerId);
@@ -91,9 +99,41 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
             chargerConfiguration = ((MainActivity) MainActivity.mContext).getChargerConfiguration();
             textViewChargerId.setText("| ID-" + chargerConfiguration.getChargerId());
         } catch (Exception e) {
-            logger.error("HeaderFragment onCreateView error : {}", e.getMessage());
+            logger.error("onCreateView error : {}", e.getMessage());
         }
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        try {
+            sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
+            sharedModel.getLiveData().observe(getViewLifecycleOwner(), new Observer<String[]>() {
+                @Override
+                public void onChanged(String[] strings) {
+                    UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
+                    switch (uiSeq) {
+                        case INIT:
+                        case MEMBER_CARD:
+                        case MEMBER_CHECK_WAIT:
+                        case CREDIT_CARD_WAIT:
+                        case CHARGING:
+                        case PLUG_CHECK:
+                        case CONNECT_CHECK:
+                        case FAULT:
+                        case REBOOTING:
+                            btnHome.setVisibility(View.INVISIBLE);
+                            break;
+                        default:
+                            btnHome.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            logger.error("onViewCreated error : {}", e.getMessage(), e);
+        }
     }
 
     @Override
@@ -124,7 +164,7 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
                     }
                     clickedCnt = 0;
                 } catch (Exception e) {
-                    logger.error("HeaderFragment btnLogo error : {}", e.getMessage());
+                    logger.error("btnLogo error : {}", e.getMessage());
                 }
             }
             clickedCnt++;
