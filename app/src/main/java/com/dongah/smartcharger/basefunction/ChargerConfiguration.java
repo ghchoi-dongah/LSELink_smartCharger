@@ -74,7 +74,7 @@ public class ChargerConfiguration {
 
     /** charging point configuration setting */
     public int chargerPointType = 0;                    // 커플러 타입
-    public String chargerPointModel = "DEVW007";        // 충전기 모델ID
+    public String chargerPointModel = "DEVD240";        // 충전기 모델ID
     public int chargerPointModelCode = 0;
     public String chargeBoxSerialNumber = "";           // 충전소ID
     public String chargerId = "";                       // 충전기ID

@@ -47,6 +47,7 @@ import com.dongah.smartcharger.websocket.socket.SocketReceiveMessage;
 import com.dongah.smartcharger.websocket.socket.SocketState;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.ChangeModeThread;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.ProcessHandler;
+import com.dongah.smartcharger.utils.DatabaseHttpServer;
 import com.dongah.smartcharger.utils.MonitorHttpServer;
 import com.dongah.smartcharger.websocket.tcpsocket.ClientSocket;
 
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     ToastPositionMake toastPositionMake;
     ClientSocket clientSocket;
     MonitorHttpServer monitorHttpServer;
+    DatabaseHttpServer databaseHttpServer;
 
     /** PLC Modem*/
     PlcModem plcModem;
@@ -232,6 +234,10 @@ public class MainActivity extends AppCompatActivity {
             monitorHttpServer = new MonitorHttpServer(8080);
             monitorHttpServer.start();
         }
+
+        // Database Inspector Server
+        databaseHttpServer = new DatabaseHttpServer();
+        databaseHttpServer.start();
 
 
         /**
