@@ -46,10 +46,10 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
     private String mParam1;
     private String mParam2;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
     int clickedCnt = 0;
     ImageButton btnHome, btnLogo;
     TextView textViewChargerId;
+    MainActivity activity;
     ChargerConfiguration chargerConfiguration;
     SharedModel sharedModel;
 
@@ -89,6 +89,7 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_header, container, false);
+        activity = (MainActivity) MainActivity.mContext; 
         btnHome = view.findViewById(R.id.btnHome);
         btnHome.setOnClickListener(this);
         btnLogo = view.findViewById(R.id.btnLogo);
@@ -96,7 +97,7 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
         textViewChargerId = view.findViewById(R.id.textViewChargerId);
 
         try {
-            chargerConfiguration = ((MainActivity) MainActivity.mContext).getChargerConfiguration();
+            chargerConfiguration = activity.getChargerConfiguration();
             textViewChargerId.setText("| ID-" + chargerConfiguration.getChargerId());
         } catch (Exception e) {
             logger.error("onCreateView error : {}", e.getMessage());
@@ -112,7 +113,7 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
             sharedModel.getLiveData().observe(getViewLifecycleOwner(), new Observer<String[]>() {
                 @Override
                 public void onChanged(String[] strings) {
-                    UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
+                    UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
                     switch (uiSeq) {
                         case INIT:
                         case MEMBER_CARD:
@@ -142,7 +143,6 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
             System.out.println("btnLogo click: " + clickedCnt);
             if (clickedCnt > 8) {
                 try {
-                    MainActivity activity = (MainActivity) MainActivity.mContext;
                     if (activity == null) {
                         System.out.println("btnLogo error: MainActivity.mContext is null");
                         return;
@@ -168,6 +168,8 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
                 }
             }
             clickedCnt++;
+        } else if (Objects.equals(v.getId(), R.id.btnHome)) {
+            activity.getClassUiProcess().onHome();
         }
     }
 }
