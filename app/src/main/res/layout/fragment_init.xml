@@ -52,17 +52,6 @@
         app:layout_constraintEnd_toEndOf="@id/imageViewCar" />
 
     <TextView
-        android:id="@+id/textViewMemberUnitInput"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/memChargingUnit"
-        android:textSize="19sp"
-        app:layout_constraintStart_toStartOf="@id/textViewInitMessage"
-        app:layout_constraintTop_toBottomOf="@id/textViewInitMessage"
-        app:layout_constraintEnd_toEndOf="@id/textViewInitMessage"/>
-
-    <TextView
         android:id="@+id/textViewInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
