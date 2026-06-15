@@ -1,6 +1,7 @@
 package com.dongah.smartcharger.pages;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.controlboard.RxData;
 import com.dongah.smartcharger.controlboard.TxData;
+import com.dongah.smartcharger.sqlite.SQLiteHelper;
 import com.dongah.smartcharger.utils.SharedModel;
 import com.dongah.smartcharger.websocket.socket.SocketState;
 
@@ -215,8 +217,13 @@ public class InitFragment extends Fragment implements View.OnClickListener {
 
     private boolean onUnitPrice() {
         try {
-            File file = new File(GlobalVariables.getRootPath() + File.separator + GlobalVariables.FILE_UNIT);
-            return file.exists();
+            SQLiteHelper helper = SQLiteHelper.getInstance(activity);
+            if (!helper.isTableExists(helper, "CP_UNIT_PRICE")) {
+                return false;
+            }
+
+            Cursor cursor = helper.selectAll("CP_UNIT_PRICE");
+            return cursor != null && cursor.moveToFirst();
         } catch (Exception e){
             logger.error("onUnitPrice error : {}", e.getMessage(), e);
             return false;

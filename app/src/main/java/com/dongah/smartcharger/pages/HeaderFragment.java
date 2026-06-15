@@ -115,7 +115,6 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
                 public void onChanged(String[] strings) {
                     UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
                     switch (uiSeq) {
-                        case INIT:
                         case MEMBER_CARD:
                         case MEMBER_CHECK_WAIT:
                         case CREDIT_CARD_WAIT:
