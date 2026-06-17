@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,6 @@ import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,7 +38,7 @@ public class ChargingFinishWaitFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private static final int TIME_OUT = 10;
+    private static final int TIME_OUT = 5;
     int cnt;
     ImageView imageViewLoading;
     AnimationDrawable animationDrawable;
@@ -98,19 +95,18 @@ public class ChargingFinishWaitFragment extends Fragment {
             cnt = 0;
             animationDrawable.start();
 
-            countHandler = new Handler(Looper.getMainLooper());
-            countRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    cnt++;
-                    if (Objects.equals(cnt, TIME_OUT)) {
-                        chargingCurrentData.setChgFinishWait(true);
-                    } else {
-                        countHandler.postDelayed(countRunnable, 1000);
-                    }
-                }
-            };
-            countHandler.postDelayed(countRunnable, 1000);
+//            countHandler = new Handler(Looper.getMainLooper());
+//            countRunnable = new Runnable() {
+//                @Override
+//                public void run() {
+//                    cnt++;
+//                    if (Objects.equals(cnt, TIME_OUT)) {
+//                    } else {
+//                        countHandler.postDelayed(countRunnable, 1000);
+//                    }
+//                }
+//            };
+//            countHandler.postDelayed(countRunnable, 1000);
         } catch (Exception e) {
             logger.error("onViewCreated error : {}", e.getMessage());
         }

@@ -190,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
         // SQLite DB
         sqLiteHelper = new SQLiteHelper(this);
         sqLiteDatabase = sqLiteHelper.getWritableDatabase();
-//        sqLiteHelper.dropAllTables(sqLiteDatabase);   // delete all tables
-//        sqLiteHelper.onCreate(sqLiteDatabase);          // create all tables
 
         imgNetwork = findViewById(R.id.imageViewNetwork);
         textViewVersion = findViewById(R.id.textViewVersionValue);

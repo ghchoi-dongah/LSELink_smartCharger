@@ -41,7 +41,6 @@ public class RxData {
     public boolean csUVR = false;       // UVR
     public boolean csOCR = false;       // OCR
     public int csSoc = 0;
-    public boolean csPowerMeterFail = false;    //311[11] 전력량계 통시 오류
 
     ControlBoard controlBoard;
 
@@ -66,10 +65,6 @@ public class RxData {
             csStart = csCPStatus == 2;
             csStop = csCPStatus != 2;
             csFault = csEmergency;
-//            if (csStop) {
-//                controlBoard.getTxData().setMainMC(false);
-//                controlBoard.getTxData().setPwmDuty((short) 100);
-//            }
         } catch (Exception e) {
             logger.error(" RxData - Decode {}", e.getMessage());
         }

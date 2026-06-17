@@ -163,6 +163,12 @@ public class CreditCardFragment extends Fragment {
                 }
                 imageViewCreditCard.setBackground(null);
             }
+
+            if (countHandler != null) {
+                countHandler.removeCallbacks(countRunnable);
+                countHandler.removeCallbacksAndMessages(null);
+                countHandler.removeMessages(0);
+            }
         } catch (Exception e) {
             logger.error("onDestroyView error : {}", e.getMessage());
         }
@@ -172,14 +178,5 @@ public class CreditCardFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        try {
-            if (countHandler != null) {
-                countHandler.removeCallbacks(countRunnable);
-                countHandler.removeCallbacksAndMessages(null);
-                countHandler.removeMessages(0);
-            }
-        } catch (Exception e) {
-            logger.error("onDetach error : {}", e.getMessage());
-        }
     }
 }

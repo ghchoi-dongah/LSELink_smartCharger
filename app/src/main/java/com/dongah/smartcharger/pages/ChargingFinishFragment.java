@@ -17,9 +17,7 @@ import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
-import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
-import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +43,13 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
     private String mParam2;
 
     Button btnCheck;
-    TextView textViewSocValue, textViewChargingAmtValue, textViewChargingTimeValue, textViewLimitSocValue;
+    TextView textViewSocValue, textViewChargingAmtValue, textViewChargingTimeValue, textViewLimitSocValue, txtChargePay, txtPowerUnitPrice;
     TextView textViewPrePayment, textViewInputPrePayment, textViewPartCancelPay, textViewInputCancelPayment;
-    CircularProgressIndicator progressCircular;
 
     MediaPlayer mediaPlayer;
     Handler uiCheckHandler;
-    ChargerConfiguration chargerConfiguration;
     ChargingCurrentData chargingCurrentData;
+    DecimalFormat payFormatter = new DecimalFormat("#,###,##0");
     DecimalFormat powerFormatter = new DecimalFormat("#,###,##0.00");
 
 
@@ -91,7 +88,6 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_charging_finish, container, false);
-        chargerConfiguration = ((MainActivity) MainActivity.mContext).getChargerConfiguration();
         chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
         btnCheck = view.findViewById(R.id.btnCheck);
         btnCheck.setOnClickListener(this);
@@ -99,6 +95,8 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
         textViewChargingAmtValue = view.findViewById(R.id.textViewChargingAmtValue);
         textViewChargingTimeValue = view.findViewById(R.id.textViewChargingTimeValue);
         textViewLimitSocValue = view.findViewById(R.id.textViewLimitSocValue);
+        txtChargePay = view.findViewById(R.id.txtChargePay);
+        txtPowerUnitPrice = view.findViewById(R.id.txtPowerUnitPrice);
         return view;
     }
 
@@ -107,7 +105,6 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            progressCircular.isIndeterminate();
             mediaPlayer();
 
             // charging finish info
@@ -116,15 +113,16 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
                 @Override
                 public void run() {
                     textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
-                    progressCircular.setProgress(chargingCurrentData.getSoc(), true);
                     textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getLimitSoc() + "%");
                     textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
                     textViewChargingTimeValue.setText(chargingCurrentData.getChargingUseTime());
+                    txtChargePay.setText(payFormatter.format(chargingCurrentData.getPowerMeterUsePay()) + " 원") ;
+                    txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getUnitPrice()) + "원");
 
                     // 신용카드 결제
                     prepaymentInfo(chargingCurrentData.isPrePaymentResult());
                     if (chargingCurrentData.isPrePaymentResult()) {
-
+                        // TODO
                     }
                 }
             });

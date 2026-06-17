@@ -319,18 +319,17 @@ public class ControlBoard implements Runnable {
                 short frequency = (short) BitUtilities.makeInt(srcData[23],srcData[24]);
                 long activeEnergy = BitUtilities.makeInt(srcData[71],srcData[72],srcData[73],srcData[74]);  //W로 표시
 
-                rxData.setVoltage((long) (voltage * 0.001));
-                rxData.setCurrent((long) (current * 0.001));
-                rxData.setActivePower((long) (activePower * 0.1));  //w
-                rxData.setActiveEnergy(activeEnergy * 10);               // 전력량 : w
-                rxData.setFrequency((short) (frequency * 0.01));
+                rxData.setVoltage((long) (voltage * 0.001));        // 전압 : V
+                rxData.setCurrent((long) (current * 0.001));        // 전류 : A
+                rxData.setActivePower((long) (activePower * 0.1));  // 전력 : w
+                rxData.setActiveEnergy(activeEnergy * 10);          // 전력량 : kWh
+                rxData.setFrequency((short) (frequency * 0.01));    // 주파수 : Hz
 
                 rxData.csOVR = rxData.getVoltage() >= maxVoltage;
                 rxData.csUVR = rxData.getVoltage() <= minVoltage;
                 rxData.csOCR = rxData.getCurrent() >= maxCurrent;
 
 //                rxData.csFault = rxData.isCsEmergency() || rxData.isCsOVR() || rxData.isCsUVR() || rxData.isCsOCR();
-
 //                rxData.csFault = rxData.isCsEmergency();
 
                 txData.setHighPowerMeter(BitUtilities.makeShort(srcData[71],srcData[72]));

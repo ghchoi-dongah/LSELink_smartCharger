@@ -83,6 +83,7 @@
         android:background="@drawable/shape_btn_white_stroke_blue_rounded"
         android:text="@string/insertMember"
         android:textSize="42sp"
+        android:textStyle="bold"
         android:textColor="@color/primary"
         app:backgroundTint="@null"
         app:layout_constraintLeft_toLeftOf="@id/btnControl"

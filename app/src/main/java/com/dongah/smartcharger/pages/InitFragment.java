@@ -187,7 +187,7 @@ public class InitFragment extends Fragment implements View.OnClickListener {
 
             if (Objects.equals(chargerConfiguration.getOpMode(), 0)) {
                 // test mode
-                double testPrice = Double.parseDouble(activity.getChargerConfiguration().getTestPrice());
+                double testPrice = Double.parseDouble(chargerConfiguration.getTestPrice());
                 activity.getChargingCurrentData().setPowerUnitPrice(testPrice);
                 activity.getClassUiProcess().setUiSeq(UiSeq.PLUG_CHECK);
                 activity.getFragmentChange().onFragmentChange(UiSeq.PLUG_CHECK, "PLUG_CHECK", null);
@@ -200,8 +200,16 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                 try {
                     SocketState socketState = activity.getSocketReceiveMessage().getSocket().getState();
                     if (Objects.equals(socketState, SocketState.OPEN)) {
-                        activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
-                        activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
+                        switch (chargerConfiguration.getAuthMode()) {
+                            case 0:
+                                activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
+                                activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
+                                break;
+                            case 1:
+                                activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
+                                activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
+                                break;
+                        }
                     } else {
                         activity.getToastPositionMake().onShowToast("서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
                     }

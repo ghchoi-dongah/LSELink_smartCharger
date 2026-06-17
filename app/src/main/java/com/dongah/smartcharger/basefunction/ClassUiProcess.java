@@ -450,13 +450,10 @@ public class ClassUiProcess implements RfCardReaderListener {
         setPowerMeterCheck(0);
         txData.setPwmDuty((short) 100);
         txData.setUiSequence((short) 1);
+        txData.setMainMC(false);
         chargingAlarm = startCheck = true;
         finishWaitScheduled = false;
         onMeterValueStop();
-        if (chargingCurrentData.getChargePointStatus() == ChargePointStatus.Reserved) {
-
-        }
-
         if (chargingCurrentData.isReBoot() && onRebootCheck()) {
             setUiSeq(UiSeq.REBOOTING);
         }
@@ -531,9 +528,6 @@ public class ClassUiProcess implements RfCardReaderListener {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void handleCharging(RxData rxData, TxData txData) {
         try {
-            txData.setPwmDuty((short) chargerConfiguration.getDuty());
-            txData.setMainMC(true);
-
             // 충전 사용량 계산
             onUsePowerMeter(rxData);
             txData.setUiSequence((short) 2);

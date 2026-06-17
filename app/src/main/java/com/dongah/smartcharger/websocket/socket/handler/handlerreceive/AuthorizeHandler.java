@@ -108,7 +108,6 @@ public class AuthorizeHandler implements OcppHandler {
                     toastPositionMake.onShowToast("충전 중지 인증 실패 : " + certificationReason);
                 } else {
                     // 회원 인증 실패
-                    activity.getChargingCurrentData().setAuthorizeResult(false);
                     activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
                     fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
                 }

@@ -20,12 +20,11 @@ import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
-import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.controlboard.TxData;
+import com.dongah.smartcharger.plc.request.StopAllRequest;
 import com.dongah.smartcharger.utils.SharedModel;
 import com.dongah.smartcharger.websocket.ocpp.utilities.ZonedDateTimeConvert;
-import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +58,12 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     String[] requestStrings = new String[1];
     Handler uiUpdateHandler;
     MainActivity activity;
-    ChargerConfiguration chargerConfiguration;
     ChargingCurrentData chargingCurrentData;
     TxData txData;
 
     Date startTime = null, useTime = null;
+    DecimalFormat payFormatter = new DecimalFormat("#,###,##0");
     DecimalFormat powerFormatter = new DecimalFormat("#,###,##0.00");
-    DecimalFormat voltageFormatter = new DecimalFormat("#,###,##0.0");
     ZonedDateTimeConvert zonedDateTimeConvert = new ZonedDateTimeConvert();
 
     public ChargingFragment() {
@@ -104,7 +102,6 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_charging, container, false);
         activity = ((MainActivity) MainActivity.mContext);
-        chargerConfiguration = activity.getChargerConfiguration();
         chargingCurrentData = activity.getChargingCurrentData();
         txData = activity.getControlBoard().getTxData();
         btnChargingStop = view.findViewById(R.id.btnChargingStop);
@@ -132,6 +129,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                 textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
                 textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getLimitSoc() + "%");
                 startTime = zonedDateTimeConvert.doStringDateToDate(chargingCurrentData.getChargingStartTime());
+                txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getUnitPrice()) + "원");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -144,7 +142,14 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (Objects.equals(v.getId(), R.id.btnChargingStop)) {
-            ((MainActivity) MainActivity.mContext).getChargingCurrentData().setUserStop(true);
+            chargingCurrentData.setUserStop(true);
+            txData.setMainMC(false);
+            txData.setPwmDuty((short) 100);
+
+            StopAllRequest stopAllRequest = new StopAllRequest((byte) 0x76, (short) 8, (byte) 0x00);
+
+            byte[] report = stopAllRequest.makeStopAllRequest("STOP", (short) 534, (short) 123);
+            activity.getPlcModem().onSend(report);
         }
     }
     
@@ -153,7 +158,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         uiUpdateHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ((MainActivity) MainActivity.mContext).runOnUiThread(new Runnable() {
+                activity.runOnUiThread(new Runnable() {
                      @SuppressLint({"SetTextI18n", "DefaultLocale"})
                      @RequiresApi(api = Build.VERSION_CODES.O)
                      @Override
@@ -170,9 +175,15 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                                  chargingCurrentData.setChargingTime((int) diffTime);
                                  textViewChargingTimeValue.setText(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
                                  chargingCurrentData.setChargingUseTime(textViewChargingTimeValue.getText().toString());
-
+                                 txtChargePay.setText(payFormatter.format((long) chargingCurrentData.getPowerMeterUsePay()) + " 원");
                                  textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
-                                 textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
+
+                                 if (chargingCurrentData.getSoc() == 0) {
+                                     textViewSocValue.setVisibility(View.INVISIBLE);
+                                 } else {
+                                     textViewSocValue.setVisibility(View.VISIBLE);
+                                     textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
+                                 }
                              }
                          } catch (Exception e) {
                              logger.error("onCharging error : {}", e.getMessage());
