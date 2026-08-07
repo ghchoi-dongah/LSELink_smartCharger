@@ -12,7 +12,7 @@ public class GlobalVariables {
     public static String ROOT_PATH = Environment.getExternalStorageDirectory().toString() + File.separator + "Download";
 
     public static String VERSION = "1.0.0";
-    public static String FW_VERSION = "1.0.1";
+    public static String FW_VERSION = "1.0.0";
 
     // file names
     public static final String UNIT_FILE_NAME = "unitPrice.dongah";

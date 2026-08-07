@@ -387,14 +387,26 @@ public class ClassUiProcess implements RfCardReaderListener {
     @Override
     public void onRfCardDataReceive(String cardNum, boolean value) {
         try {
-            if (cardNum.isEmpty() || Objects.equals(cardNum,"0000000000000000")) {
-                MainActivity activity = (MainActivity) MainActivity.mContext;
-                setUiSeq(UiSeq.INIT);
-                fragmentChange.onFragmentChange(UiSeq.INIT,"INIT",null);
+            MainActivity activity = (MainActivity) MainActivity.mContext;
+            // 회원카드 태깅 화면이 아니면 RF 카드 이벤트 무시
+            UiSeq currentSeq = activity.getClassUiProcess().getUiSeq();
+            if (!Objects.equals(UiSeq.CHARGING, currentSeq) &&
+                    !Objects.equals(UiSeq.MEMBER_CARD, currentSeq) &&
+                    !Objects.equals(UiSeq.INIT, currentSeq)) {
+                return;
+            }
 
-                activity.runOnUiThread(() -> {
-                    Toast.makeText(activity, "카드 리더기에서 응답이 없습니다.", Toast.LENGTH_SHORT).show();
-                });
+            if (cardNum.isEmpty() || Objects.equals(cardNum,"0000000000000000")) {
+                // 카드 미인식 — MEMBER_CARD 상태에서만 재요청 (CHARGING 중에는 무시)
+                if (Objects.equals(UiSeq.MEMBER_CARD, currentSeq)) {
+                    rfCardReaderReceive.rfCardReadRequest();
+                }
+//                setUiSeq(UiSeq.INIT);
+//                fragmentChange.onFragmentChange(UiSeq.INIT,"INIT",null);
+//
+//                activity.runOnUiThread(() -> {
+//                    Toast.makeText(activity, "카드 리더기에서 응답이 없습니다.", Toast.LENGTH_SHORT).show();
+//                });
             } else {
                 onRfCardDataReceiveEvent(cardNum, true);
             }

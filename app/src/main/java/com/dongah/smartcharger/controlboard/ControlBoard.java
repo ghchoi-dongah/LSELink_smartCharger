@@ -1,5 +1,8 @@
 package com.dongah.smartcharger.controlboard;
 
+import com.dongah.smartcharger.MainActivity;
+import com.dongah.smartcharger.basefunction.ChargerConfiguration;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.utils.BitUtilities;
 import com.dongah.smartcharger.utils.CRC16;
 
@@ -148,6 +151,18 @@ public class ControlBoard implements Runnable {
                         values[i] = (short)(values[i] | data2);
                     }
                     rxData.Decode(values);
+
+                    // update firmware version
+                    short fw = rxData.getCsFirmwareVersion();
+                    if (fw > 0) {
+                        String fwVersion = new ControlBoardUtil().parseVersion(fw);
+                        if (fwVersion != null) {
+                            ChargerConfiguration chargerConfiguration = ((MainActivity) MainActivity.mContext).getChargerConfiguration();
+                            chargerConfiguration.setFirmwareVersion(fwVersion);
+                            chargerConfiguration.onSaveConfiguration();
+                            GlobalVariables.FW_VERSION = fwVersion;
+                        }
+                    }
                     if (controlBoardListener != null) controlBoardListener.onControlBoardReceive(rxData);
                     Arrays.fill(realReceiveData,(byte)0x00);
                 }

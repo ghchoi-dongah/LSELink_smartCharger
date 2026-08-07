@@ -8,7 +8,7 @@ import com.dongah.smartcharger.websocket.ocpp.utilities.MoreObjects;
 import java.util.Objects;
 
 public class CancelReservationConfirmation implements Confirmation {
-
+    private static final String ACTION_NAME = "CancelReservation";
     private CancelReservationStatus status;
 
     /**
@@ -17,6 +17,10 @@ public class CancelReservationConfirmation implements Confirmation {
      */
     @Deprecated
     public CancelReservationConfirmation() {
+    }
+
+    public String getActionName() {
+        return ACTION_NAME;
     }
 
     /**

@@ -153,6 +153,7 @@ public class ChargingCurrentData {
     public boolean connectUse = true;
 
     public int limitSoc = 0;
+    public float limitPower = 0;
     public int fullrechgsoc = 100;
 
     public ChargingCurrentData() {
@@ -860,6 +861,14 @@ public class ChargingCurrentData {
 
     public void setLimitSoc(int limitSoc) {
         this.limitSoc = limitSoc;
+    }
+
+    public float getLimitPower() {
+        return limitPower;
+    }
+
+    public void setLimitPower(float limitPower) {
+        this.limitPower = limitPower;
     }
 
     public int getFullrechgsoc() {

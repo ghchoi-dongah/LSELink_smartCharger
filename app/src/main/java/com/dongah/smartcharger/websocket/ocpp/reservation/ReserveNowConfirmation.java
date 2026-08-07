@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "reserveNowResponse")
 public class ReserveNowConfirmation implements Confirmation {
 
+    private static final String ACTION_NAME = "ReserveNow";
     private ReservationStatus status;
 
     /**
@@ -23,6 +24,10 @@ public class ReserveNowConfirmation implements Confirmation {
      */
     @Deprecated
     public ReserveNowConfirmation() {
+    }
+
+    public String getActionName() {
+        return ACTION_NAME;
     }
 
     /**

@@ -513,8 +513,16 @@ public class Socket extends WebSocketListener {
 
 
             // JSON append 저장
-            LogDataSave logDataSave = new LogDataSave("log");
-            logDataSave.makeLogDate(100,"SOCKET_ERROR", log.toString());
+            fileManagement.stringToFileSave(
+                    GlobalVariables.getRootPath(),
+                    FILE_NAME,
+                    log.toString(),
+                    true
+            );
+
+            // JSON append 저장
+//            LogDataSave logDataSave = new LogDataSave("log");
+//            logDataSave.makeLogDate(100,"SOCKET_ERROR", log.toString());
 
             logger.error("WebSocket Failure logged : {}", log.toString());
         } catch (Exception e) {

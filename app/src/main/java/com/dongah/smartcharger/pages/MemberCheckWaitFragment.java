@@ -49,7 +49,7 @@ import java.util.Objects;
  * Use the {@link MemberCheckWaitFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MemberCheckWaitFragment extends Fragment implements View.OnClickListener {
+public class MemberCheckWaitFragment extends Fragment {
 
     private static final Logger logger = LoggerFactory.getLogger(MemberCheckWaitFragment.class);
 
@@ -117,7 +117,6 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_member_check_wait, container, false);
-        view.setOnClickListener(this);
         imageViewLoading = view.findViewById(R.id.imageViewLoading);
         imageViewLoading.setBackgroundResource(R.drawable.ani_loading);
         animationDrawable = (AnimationDrawable) imageViewLoading.getBackground();
@@ -297,17 +296,6 @@ public class MemberCheckWaitFragment extends Fragment implements View.OnClickLis
             }
         } catch (Exception e) {
             logger.error("onViewCreated error : {}", e.getMessage());
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        try {
-            return;
-//            if (!isAdded() && !isFlag) return;
-//            activity.getClassUiProcess(mChannel).onHome();
-        } catch (Exception e) {
-            logger.error("onClick error : {}", e.getMessage());
         }
     }
 

@@ -14,7 +14,6 @@ import com.dongah.smartcharger.basefunction.ClassUiProcess;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.controlboard.RxData;
-import com.dongah.smartcharger.controlboard.TxData;
 import com.dongah.smartcharger.sqlite.SQLiteHelper;
 import com.dongah.smartcharger.sqlite.dto.CpChangeMode;
 import com.dongah.smartcharger.websocket.ocpp.core.ChargePointStatus;
@@ -251,6 +250,7 @@ public class ChangeModeThread extends Thread {
     public static void setChgModeElec(int connectorId) {
         MainActivity activity = (MainActivity) MainActivity.mContext;
         ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
         SQLiteHelper helper = null;
 
         try {
@@ -260,11 +260,10 @@ public class ChangeModeThread extends Thread {
             String tableName = dto.getTableName();
 
             // Check if the table exists
-            TxData txData = activity.getControlBoard().getTxData();
             if (!helper.isTableExists(helper, tableName)) {
                 logger.warn("setChgModeElec {} doesn't exist", tableName);
-                // TODO
-//                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+                float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
+                chargingCurrentData.setLimitPower(power);
                 if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
                 return;
             }
@@ -274,8 +273,8 @@ public class ChangeModeThread extends Thread {
             // Cursor null 여부 확인, 조회 결과 존재 여부 확인
             if (cursor == null || !cursor.moveToFirst()) {
                 logger.warn("setChgModeElec {} cursor is null or no data. connectorId : {}", tableName, connectorId);
-                // TODO
-//                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+                float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
+                chargingCurrentData.setLimitPower(power);
                 if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
                 return;
             }
@@ -283,12 +282,15 @@ public class ChangeModeThread extends Thread {
             int value = cursor.getInt(cursor.getColumnIndexOrThrow("RECHG_ELEC"));
             // TODO
             if (value == 0) {
-//                txData.setOutPowerLimit((short) chargerConfiguration.getDr());
+                float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
+                chargingCurrentData.setLimitPower(power);
             } else {
-//                txData.setOutPowerLimit((short) value);
+                chargingCurrentData.setLimitPower(value);
+                chargerConfiguration.setDuty(value >= 7 ? 50 : 25);
+                chargerConfiguration.onSaveConfiguration();
             }
 
-//            logger.info("setChgModeElec connectorId[{}] outPowerLimit : {}", connectorId, txData.getOutPowerLimit());
+            logger.info("setChgModeElec connectorId[{}] outPowerLimit : {}", connectorId, chargingCurrentData.getLimitPower());
             if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
 
             cursor.close();

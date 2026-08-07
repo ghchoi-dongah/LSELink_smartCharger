@@ -19,6 +19,7 @@ import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.Authorize
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.BatteryEncryptKeyHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.BatteryInfoHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.BootNotificationHandler;
+import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.CancelReservationHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ChangeAvailabilityHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ChangeConfigurationHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ChangeElecModeHandler;
@@ -37,6 +38,7 @@ import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.PrePaymen
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.RechgrsocscheduleHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.RemoteStartTransactionHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.RemoteStopTransactionHandler;
+import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ReserveNowHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.ResetHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.SendLocalListHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlerreceive.StartTransactionHandler;
@@ -174,6 +176,8 @@ public class SocketReceiveMessage extends JSONCommunicator implements SocketInte
         handlerMap.put("UpdateFirmware", new UpdateFirmwareHandler());
         handlerMap.put("FirmwareStatusNotification", new FirmwareStatusNotificationHandler());
         handlerMap.put("TriggerMessage", new TriggerMessageHandler());
+        handlerMap.put("ReserveNow", new ReserveNowHandler());
+        handlerMap.put("CancelReservation", new CancelReservationHandler());
 
         // DataTransfer messageId별 핸들러
         handlerMap.put("unitprice.req", new UnitPriceHandler());

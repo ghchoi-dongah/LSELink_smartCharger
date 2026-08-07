@@ -71,7 +71,7 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
             );
 
             if (Objects.equals(status, RemoteStartStopStatus.Accepted)) {
-                chargingCurrentData.setAuthType("C");   // TODO
+                chargingCurrentData.setAuthType("M");
 
                 // Authorize
                 AuthorizeReq authorizeReq = new AuthorizeReq(connectorId);

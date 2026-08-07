@@ -152,8 +152,8 @@ public class InitFragment extends Fragment implements View.OnClickListener {
 
             if (chargerConfiguration.isInitInfo()) {
                 textViewInfo.setVisibility(View.VISIBLE);
-//                textViewInfo.setText(getString(R.string.intiInfo, chargingCurrentData.getLimitSoc(),
-//                        txData.getOutPowerLimit()));
+                textViewInfo.setText(getString(R.string.intiInfo, chargingCurrentData.getLimitSoc(),
+                        chargingCurrentData.getLimitPower()));
             } else {
                 textViewInfo.setVisibility(View.INVISIBLE);
             }

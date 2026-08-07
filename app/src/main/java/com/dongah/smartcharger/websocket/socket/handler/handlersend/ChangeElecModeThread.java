@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.basefunction.ChargerConfiguration;
+import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.ClassUiProcess;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.UiSeq;
@@ -128,16 +129,22 @@ public class ChangeElecModeThread extends Thread {
                     int value = cursor.getInt(cursor.getColumnIndexOrThrow(hourKey));
                     System.out.println("processRechgElec " + hourKey + " : " + value);
 
+                    ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+
                     // 시간대 전력 설정
-                    TxData txData = activity.getControlBoard().getTxData();
-                    // TODO
-//                    if (value == 0) {
-//                        txData.setOutPowerLimit((short) chargerConfiguration.getDr());
-//                    } else {
-//                        txData.setOutPowerLimit((short) value);
-//                    }
-//
-//                    logger.info("processRechgElec connectorId[{}] outPowerLimit : {}", i, txData.getOutPowerLimit());
+                    /** 7kW   → duty = 50
+                     *  3.3kW → duty = 25
+                     *
+                     *  0kW   → CP_CHANGE_MODE 테이블 확인
+                     **/
+                    if (value == 0) {
+                        ChangeModeThread.setChgModeElec(i);
+                    } else {
+                        chargingCurrentData.setLimitPower(value);
+                        chargerConfiguration.setDuty(value >= 7 ? 50 : 25);
+                        chargerConfiguration.onSaveConfiguration();
+                    }
+                    logger.info("processRechgElec connectorId[{}] outPowerLimit : {}", i,chargingCurrentData.getLimitPower());
 
                     if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
                         activity.getClassUiProcess().onHome();
@@ -159,6 +166,7 @@ public class ChangeElecModeThread extends Thread {
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             ClassUiProcess classUiProcess = activity.getClassUiProcess();
 
             // config dr setting
@@ -176,10 +184,9 @@ public class ChangeElecModeThread extends Thread {
             // insert
             sqLiteHelper.insert(cpChgElecmode);
 
-            TxData txData = activity.getControlBoard().getTxData();
-            // TODO
-//            txData.setOutPowerLimit((short) chargerConfiguration.getDr());
-//            logger.info("insertChgElecMode connectorId[{}] outPowerLimit : {}", connectorId, txData.getOutPowerLimit());
+            float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
+            chargingCurrentData.setLimitPower(power);
+            logger.info("insertChgElecMode connectorId[{}] limitPower : {}", connectorId, chargingCurrentData.getLimitPower());
 
             if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) {
                 classUiProcess.onHome();
