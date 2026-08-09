@@ -122,7 +122,7 @@ public class Socket extends WebSocketListener {
             socketInterface.onOpen(webSocket);
 
             ProcessHandler ph = ((MainActivity) MainActivity.mContext).getProcessHandler();
-            if (ph != null) {
+            if (ph != null && !GlobalVariables.isConnectRetry()) {
                 ph.onBootNotificationStart(5);
             } else {
                 logger.warn("onOpen: ProcessHandler not ready yet");

@@ -20,7 +20,10 @@ import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
+import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.PaymentType;
+import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.controlboard.TxData;
 import com.dongah.smartcharger.plc.request.StopAllRequest;
 import com.dongah.smartcharger.utils.SharedModel;
@@ -59,6 +62,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     Handler uiUpdateHandler;
     MainActivity activity;
     ChargingCurrentData chargingCurrentData;
+    ChargerConfiguration chargerConfiguration;
     TxData txData;
 
     Date startTime = null, useTime = null;
@@ -103,6 +107,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_charging, container, false);
         activity = ((MainActivity) MainActivity.mContext);
         chargingCurrentData = activity.getChargingCurrentData();
+        chargerConfiguration = activity.getChargerConfiguration();
         txData = activity.getControlBoard().getTxData();
         btnChargingStop = view.findViewById(R.id.btnChargingStop);
         btnChargingStop.setOnClickListener(this);
@@ -142,16 +147,33 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (Objects.equals(v.getId(), R.id.btnChargingStop)) {
-            chargingCurrentData.setUserStop(true);
-            txData.setMainMC(false);
-            txData.setPwmDuty((short) 100);
-
-            StopAllRequest stopAllRequest = new StopAllRequest((byte) 0x76, (short) 8, (byte) 0x00);
-
-            byte[] report = stopAllRequest.makeStopAllRequest("STOP", (short) 534, (short) 123);
-            activity.getPlcModem().onSend(report);
+            if (Objects.equals(chargerConfiguration.getOpMode(), 0)) {
+                // test mode
+                stopCharging();
+            } else {
+                // server mode
+                boolean requireRfCard = Objects.equals(chargingCurrentData.getPaymentType(), PaymentType.MEMBER) &&
+                        chargerConfiguration.isStopConfirm();
+                if (requireRfCard) {
+                    activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
+                } else {
+                    stopCharging();
+                }
+            }
         }
     }
+
+    private void stopCharging() {
+        chargingCurrentData.setUserStop(true);
+        txData.setMainMC(false);
+        txData.setPwmDuty((short) 100);
+
+        StopAllRequest stopAllRequest = new StopAllRequest((byte) 0x76, (short) 8, (byte) 0x00);
+
+        byte[] report = stopAllRequest.makeStopAllRequest("STOP", (short) 534, (short) 123);
+        activity.getPlcModem().onSend(report);
+    }
+
     
     private void onCharging() {
         uiUpdateHandler = new Handler();

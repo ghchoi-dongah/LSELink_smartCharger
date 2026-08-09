@@ -66,7 +66,7 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
     EditText editMeterSerialNumber, editMeterType;
     EditText editSoc, editDuty;
     Button btnExit, btnSave, btnRebooting, btnKeyboardControl;
-    CheckBox checkboxControlMonitor, checkboxInitInfo;
+    CheckBox checkboxControlMonitor, checkboxInitInfo, checkboxStopConfirm;
 
 
     public ConfigSettingFragment() {
@@ -400,6 +400,8 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
             checkboxControlMonitor.setChecked(chargerConfiguration.isControlMonitor());
             checkboxInitInfo = v.findViewById(R.id.checkboxInitInfo);
             checkboxInitInfo.setChecked(chargerConfiguration.isInitInfo());
+            checkboxStopConfirm = v.findViewById(R.id.checkboxStopConfirm);
+            checkboxStopConfirm.setChecked(chargerConfiguration.isStopConfirm());
         } catch (Exception e) {
             logger.error("InitializationComponents error : {}",  e.getMessage());
         }
@@ -446,6 +448,7 @@ public class ConfigSettingFragment extends Fragment implements View.OnClickListe
 
             chargerConfiguration.setControlMonitor(checkboxControlMonitor.isChecked());
             chargerConfiguration.setInitInfo(checkboxInitInfo.isChecked());
+            chargerConfiguration.setStopConfirm(checkboxStopConfirm.isChecked());
         } catch (Exception e) {
             logger.error("onConfigurationUpdate error : {}",  e.getMessage());
         }

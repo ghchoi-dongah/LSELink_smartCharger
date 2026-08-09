@@ -72,6 +72,12 @@ public class GlobalVariables {
     public static boolean reconnectCheck = false;
     public static boolean Scheduled = false;
 
+    public static boolean memberRegisterMode = false;
+    public static MemberCardRegisterCallback memberCardRegisterCallback = null;
+    public interface MemberCardRegisterCallback {
+        void onCardReceived(String cardId);
+    }
+
     //modem tel number
     public static String IMSI = "" ;
     public static String RSRP = "";

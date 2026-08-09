@@ -387,8 +387,14 @@ public class ClassUiProcess implements RfCardReaderListener {
     @Override
     public void onRfCardDataReceive(String cardNum, boolean value) {
         try {
-            MainActivity activity = (MainActivity) MainActivity.mContext;
+            if (GlobalVariables.memberRegisterMode && GlobalVariables.memberCardRegisterCallback != null &&
+                    !cardNum.isEmpty() && !Objects.equals(cardNum, "0000000000000000")) {
+                GlobalVariables.memberCardRegisterCallback.onCardReceived("M" + cardNum);
+                return;
+            }
+
             // 회원카드 태깅 화면이 아니면 RF 카드 이벤트 무시
+            MainActivity activity = (MainActivity) MainActivity.mContext;
             UiSeq currentSeq = activity.getClassUiProcess().getUiSeq();
             if (!Objects.equals(UiSeq.CHARGING, currentSeq) &&
                     !Objects.equals(UiSeq.MEMBER_CARD, currentSeq) &&
@@ -401,12 +407,6 @@ public class ClassUiProcess implements RfCardReaderListener {
                 if (Objects.equals(UiSeq.MEMBER_CARD, currentSeq)) {
                     rfCardReaderReceive.rfCardReadRequest();
                 }
-//                setUiSeq(UiSeq.INIT);
-//                fragmentChange.onFragmentChange(UiSeq.INIT,"INIT",null);
-//
-//                activity.runOnUiThread(() -> {
-//                    Toast.makeText(activity, "카드 리더기에서 응답이 없습니다.", Toast.LENGTH_SHORT).show();
-//                });
             } else {
                 onRfCardDataReceiveEvent(cardNum, true);
             }
@@ -423,11 +423,31 @@ public class ClassUiProcess implements RfCardReaderListener {
                 } else if (!cardNum.isEmpty()) {
                     MainActivity activity = ((MainActivity) MainActivity.mContext);
                     ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+                    UiSeq seq = activity.getClassUiProcess().getUiSeq();
 
-                    chargingCurrentData.setAuthType("M");
-                    chargingCurrentData.setIdTag(cardNum);
-
-                    activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CHECK_WAIT);
+                    if (Objects.equals(UiSeq.CHARGING, seq)) {
+                        int userType = chargingCurrentData.getPaymentType().value();
+                        switch (userType) {
+                            case 1:
+                                chargingCurrentData.setIdTagStop("M" + cardNum);
+                                break;
+                            case 2:
+                                chargingCurrentData.setIdTagStop("N" + cardNum);
+                                break;
+                            case 7:
+                                chargingCurrentData.setIdTagStop("C" + cardNum);
+                                break;
+                            case 8:
+                                chargingCurrentData.setIdTagStop("K" + cardNum);
+                                break;
+                            default:
+                                logger.error("onRfCardDataReceiveEvent userType none");
+                                break;
+                        }
+                    } else {
+                        chargingCurrentData.setIdTag(cardNum);
+                        activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CHECK_WAIT);
+                    }
                     fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_WAIT,"MEMBER_CHECK_WAIT",null);
                     rfCardReaderReceive.rfCardReadRelease();
                 }
@@ -457,6 +477,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     }
 
     // init
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void handleInit(TxData txData) {
         setoSeq(UiSeq.INIT);
         setPowerMeterCheck(0);
@@ -473,6 +494,24 @@ public class ClassUiProcess implements RfCardReaderListener {
         else if (!GlobalVariables.ChargerOperation[getCh()+1]) {
             setUiSeq(UiSeq.OP_STOP);
             fragmentChange.onFragmentChange(UiSeq.OP_STOP, "OP_STOP", null);
+        } else if (chargingCurrentData.getChargePointStatus() == ChargePointStatus.Reserved) {
+            // reservation
+            String currentTime = zonedDateTimeConvert.doGetKstDatetimeAsString();
+            // 현재 KST 시간과 예약 만료 시간 비교 => 현재 시간이 예약 만료 시간을 지났는지 확인
+            // str1.compareTo(str2) > 0 : str1이 str2보다 큼 → 예약 만료 처리
+            if (currentTime.compareTo(chargingCurrentData.getResExpiryDate()) > 0) {
+                // available
+                chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
+                statusNotificationReq.sendStatusNotification(); // StatusNotification send
+
+                // reservation clear
+                chargingCurrentData.setResConnectorId(0);
+                chargingCurrentData.setResIdTag("");
+                chargingCurrentData.setResExpiryDate("");
+                chargingCurrentData.setResReservationId("");
+                chargingCurrentData.setResParentIdTag("");
+                chargingCurrentData.setReservedStatus(ChargePointStatus.Available);
+            }
         }
     }
 
@@ -505,7 +544,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     private void handleConnectCheck(RxData rxData, TxData txData) {
         // MC ON
         if (Objects.equals(rxData.getCsCPStatus(), (short) 1)) {
-            txData.setPwmDuty((short) chargerConfiguration.getDuty());
+            txData.setPwmDuty((short) chargingCurrentData.getLimitPower() >= 7 ?(short) 50 :(short) 25);
         }
         if (Objects.equals(rxData.getCsCPStatus(), (short) 2) && startCheck) {
             txData.setMainMC(true);
