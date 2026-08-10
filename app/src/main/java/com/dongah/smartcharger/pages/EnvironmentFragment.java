@@ -16,6 +16,9 @@ import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.UiSeq;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Objects;
 
 /**
@@ -24,6 +27,7 @@ import java.util.Objects;
  * create an instance of this fragment.
  */
 public class EnvironmentFragment extends Fragment implements View.OnClickListener {
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentFragment.class);
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -93,39 +97,43 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         int getId = v.getId();
-        if (Objects.equals(getId, R.id.btnConfig)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CONFIG_SETTING, "CONFIG_SETTING", null);
-        } else if (Objects.equals(getId, R.id.btnWebSocket)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.WEB_SOCKET, "WEB_SOCKET", null);
-        } else if (Objects.equals(getId, R.id.btnControl)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CONTROL_BOARD_DEBUGGING, "CONTROL_BOARD_DEBUGGING", null);
-        } else if (Objects.equals(getId, R.id.btnDbControl)) {
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.DATABASE, "DATABASE", null);
-        } else if (Objects.equals(getId, R.id.btnMember)) {
-            // TODO: insert member
-        } else if (Objects.equals(getId, R.id.btnUi)) {
-            UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
-            switch (uiSeq) {
-                case CHARGING:
-                    ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.CHARGING);
-                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
-                    break;
-                case FAULT:
-                    ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.FAULT);
-                    ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.FAULT, "FAULT", null);
-                    break;
-                default:
-                    MainActivity activity = (MainActivity) MainActivity.mContext;
-                    activity.getClassUiProcess().setUiSeq(UiSeq.INIT);
-                    ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
-                    break;
+        try {
+            if (Objects.equals(getId, R.id.btnConfig)) {
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CONFIG_SETTING, "CONFIG_SETTING", null);
+            } else if (Objects.equals(getId, R.id.btnWebSocket)) {
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.WEB_SOCKET, "WEB_SOCKET", null);
+            } else if (Objects.equals(getId, R.id.btnControl)) {
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CONTROL_BOARD_DEBUGGING, "CONTROL_BOARD_DEBUGGING", null);
+            } else if (Objects.equals(getId, R.id.btnDbControl)) {
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.DATABASE, "DATABASE", null);
+            } else if (Objects.equals(getId, R.id.btnMember)) {
+                // TODO: insert member
+            } else if (Objects.equals(getId, R.id.btnUi)) {
+                UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
+                switch (uiSeq) {
+                    case CHARGING:
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.CHARGING);
+                        ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
+                        break;
+                    case FAULT:
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.FAULT);
+                        ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.FAULT, "FAULT", null);
+                        break;
+                    default:
+                        MainActivity activity = (MainActivity) MainActivity.mContext;
+                        activity.getClassUiProcess().setUiSeq(UiSeq.INIT);
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
+                        break;
+                }
+            } else if (Objects.equals(getId, R.id.btnSystemExit)) {
+                ActivityCompat.finishAffinity((MainActivity) MainActivity.mContext);
+                System.exit(0);
+            } else if (Objects.equals(getId, R.id.btnRemoteTest)) {
+                ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.REMOTE_TEST);
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.REMOTE_TEST, "REMOTE_TEST", null);
             }
-        } else if (Objects.equals(getId, R.id.btnSystemExit)) {
-            ActivityCompat.finishAffinity((MainActivity) MainActivity.mContext);
-            System.exit(0);
-        } else if (Objects.equals(getId, R.id.btnRemoteTest)) {
-            ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.REMOTE_TEST);
-            ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.REMOTE_TEST, "REMOTE_TEST", null);
+        } catch (Exception e){
+            logger.error("onClick error : {}", e.getMessage(), e);
         }
     }
 }

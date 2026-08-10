@@ -44,7 +44,7 @@ public class ChargerConfiguration {
      * 0: 회원카드
      * 1: 회원카드 + 신용카드
      * */
-    public int authMode = 2;
+    public int authMode = 0;
     public int authModeId;
 
     /** 운영모드
