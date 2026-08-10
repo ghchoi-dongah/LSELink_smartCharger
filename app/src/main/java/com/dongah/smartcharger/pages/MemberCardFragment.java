@@ -14,15 +14,22 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
+import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.ClassUiProcess;
+import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.utils.SharedModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 
 /**
@@ -43,12 +50,15 @@ public class MemberCardFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    int timer = 20;
-    TextView textViewTagTimer;
+    int timer = 30;
+    TextView textViewTagTimer, textViewMemberCheckMessage, textViewMemberStopMessage;
     ImageView imageViewMemberCard;
-    AnimationDrawable animationDrawable;
+    Animation animation;
     Handler countHandler;
     Runnable countRunnable;
+    MainActivity activity;
+    ClassUiProcess classUiProcess;
+    ChargingCurrentData chargingCurrentData;
 
     public MemberCardFragment() {
         // Required empty public constructor
@@ -85,14 +95,20 @@ public class MemberCardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_member_card, container, false);
-        textViewTagTimer = view.findViewById(R.id.textViewTagTimer);
-        imageViewMemberCard = view.findViewById(R.id.imageViewMemberCard);
-        imageViewMemberCard.setBackgroundResource(R.drawable.membercardtagging);
-        animationDrawable = (AnimationDrawable) imageViewMemberCard.getBackground();
         String[] requestStrings = new String[1];
         SharedModel sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
         requestStrings[0] = String.valueOf(0);
         sharedModel.setMutableLiveData(requestStrings);
+
+        activity = (MainActivity) MainActivity.mContext;
+        classUiProcess = activity.getClassUiProcess();
+        chargingCurrentData = activity.getChargingCurrentData();
+
+        textViewTagTimer = view.findViewById(R.id.textViewTagTimer);
+        imageViewMemberCard = view.findViewById(R.id.imageViewMemberCard);
+        textViewMemberCheckMessage = view.findViewById(R.id.textViewMemberCheckMessage);
+        textViewMemberStopMessage = view.findViewById(R.id.textViewMemberStopMessage);
+        animation = AnimationUtils.loadAnimation(getContext(), R.anim.translate);
 
         // rfCard ready
         ((MainActivity) MainActivity.mContext).getRfCardReaderReceive().rfCardReadRequest();
@@ -105,8 +121,11 @@ public class MemberCardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            animationDrawable.start();
+            textViewMemberStopMessage.setVisibility(Objects.equals(classUiProcess.getUiSeq(), UiSeq.CHARGING) ?
+                    View.VISIBLE : View.INVISIBLE);
             textViewTagTimer.setText(timer + "초");
+            updateCardBackground(chargingCurrentData.getAuthType());
+            imageViewMemberCard.startAnimation(animation);
 
             countHandler = new Handler();
             countRunnable = new Runnable() {
@@ -127,19 +146,36 @@ public class MemberCardFragment extends Fragment {
         }
     }
 
+    private void updateCardBackground(String type) {
+        switch (type) {
+            case "C":
+                imageViewMemberCard.setBackgroundResource(R.drawable.corp_card);
+                textViewMemberCheckMessage.setText(getString(R.string.corpCardTagMessage));
+                break;
+            case "K":
+                imageViewMemberCard.setBackgroundResource(R.drawable.moe_card);
+                textViewMemberCheckMessage.setText(getString(R.string.moeCardTagMessage));
+                break;
+            default:
+                imageViewMemberCard.setBackgroundResource(R.drawable.member_card);
+                textViewMemberCheckMessage.setText(getString(R.string.memberCardTagMessage));
+                break;
+        }
+    }
+
     @Override
     public void onDestroyView() {
         try {
-            if (animationDrawable != null) {
-                animationDrawable.stop();
+            if (countHandler != null) {
+                countHandler.removeCallbacks(countRunnable);
+                countHandler.removeCallbacksAndMessages(null);
+                countHandler.removeMessages(0);
             }
 
-            if (imageViewMemberCard != null) {
-                Drawable bg = imageViewMemberCard.getBackground();
-                if (bg instanceof AnimationDrawable) {
-                    ((AnimationDrawable) bg).stop();
-                }
-                imageViewMemberCard.setBackground(null);
+            if (animation != null) {
+                imageViewMemberCard.clearAnimation();
+                animation.setAnimationListener(null);
+                animation = null;
             }
         } catch (Exception e) {
             logger.error("onDestroyView error : {}", e.getMessage());
@@ -150,14 +186,5 @@ public class MemberCardFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        try {
-            if (countHandler != null) {
-                countHandler.removeCallbacks(countRunnable);
-                countHandler.removeCallbacksAndMessages(null);
-                countHandler.removeMessages(0);
-            }
-        } catch (Exception e) {
-            logger.error("onDetach error : {}", e.getMessage());
-        }
     }
 }

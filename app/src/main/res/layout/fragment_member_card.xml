@@ -23,7 +23,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/card_to_reader_background"
-        android:layout_marginTop="-50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewMemberCheckMessage"
@@ -34,11 +33,9 @@
         android:id="@+id/imageViewMemberCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/membercardtagging"
+        android:background="@drawable/member_card"
         android:importantForAccessibility="no"
-        app:layout_constraintStart_toStartOf="@id/imageViewMemberCardReader"
         app:layout_constraintEnd_toEndOf="@id/imageViewMemberCardReader"
-        app:layout_constraintTop_toTopOf="@id/imageViewMemberCardReader"
         app:layout_constraintBottom_toBottomOf="@id/imageViewMemberCardReader"
         tools:ignore="contentDescription" />
 
@@ -52,5 +49,18 @@
         app:layout_constraintStart_toStartOf="@id/imageViewMemberCardReader"
         app:layout_constraintEnd_toEndOf="@id/imageViewMemberCardReader"
         app:layout_constraintTop_toBottomOf="@id/imageViewMemberCardReader" />
+
+    <TextView
+        android:id="@+id/textViewMemberStopMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text="@string/memberCardTagStopMessage"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/textViewMemberCheckMessage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
