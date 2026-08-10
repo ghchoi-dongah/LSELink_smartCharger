@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.dongah.smartcharger.sqlite.dto.BatteryEncryptKey;
 import com.dongah.smartcharger.sqlite.dto.CpChangeMode;
 import com.dongah.smartcharger.sqlite.dto.CpChargingHist;
 import com.dongah.smartcharger.sqlite.dto.CpChgElecmode;
@@ -51,6 +52,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CpChangeMode.CREATE_SQL);
         sqLiteDatabase.execSQL(CpRechgSoc.CREATE_SQL);
         sqLiteDatabase.execSQL(CpUnitPrice.CREATE_SQL);
+        sqLiteDatabase.execSQL(BatteryEncryptKey.CREATE_SQL);
 
 //        sqLiteDatabase.execSQL(CpSettings.CREATE_SQL);
 //        sqLiteDatabase.execSQL(CpOcppConfigKeys.CREATE_SQL);
@@ -71,6 +73,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 break;
             case "CP_UNIT_PRICE":
                 sqLiteDatabase.execSQL(CpUnitPrice.CREATE_SQL);
+                break;
+            case "BATTERY_ENCRYPT_KEY":
+                sqLiteDatabase.execSQL(BatteryEncryptKey.CREATE_SQL);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown table: " + tableName);
@@ -106,6 +111,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + new CpNonTransmit().getTableName());
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + new CpChargingHist().getTableName());
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + new CpRechgSoc().getTableName());
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + new BatteryEncryptKey().getTableName());
     }
 
     // delete table
