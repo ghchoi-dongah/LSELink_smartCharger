@@ -216,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
 //        fragmentSeq = new UiSeq[GlobalVariables.maxChannel];
         chargingCurrentData = new ChargingCurrentData();
         chargingCurrentData.onCurrentDataClear();
+        chargingCurrentData.setConnectorId(1);
 
         fragmentChange = new FragmentChange();
         fragmentChange.onFragmentChange(UiSeq.INIT, "INIT", "");

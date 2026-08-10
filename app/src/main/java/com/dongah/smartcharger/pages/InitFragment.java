@@ -165,7 +165,7 @@ public class InitFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (!chargingCurrentData.isConnectUse()
-                || (!Objects.equals(v.getId(), R.id.viewCircle) && !rxData.isCsPilot())) {
+                || (!Objects.equals(v.getId(), R.id.viewCircle))) {
             return;
         }
         changeFragment();
@@ -198,24 +198,23 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
                 try {
-                    SocketState socketState = activity.getSocketReceiveMessage().getSocket().getState();
-                    if (Objects.equals(socketState, SocketState.OPEN)) {
-                        switch (chargerConfiguration.getAuthMode()) {
-                            case 0:
-                                activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
-                                activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
-                                break;
-                            case 1:
-                                activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
-                                activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
-                                break;
-                        }
-                    } else {
-                        activity.getToastPositionMake().onShowToast("서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
+                    switch (chargerConfiguration.getAuthMode()) {
+                        case 0:
+                            activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
+                            activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
+                            break;
+                        case 1:
+                            activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
+                            activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
+                            break;
+                        default:
+                            logger.error("InitFragment changeFragment error >> Invalid value");
+                            activity.getToastPositionMake().onShowToast("충전을 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+                            break;
                     }
                 } catch (Exception e){
-                    activity.getToastPositionMake().onShowToast("서버 연결 DISCONNECT. \n충전을 할 수 없습니다.");
                     logger.error("server disconnect error : {}", e.getMessage(), e);
+                    activity.getToastPositionMake().onShowToast("충전을 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
                 }
             }
         } catch (Exception e) {
