@@ -44,7 +44,7 @@ public class GlobalVariables {
     public static boolean notSupportedKey = false;
     public static int ConnectionTimeOut = 60;
     public static int MinimunStatusDuration = 300;
-    public static int MeterValueSampleInterval = 60 * 5; // 급속:1분, 완속:5분
+    public static int MeterValueSampleInterval = 60 * 15; // 급속:1분, 완속:15분
     public static int HeartBeatInterval = 60;
     public static boolean AuthorizeRemoteTxRequests = false;
     public static boolean ReserveConnectorZeroSupported = true;
