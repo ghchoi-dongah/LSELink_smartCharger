@@ -132,9 +132,9 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
 
             try {
                 textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
-                textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getLimitSoc() + "%");
+                textViewLimitSocValue.setText("목표 충전율: " + chargingCurrentData.getTargetSoc() + "%");
                 startTime = zonedDateTimeConvert.doStringDateToDate(chargingCurrentData.getChargingStartTime());
-                txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getUnitPrice()) + "원");
+                txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -197,7 +197,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                                  chargingCurrentData.setChargingTime((int) diffTime);
                                  textViewChargingTimeValue.setText(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
                                  chargingCurrentData.setChargingUseTime(textViewChargingTimeValue.getText().toString());
-                                 txtChargePay.setText(payFormatter.format((long) chargingCurrentData.getPowerMeterUsePay()) + " 원");
+                                 txtChargePay.setText(payFormatter.format((long) chargingCurrentData.getPowerMeterUsePay()) + "원");
                                  textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
 
                                  if (chargingCurrentData.getSoc() == 0) {

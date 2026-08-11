@@ -6,6 +6,7 @@ import android.os.Environment;
 import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.plc.DataTransformation;
 import com.dongah.smartcharger.utils.FileManagement;
 import com.dongah.smartcharger.websocket.ocpp.core.datatransfer.vas.BatteryData;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class BatteryInfoReceive {
 
     private static final Logger logger = LoggerFactory.getLogger(BatteryInfoReceive.class);
-    private static final String FILE_PATH = Environment.getExternalStorageDirectory().toString() + File.separator + "Download";
+    private static final String FILE_PATH = GlobalVariables.getRootPath();
     private static final String FILE_NAME = "batteryInfo.dongah";
     private final Base64Util base64Util = new Base64Util();
 
@@ -92,12 +93,12 @@ public class BatteryInfoReceive {
             byte[] mPackCurrent = new byte[packCurrentLen];       // current * 0.1
             System.arraycopy(data, 41, mPackCurrent, 0, packCurrentLen);
             short sPackCurrent = dataTransformation.ByteArrayToShort(mPackCurrent);
-//            try {
-//                long packCurrent = (long) (sPackCurrent * 0.1);
-//                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatCurrent(packCurrent);
-//            } catch (Exception e) {
-//                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatCurrent(0);
-//            }
+            try {
+                long packCurrent = (long) (sPackCurrent * 0.1);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatCurrent(packCurrent);
+            } catch (Exception e) {
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatCurrent(0);
+            }
 
             //BatteryPack voltage(A6)
             byte packVoltageCode = data[43];
@@ -105,12 +106,12 @@ public class BatteryInfoReceive {
             byte[] mPackVoltage = new byte[packVoltageLen];
             System.arraycopy(data, 45, mPackVoltage, 0, packVoltageLen);
             short sPackVoltage = dataTransformation.ByteArrayToShort(mPackVoltage);
-//            try {
-//                long packVoltage = (long) (sPackVoltage * 0.1);
-//                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatVoltage(packVoltage);
-//            } catch (Exception e) {
-//                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatVoltage(0);
-//            }
+            try {
+                long packVoltage = (long) (sPackVoltage * 0.1);
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatVoltage(packVoltage);
+            } catch (Exception e) {
+                ((MainActivity) MainActivity.mContext).getChargingCurrentData().setBatVoltage(0);
+            }
 
             //Battery Cell Voltage(A7)
             byte batteryVoltageCode = data[47];
@@ -153,7 +154,7 @@ public class BatteryInfoReceive {
 //            batteryInfoDataSend.setBattery(batteryData);
             batteryInfoDataSend.setBattery(base64Util.encode(gson.toJson(batteryData)));
 
-            String result = gson.toJson(batteryInfoDataSend);
+            String result = gson.toJson(batteryInfoDataSend) + "\n";
             fileManagement.stringToFileSave(FILE_PATH, FILE_NAME, result, true);
         } catch (Exception e) {
             logger.error(" BatteryInfoReceive error : {}", e.getMessage());

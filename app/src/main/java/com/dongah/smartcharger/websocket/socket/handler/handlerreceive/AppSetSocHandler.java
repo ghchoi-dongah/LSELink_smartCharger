@@ -6,12 +6,16 @@ import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
+import com.dongah.smartcharger.websocket.ocpp.core.DataTransferStatus;
 import com.dongah.smartcharger.websocket.ocpp.core.datatransfer.lselink.AppSetSocConfirm;
 import com.dongah.smartcharger.websocket.socket.OcppHandler;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class AppSetSocHandler implements OcppHandler {
     private static final Logger logger = LoggerFactory.getLogger(AppSetSocHandler.class);
@@ -27,11 +31,17 @@ public class AppSetSocHandler implements OcppHandler {
             String idTag = dataJson.getString("idTag");
             int soc = dataJson.getInt("setSoc");
 
-            chargingCurrentData.setIdTag(idTag);
+            GlobalVariables.startApp = true;
+            DataTransferStatus status = DataTransferStatus.Rejected;
+            if (Objects.equals(chargingCurrentData.getIdTag(), idTag)) {
+                status = DataTransferStatus.Accepted;
+            }
+//            chargingCurrentData.setIdTag(idTag);
             chargingCurrentData.setTargetSoc(soc);
 
             // response
             AppSetSocConfirm appSetSocConfirm = new AppSetSocConfirm();
+            appSetSocConfirm.setStatus(status);
             activity.getSocketReceiveMessage().onResultSend(
                     connectorId,
                     appSetSocConfirm.getActionName(),

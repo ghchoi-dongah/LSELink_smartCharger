@@ -156,6 +156,9 @@ public class ChargingCurrentData {
     public float limitPower = 0;
     public int fullrechgsoc = 100;
 
+    long batVoltage = 0;
+    long batCurrent = 0;
+
     public ChargingCurrentData() {
         sampleValueData = new SampleValueData();
     }
@@ -213,11 +216,13 @@ public class ChargingCurrentData {
             setResReservationId("");
             setRemoteStartSmartCharging(false);
             setSoc(0);
-            setTargetSoc(80);
+            setTargetSoc(100);
             setTargetCurrent(0);
             setAuthType("M");
             setFullrechgsoc(100);
             setUnitPrice(0);
+            setBatCurrent(0);
+            setBatVoltage(0);
         } catch (Exception e) {
             logger.error("ChargingCurrentData onCurrentDataClear error : {}", e.getMessage(), e);
         }
@@ -885,5 +890,21 @@ public class ChargingCurrentData {
 
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public long getBatVoltage() {
+        return batVoltage;
+    }
+
+    public void setBatVoltage(long batVoltage) {
+        this.batVoltage = batVoltage;
+    }
+
+    public long getBatCurrent() {
+        return batCurrent;
+    }
+
+    public void setBatCurrent(long batCurrent) {
+        this.batCurrent = batCurrent;
     }
 }

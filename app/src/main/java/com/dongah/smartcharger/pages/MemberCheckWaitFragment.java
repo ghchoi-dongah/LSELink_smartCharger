@@ -168,9 +168,13 @@ public class MemberCheckWaitFragment extends Fragment {
                                 if (cnt > TIME_MAX) {
                                     countHandler.removeCallbacks(countRunnable);
 
-                                    // 회원 인증 실패
-                                    classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
-                                    fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                                    if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.CHARGING)) {
+                                        fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
+                                    } else {
+                                        // 회원 인증 실패
+                                        classUiProcess.setUiSeq(UiSeq.MEMBER_CHECK_FAILED);
+                                        fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_FAILED, "MEMBER_CHECK_FAILED", null);
+                                    }
                                 } else {
                                     countHandler.postDelayed(countRunnable, 1000);
                                 }

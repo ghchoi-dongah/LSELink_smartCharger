@@ -60,7 +60,7 @@ public class BatteryInfoReq {
             batteryInfoData.setConnectorId(String.valueOf(chargingCurrentData.getConnectorId()));
             batteryInfoData.setTsdt(time);
             batteryInfoData.setKeyId(GlobalVariables.getBatteryEncryptKeyId());
-            batteryInfoData.setBatteryData(batteryDataList);
+//            batteryInfoData.setBatteryData(batteryDataList);
 
             BatteryInfoRequest batteryInfoRequest = new BatteryInfoRequest();
             batteryInfoRequest.setVendorId(activity.getChargerConfiguration().getChargePointVendor());

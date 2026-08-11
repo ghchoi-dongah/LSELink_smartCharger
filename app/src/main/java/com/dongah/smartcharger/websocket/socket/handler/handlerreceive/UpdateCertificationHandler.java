@@ -26,6 +26,7 @@ public class UpdateCertificationHandler implements OcppHandler {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void handle(JSONObject payload, int connectorId, String messageId) throws Exception {
+        MainActivity activity = (MainActivity) MainActivity.mContext;
         try {
             JSONObject dataJson = payload.getJSONObject("data");
 
@@ -37,7 +38,6 @@ public class UpdateCertificationHandler implements OcppHandler {
 
             GlobalVariables.validTime = validTime;
 
-            MainActivity activity = (MainActivity) MainActivity.mContext;
             AtomicInteger doneCount    = new AtomicInteger(0);
             AtomicInteger successCount = new AtomicInteger(0);
 
@@ -91,6 +91,14 @@ public class UpdateCertificationHandler implements OcppHandler {
 
         } catch (Exception e) {
             logger.error("UpdateCertificationHandler error : {}", e.getMessage(), e);
+            UpdateCertificationConfirm confirm = new UpdateCertificationConfirm();
+            confirm.setStatus(DataTransferStatus.Rejected);
+            try {
+                activity.getSocketReceiveMessage().onResultSend(
+                        connectorId, confirm.getActionName(), messageId, confirm);
+            } catch (Exception ex) {
+                logger.error("UpdateCertification Rejected send error: {}", ex.getMessage(), ex);
+            }
         }
     }
 

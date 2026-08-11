@@ -37,7 +37,8 @@ public class VehicleInfoReq {
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             RxData rxData = activity.getControlBoard().getRxData();
 //            String evccId = BitUtilities.toHexString(rxData.getCsmVehicleEvccId());
-            String evccId = "1364747EE704";   // test code
+//            String evccId = "1364747EE704";   // test code
+            String evccId = "";   // test code
 
             VehicleInfoData vehicleInfoData = createVehicleInfoData(evccId);
 

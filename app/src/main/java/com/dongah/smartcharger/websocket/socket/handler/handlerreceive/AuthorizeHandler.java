@@ -85,8 +85,8 @@ public class AuthorizeHandler implements OcppHandler {
                     dtAuthorizeReq.sendDtAuthorize();
 
                     // DataTransfer vehicleInfo
-                    VehicleInfoReq vehicleInfoReq = new VehicleInfoReq(connectorId);
-                    vehicleInfoReq.sendVehicleInfo();
+//                    VehicleInfoReq vehicleInfoReq = new VehicleInfoReq(connectorId);
+//                    vehicleInfoReq.sendVehicleInfo();
 
                     if (Objects.equals(chargingCurrentData.getChargePointStatus(), ChargePointStatus.Available)) {
                         chargingCurrentData.setChargePointStatus(ChargePointStatus.Preparing);

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.PaymentType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +43,9 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
     private String mParam1;
     private String mParam2;
 
+    private static final long UI_CHECK_INTERVAL_MS = 3 * 60 * 1000; // 3분
     Button btnCheck;
     TextView textViewSocValue, textViewChargingAmtValue, textViewChargingTimeValue, textViewLimitSocValue, txtChargePay, txtPowerUnitPrice;
-    TextView textViewPrePayment, textViewInputPrePayment, textViewPartCancelPay, textViewInputCancelPayment;
 
     MediaPlayer mediaPlayer;
     Handler uiCheckHandler;
@@ -107,23 +108,29 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
         try {
             mediaPlayer();
 
+            // unplug check 후 초기 화면
+            uiCheckHandler = new Handler();
+            uiCheckHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (!((MainActivity) MainActivity.mContext).getControlBoard().getRxData().isCsPilot()) {
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
+                    }
+                    uiCheckHandler.postDelayed(this, UI_CHECK_INTERVAL_MS);
+                }
+            }, UI_CHECK_INTERVAL_MS);
+
             // charging finish info
             ((MainActivity) MainActivity.mContext).runOnUiThread(new Runnable() {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
-                    textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getLimitSoc() + "%");
+                    textViewSocValue.setText(chargingCurrentData.getSoc() == 0 ? "미지원" : chargingCurrentData.getSoc() + "%");
+                    textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getTargetSoc() + "%");
                     textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
                     textViewChargingTimeValue.setText(chargingCurrentData.getChargingUseTime());
-                    txtChargePay.setText(payFormatter.format(chargingCurrentData.getPowerMeterUsePay()) + " 원") ;
-                    txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getUnitPrice()) + "원");
-
-                    // 신용카드 결제
-                    prepaymentInfo(chargingCurrentData.isPrePaymentResult());
-                    if (chargingCurrentData.isPrePaymentResult()) {
-                        // TODO
-                    }
+                    txtChargePay.setText(payFormatter.format(chargingCurrentData.getPowerMeterUsePay()) + "원") ;
+                    txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
                 }
             });
         } catch (Exception e) {
@@ -131,12 +138,6 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
         }
     }
 
-    private void prepaymentInfo(boolean check) {
-        textViewPrePayment.setVisibility(check ? View.VISIBLE : View.GONE);
-        textViewInputPrePayment.setVisibility(check ? View.VISIBLE : View.GONE);
-        textViewPartCancelPay.setVisibility(check ? View.VISIBLE : View.GONE);
-        textViewInputCancelPayment.setVisibility(check ? View.VISIBLE : View.GONE);
-    }
 
     @Override
     public void onClick(View v) {

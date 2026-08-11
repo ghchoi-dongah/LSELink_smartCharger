@@ -49,14 +49,14 @@ public class FirmwareDownload {
         try {
             URL u = new URL(url);
             for (int i = 0; i < retry; i++) {
-                conn = (HttpURLConnection) u.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(15000);
-                conn.connect();
+                HttpURLConnection attempt = (HttpURLConnection) u.openConnection();
+                attempt.setRequestMethod("GET");
+                attempt.setConnectTimeout(10000);
+                attempt.setReadTimeout(15000);
+                attempt.connect();
 
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-
+                if (attempt.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    conn = attempt;
                     File file = new File(GlobalVariables.getRootPath() + File.separator + fileName);
                     is = new BufferedInputStream(conn.getInputStream());
                     fos = new FileOutputStream(file);
@@ -70,6 +70,8 @@ public class FirmwareDownload {
                     success = true;
                     callback.onSuccess(file);
                     break;
+                } else {
+                    attempt.disconnect();
                 }
             }
         } catch (Exception e) {

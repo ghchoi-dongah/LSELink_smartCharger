@@ -25,6 +25,7 @@ import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.ChargerPointType;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
+import com.dongah.smartcharger.basefunction.PaymentType;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.controlboard.RxData;
 import com.dongah.smartcharger.controlboard.TxData;
@@ -200,6 +201,9 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                 try {
                     switch (chargerConfiguration.getAuthMode()) {
                         case 0:
+                            chargingCurrentData.setAuthType("M");
+                            chargingCurrentData.setPaymentType(PaymentType.MEMBER);
+                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
                             activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
                             activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
                             break;

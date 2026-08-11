@@ -23,6 +23,7 @@ import com.dongah.smartcharger.websocket.ocpp.core.ResetType;
 import com.dongah.smartcharger.websocket.ocpp.utilities.ZonedDateTimeConvert;
 import com.dongah.smartcharger.websocket.socket.SocketReceiveMessage;
 import com.dongah.smartcharger.websocket.socket.SocketState;
+import com.dongah.smartcharger.websocket.socket.handler.handlersend.BatteryInfoThread;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.ChargingAlarmReq;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.MeterValuesReq;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.ProcessHandler;
@@ -68,6 +69,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     /** OCPP     */
     StatusNotificationReq statusNotificationReq;
     MeterValuesReq meterValuesReq;
+    BatteryInfoThread batteryInfoThread;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     public int getCh() {
@@ -168,13 +170,8 @@ public class ClassUiProcess implements RfCardReaderListener {
                 case MEMBER_CHECK_WAIT:
                 case CREDIT_CARD:
                 case CREDIT_CARD_WAIT:
-                    break;
-
                 case CONNECTION_FAILED:
                 case MEMBER_CHECK_FAILED:
-                    if (!rxData.isCsPilot()) {
-                        onHome();
-                    }
                     break;
 
                 case PLUG_CHECK:
@@ -194,7 +191,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                     break;
 
                 case FINISH:
-                    onFinish(rxData);
+                    onFinish();
                     break;
 
                 case FAULT:
@@ -224,14 +221,10 @@ public class ClassUiProcess implements RfCardReaderListener {
     }
 
     /** 충전 완료 */
-    private void onFinish(RxData rxData) {
+    private void onFinish() {
         try {
             if (chargingCurrentData.isReBoot()) {
                 setUiSeq(UiSeq.INIT);
-            }
-
-            if (!rxData.isCsPilot()) {
-                onHome();
             }
         } catch (Exception e) {
             logger.error("ClassUiProcess onFinish error : {}", e.getMessage());
@@ -309,6 +302,23 @@ public class ClassUiProcess implements RfCardReaderListener {
         if (meterValuesReq != null) {
             meterValuesReq.stopMeterValues();
             meterValuesReq = null;
+        }
+    }
+
+    /**
+     * Battery info start
+     * @param delay duration time
+     */
+    public void onBatteryInfoStart(int delay) {
+        onBatteryInfoStop();
+        batteryInfoThread = new BatteryInfoThread(delay);
+        batteryInfoThread.start();
+    }
+
+    public void onBatteryInfoStop() {
+        if (batteryInfoThread != null) {
+            batteryInfoThread.stopThread();
+            batteryInfoThread = null;
         }
     }
 
@@ -486,6 +496,8 @@ public class ClassUiProcess implements RfCardReaderListener {
         txData.setMainMC(false);
         chargingAlarm = startCheck = true;
         finishWaitScheduled = false;
+        GlobalVariables.startApp = false;
+
         onMeterValueStop();
         if (chargingCurrentData.isReBoot() && onRebootCheck()) {
             setUiSeq(UiSeq.REBOOTING);
@@ -570,7 +582,19 @@ public class ClassUiProcess implements RfCardReaderListener {
                 StartTransactionReq startTransactionReq = new StartTransactionReq(chargingCurrentData.getConnectorId());
                 startTransactionReq.sendStartTransactionReq();
                 startMeterValuesWithDelay();
+                onBatteryInfoStart(GlobalVariables.batteryDelay);
                 startCheck = false;
+
+                // target soc
+                int targetSoc = Math.min(chargingCurrentData.getLimitSoc(), chargingCurrentData.getFullrechgsoc());
+                if (targetSoc == 0 || Objects.equals(chargerConfiguration.getOpMode(), 0)) {
+                    targetSoc = chargerConfiguration.getTargetSoc() == 0 ? 100 : chargerConfiguration.getTargetSoc();
+                }
+
+                if (GlobalVariables.startApp) {
+                    targetSoc = Math.min(chargingCurrentData.getTargetSoc(), targetSoc);
+                }
+                chargingCurrentData.setTargetSoc(targetSoc);
             }
         }
     }
@@ -584,15 +608,8 @@ public class ClassUiProcess implements RfCardReaderListener {
             txData.setUiSequence((short) 2);
             boolean isStopped = rxData.isCsStop();
             boolean isPilotDisconnected = rxData.getCsCPStatus() == 1 || rxData.getCsCPStatus() == 0;
-
-            // target soc
-            int targetSoc = Math.min(chargingCurrentData.getLimitSoc(), chargingCurrentData.getFullrechgsoc());
-            if (targetSoc == 0) {
-                targetSoc = chargerConfiguration.getTargetSoc();
-            }
             boolean isSocReached = (chargingCurrentData.getSoc() != 0
-                    && chargingCurrentData.getSoc() >= targetSoc);
-
+                    && chargingCurrentData.getSoc() >= chargingCurrentData.getTargetSoc());
             boolean isPrePaymentEnabled = chargingCurrentData.isPrePaymentResult();
             boolean isPaymentDepleted = chargingCurrentData.getPrePayment() <= chargingCurrentData.getPowerMeterUsePay();
 
@@ -613,20 +630,20 @@ public class ClassUiProcess implements RfCardReaderListener {
             if (!GlobalVariables.isStopTransactionOnEVSideDisconnect() &&
                     !GlobalVariables.isUnlockConnectorOnEVSideDisconnect()) {
                 if (isStopped || isPilotDisconnected || isSocReached || isLimitTime) {
-                    if (chargingCurrentData.getStopReason() == Reason.Remote || chargingCurrentData.isUserStop()) {
+                    if (!rxData.isCsPilot() && (chargingCurrentData.getStopReason() == Reason.Remote || chargingCurrentData.isUserStop())) {
                         // status notification send to server : ChargePointStatus.SuspendedEV
                         // 2.4.5. EV Side Disconnected
                         chargingCurrentData.setStopReason(Reason.EVDisconnected);
-                        setUiSeq(UiSeq.FINISH_WAIT);
-                        fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                     }
+                    setUiSeq(UiSeq.FINISH_WAIT);
+                    fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                 }
             } else {
-                if (isStopped || isPilotDisconnected || isSocReached || isLimitTime
+                if (isStopped || isPilotDisconnected || isSocReached || isLimitTime || chargingCurrentData.isUserStop()
                         || !GlobalVariables.ChargerOperation[getCh()+1]) {
                     // status notification send to server : ChargePointStatus.SuspendedEV
                     // 2.4.5. EV Side Disconnected
-                    if (Objects.equals(chargerConfiguration.getOpMode(), 1)) {
+                    if (!rxData.isCsPilot()) {
                         chargingCurrentData.setStopReason(Reason.EVDisconnected);
                     }
                     setUiSeq(UiSeq.FINISH_WAIT);
@@ -665,7 +682,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                 meterValuesReq.sendMeterValues(chargingCurrentData.getConnectorId());
             }
             onMeterValueStop();
-
+            onBatteryInfoStop();
 
             handler.postDelayed(() -> {
                 finishWaitScheduled = false;   // 완료 후 해제
@@ -676,15 +693,9 @@ public class ClassUiProcess implements RfCardReaderListener {
                     stopTransactionReq.sendStopTransactionReq();
                 }
 
-                if (!GlobalVariables.ChargerOperation[1]) {
-                    setUiSeq(UiSeq.INIT);
-                    fragmentChange.onFragmentChange(UiSeq.INIT, "INIT", null);
-                } else {
-                    setUiSeq(UiSeq.FINISH);
-                    fragmentChange.onFragmentChange(UiSeq.FINISH, "FINISH", null);
-                }
-
-            }, 3000);
+                setUiSeq(UiSeq.FINISH);
+                fragmentChange.onFragmentChange(UiSeq.FINISH, "FINISH", null);
+            }, 2000);
         } catch (Exception e) {
             finishWaitScheduled = false;
             logger.error("ClassUiProcess - FINISH_WAIT error : {} ", e.getMessage());
@@ -711,6 +722,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                     // meter values stop
                     meterValuesReq.sendMeterValues(chargingCurrentData.getConnectorId());
                     onMeterValueStop();
+                    onBatteryInfoStop();
 
                     handler.postDelayed(() -> {
                         // socket receive message get instance
