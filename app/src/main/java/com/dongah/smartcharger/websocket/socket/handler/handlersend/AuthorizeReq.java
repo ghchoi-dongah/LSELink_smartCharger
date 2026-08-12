@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.utils.LogDataSave;
 import com.dongah.smartcharger.websocket.ocpp.core.AuthorizeRequest;
 import com.dongah.smartcharger.websocket.socket.SocketState;
@@ -76,6 +77,7 @@ public class AuthorizeReq {
     }
 
     private String idTagWithUserType(String idTag) {
+        if (GlobalVariables.RemoteStart) return idTag;
         try {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();

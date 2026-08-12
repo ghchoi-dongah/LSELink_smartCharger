@@ -94,7 +94,6 @@ public class SocketReceiveMessage extends JSONCommunicator implements SocketInte
      */
     HashMap<String, String> hashMapUuid = null;
     HashMap<String, Object> newHashMapUuid = null;
-    HashMap<Integer, Integer> getConnectorIdHashMap;
 
     /**
      * LogData save class
@@ -141,10 +140,6 @@ public class SocketReceiveMessage extends JSONCommunicator implements SocketInte
             if (newHashMapUuid != null)
                 newHashMapUuid = null;
             newHashMapUuid = new HashMap<String, Object>();
-            // connectorId to channel (remoteStart ==> remoteStop)
-            if (getConnectorIdHashMap != null)
-                getConnectorIdHashMap = null;
-            getConnectorIdHashMap = new HashMap<Integer, Integer>();
 
             socket = new Socket(url);
             socket.setState(SocketState.OPENING);

@@ -166,16 +166,19 @@ public class ClassUiProcess implements RfCardReaderListener {
                     handleRebooting();
                     break;
 
+                case PLUG_CHECK:
+                    handlePlugCheck(rxData, txData);
+                    break;
+
                 case MEMBER_CARD:
                 case MEMBER_CHECK_WAIT:
                 case CREDIT_CARD:
                 case CREDIT_CARD_WAIT:
-                case CONNECTION_FAILED:
                 case MEMBER_CHECK_FAILED:
                     break;
 
-                case PLUG_CHECK:
-                    handlePlugCheck(rxData, txData);
+                case CONNECTION_FAILED:
+                    handleConnectionFailed(txData);
                     break;
 
                 case CONNECT_CHECK:
@@ -322,7 +325,7 @@ public class ClassUiProcess implements RfCardReaderListener {
         }
     }
 
-    private void startMeterValuesWithDelay() {
+    public void startMeterValuesWithDelay() {
         if (GlobalVariables.getMeterValueSampleInterval() > 0) {
             handler.postDelayed(() -> {
                 onMeterValueStart(getCh()+1);
@@ -382,8 +385,7 @@ public class ClassUiProcess implements RfCardReaderListener {
             chargingCurrentData.setOutPutVoltage(rxData.getVoltage());  //출력전압
             chargingCurrentData.setPowerMeter(rxData.getActiveEnergy());  //전력량
             chargingCurrentData.setFrequency(rxData.getFrequency() * 0.01);    //주파수
-//            chargingCurrentData.setChargingRemainTime(rxData.getRemainTime());  // 충전 남은 시간
-//            chargingCurrentData.setSoc(rxData.getSoc());
+//            chargingCurrentData.setSoc(rxData.getSoc());  // soc
         } catch (Exception e) {
             logger.error("power meter calculate error : {}", e.getMessage());
         }
@@ -496,7 +498,6 @@ public class ClassUiProcess implements RfCardReaderListener {
         txData.setMainMC(false);
         chargingAlarm = startCheck = true;
         finishWaitScheduled = false;
-        GlobalVariables.startApp = false;
 
         onMeterValueStop();
         if (chargingCurrentData.isReBoot() && onRebootCheck()) {
@@ -581,8 +582,8 @@ public class ClassUiProcess implements RfCardReaderListener {
                 // start transaction send to server(Accepted → Charging Fragment)
                 StartTransactionReq startTransactionReq = new StartTransactionReq(chargingCurrentData.getConnectorId());
                 startTransactionReq.sendStartTransactionReq();
-                startMeterValuesWithDelay();
-                onBatteryInfoStart(GlobalVariables.batteryDelay);
+//                startMeterValuesWithDelay();
+//                onBatteryInfoStart(GlobalVariables.batteryDelay);
                 startCheck = false;
 
                 // target soc
@@ -630,7 +631,7 @@ public class ClassUiProcess implements RfCardReaderListener {
             if (!GlobalVariables.isStopTransactionOnEVSideDisconnect() &&
                     !GlobalVariables.isUnlockConnectorOnEVSideDisconnect()) {
                 if (isStopped || isPilotDisconnected || isSocReached || isLimitTime) {
-                    if (!rxData.isCsPilot() && (chargingCurrentData.getStopReason() == Reason.Remote || chargingCurrentData.isUserStop())) {
+                    if (!rxData.isCsPilot()) {
                         // status notification send to server : ChargePointStatus.SuspendedEV
                         // 2.4.5. EV Side Disconnected
                         chargingCurrentData.setStopReason(Reason.EVDisconnected);
@@ -640,7 +641,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                 }
             } else {
                 if (isStopped || isPilotDisconnected || isSocReached || isLimitTime || chargingCurrentData.isUserStop()
-                        || !GlobalVariables.ChargerOperation[getCh()+1]) {
+                        || !GlobalVariables.ChargerOperation[getCh()+1] || Objects.equals(chargingCurrentData.getStopReason(), Reason.Remote)) {
                     // status notification send to server : ChargePointStatus.SuspendedEV
                     // 2.4.5. EV Side Disconnected
                     if (!rxData.isCsPilot()) {
@@ -693,6 +694,8 @@ public class ClassUiProcess implements RfCardReaderListener {
                     stopTransactionReq.sendStopTransactionReq();
                 }
 
+                chargingCurrentData.setStopReason(Reason.Local);
+                GlobalVariables.RemoteStart = false;
                 setUiSeq(UiSeq.FINISH);
                 fragmentChange.onFragmentChange(UiSeq.FINISH, "FINISH", null);
             }, 2000);
@@ -762,9 +765,23 @@ public class ClassUiProcess implements RfCardReaderListener {
         }
     }
 
+    // connection failed
+    private void handleConnectionFailed(TxData txData) {
+        try {
+            txData.setUiSequence((short) 3);
+            txData.setMainMC(false);
+            txData.setPwmDuty((short) 100);
+            onMeterValueStop();
+            onBatteryInfoStop();
+            GlobalVariables.RemoteStart = false;
+        } catch (Exception e) {
+            logger.error("handleConnectionFailed error : {}", e.getMessage(), e);
+        }
+    }
+
     // 점검 상태
     private void handleOpStop() {
-        // OP_STOp → INIT
+        // OP_STOP → INIT
         if (GlobalVariables.ChargerOperation[getCh()+1]) {
             setUiSeq(UiSeq.INIT);
             fragmentChange.onFragmentChange(UiSeq.INIT, "INIT", null);

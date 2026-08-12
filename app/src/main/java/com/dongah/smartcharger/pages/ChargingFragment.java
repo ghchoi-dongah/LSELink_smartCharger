@@ -22,6 +22,7 @@ import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.basefunction.ChargerConfiguration;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.PaymentType;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.controlboard.TxData;
@@ -131,7 +132,12 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
             mediaPlayer();      // media player
 
             try {
-                textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
+                if (chargingCurrentData.getSoc() == 0) {
+                    textViewSocValue.setVisibility(View.INVISIBLE);
+                } else {
+                    textViewSocValue.setVisibility(View.VISIBLE);
+                    textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
+                }
                 textViewLimitSocValue.setText("목표 충전율: " + chargingCurrentData.getTargetSoc() + "%");
                 startTime = zonedDateTimeConvert.doStringDateToDate(chargingCurrentData.getChargingStartTime());
                 txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
@@ -152,7 +158,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                 stopCharging();
             } else {
                 // server mode
-                boolean requireRfCard = Objects.equals(chargingCurrentData.getPaymentType(), PaymentType.MEMBER) &&
+                boolean requireRfCard = !Objects.equals(chargingCurrentData.getPaymentType(), PaymentType.CREDIT) &&
                         chargerConfiguration.isStopConfirm();
                 if (requireRfCard) {
                     activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);

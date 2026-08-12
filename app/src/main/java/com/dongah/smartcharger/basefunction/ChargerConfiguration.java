@@ -73,8 +73,8 @@ public class ChargerConfiguration {
 
 
     /** charging point configuration setting */
-    public int chargerPointType = 0;                    // 커플러 타입
-    public String chargerPointModel = "DEVD240";        // 충전기 모델ID
+    public int chargerPointType = 1;                    // 커플러 타입
+    public String chargerPointModel = "DEVW007";        // 충전기 모델ID
     public int chargerPointModelCode = 0;
     public String chargeBoxSerialNumber = "";           // 충전소ID
     public String chargerId = "";                       // 충전기ID
@@ -182,7 +182,7 @@ public class ChargerConfiguration {
             obj.put("SIGNED", isSigned());
             obj.put("CONTROL_MONITOR", isControlMonitor());
             obj.put("INIT_INFO", isInitInfo());
-            fileManagement.stringToFileSave(rootPath, CONFIG_FILE_NAME, obj.toString(), false);
+            fileManagement.stringToFileSave(GlobalVariables.ROOT_PATH, CONFIG_FILE_NAME, obj.toString(), false);
         } catch (Exception e) {
             logger.error("configuration save fail: {}", e.getMessage(), e);
         }

@@ -114,6 +114,8 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_init, container, false);
         view.setOnClickListener(this);
+        GlobalVariables.startApp = false;
+
         animBlink = AnimationUtils.loadAnimation(getActivity(), R.anim.blink_animation);
         activity = ((MainActivity) MainActivity.mContext);
         chargerConfiguration = activity.getChargerConfiguration();
@@ -140,6 +142,7 @@ public class InitFragment extends Fragment implements View.OnClickListener {
             logger.error("onCreateView error : {}", e.getMessage(), e);
         }
 
+        initData();
         return view;
     }
 
@@ -184,8 +187,6 @@ public class InitFragment extends Fragment implements View.OnClickListener {
 
     private void changeFragment() {
         try {
-            initData();
-
             if (Objects.equals(chargerConfiguration.getOpMode(), 0)) {
                 // test mode
                 double testPrice = Double.parseDouble(chargerConfiguration.getTestPrice());

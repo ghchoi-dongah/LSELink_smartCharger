@@ -23,6 +23,7 @@ import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.ClassUiProcess;
+import com.dongah.smartcharger.basefunction.FragmentChange;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.utils.SharedModel;
 
@@ -57,6 +58,7 @@ public class MemberCardFragment extends Fragment {
     Handler countHandler;
     Runnable countRunnable;
     MainActivity activity;
+    FragmentChange fragmentChange;
     ClassUiProcess classUiProcess;
     ChargingCurrentData chargingCurrentData;
 
@@ -101,6 +103,7 @@ public class MemberCardFragment extends Fragment {
         sharedModel.setMutableLiveData(requestStrings);
 
         activity = (MainActivity) MainActivity.mContext;
+        fragmentChange = activity.getFragmentChange();
         classUiProcess = activity.getClassUiProcess();
         chargingCurrentData = activity.getChargingCurrentData();
 
@@ -133,7 +136,13 @@ public class MemberCardFragment extends Fragment {
                 public void run() {
                     timer--;
                     if (timer <= 0) {
-                        ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
+                        countHandler.removeCallbacks(countRunnable);
+
+                        if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.CHARGING)) {
+                            fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
+                        } else {
+                            classUiProcess.onHome();
+                        }
                     } else {
                         countHandler.postDelayed(countRunnable, 1000);
                         textViewTagTimer.setText(timer + "초");

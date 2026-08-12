@@ -4,8 +4,11 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +38,10 @@ public class ConnectionFailedFragment extends Fragment implements View.OnClickLi
     private String mParam1;
     private String mParam2;
 
+    private static final long UI_CHECK_INTERVAL_MS = 2 * 60 * 1000; // 2분
     TextView textViewFailed;
     ObjectAnimator fadeAnimator;
+    Handler uiCheckHandler;
 
     public ConnectionFailedFragment() {
         // Required empty public constructor
@@ -88,6 +93,26 @@ public class ConnectionFailedFragment extends Fragment implements View.OnClickLi
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        try {
+            // unplug check 후 초기 화면
+            uiCheckHandler = new Handler();
+            uiCheckHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (!((MainActivity) MainActivity.mContext).getControlBoard().getRxData().isCsPilot()) {
+                        ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
+                    }
+                    uiCheckHandler.postDelayed(this, UI_CHECK_INTERVAL_MS);
+                }
+            }, UI_CHECK_INTERVAL_MS);
+        } catch (Exception e) {
+            logger.error("onViewCreated error : {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if (!isAdded()) return;
         ((MainActivity) MainActivity.mContext).getClassUiProcess().onHome();
@@ -101,6 +126,11 @@ public class ConnectionFailedFragment extends Fragment implements View.OnClickLi
             if (fadeAnimator != null) {
                 fadeAnimator.cancel();
                 fadeAnimator = null;
+            }
+
+            if (uiCheckHandler != null) {
+                uiCheckHandler.removeCallbacksAndMessages(null);
+                uiCheckHandler = null;
             }
         } catch (Exception e) {
             logger.error("ConnectionFailedFragment onDestroyView error : {}", e.getMessage());

@@ -223,6 +223,7 @@ public class ChargingCurrentData {
             setUnitPrice(0);
             setBatCurrent(0);
             setBatVoltage(0);
+            setStopReason(Reason.Other);
         } catch (Exception e) {
             logger.error("ChargingCurrentData onCurrentDataClear error : {}", e.getMessage(), e);
         }

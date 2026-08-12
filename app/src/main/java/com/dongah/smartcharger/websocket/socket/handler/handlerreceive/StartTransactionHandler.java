@@ -35,7 +35,8 @@ public class StartTransactionHandler implements OcppHandler  {
         MainActivity activity = ((MainActivity) MainActivity.mContext);
         ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
         //서버에서 transactionId 받음 ==> stopTransaction 계속하여 사용.
-        chargingCurrentData.setTransactionId(payload.getInt("transactionId"));
+        int transactionId = payload.getInt("transactionId");
+        chargingCurrentData.setTransactionId(transactionId);
 
         JSONObject idTagInfo = payload.getJSONObject("idTagInfo");
         AuthorizationStatus status = AuthorizationStatus.valueOf(idTagInfo.getString("status"));
@@ -43,16 +44,20 @@ public class StartTransactionHandler implements OcppHandler  {
 
         // dump data
         if (GlobalVariables.isDumpSending(connectorId)) {
-            logger.info("Dump StartTransaction Conf 수신 : {}", payload.getInt("transactionId"));
-            GlobalVariables.setDumpTransactionId(connectorId, payload.getInt("transactionId"));
+            logger.info("Dump StartTransaction Conf 수신 : {}", transactionId);
+            GlobalVariables.setDumpTransactionId(connectorId, transactionId);
             activity.getSocketReceiveMessage().getSocket()
-                    .getDumpDataSend(connectorId).onReceiveStartTransactionConf(connectorId, payload.getInt("transactionId"));
+                    .getDumpDataSend(connectorId).onReceiveStartTransactionConf(connectorId, transactionId);
             return;
         }
 
         //accept continue
         if (Objects.equals(status, AuthorizationStatus.Accepted)) {
             chargingCurrentData.setChargePointStatus(ChargePointStatus.Charging);
+
+            if (GlobalVariables.RemoteStart) {
+                GlobalVariables.remoteConnectorId.put(connectorId, transactionId);
+            }
 
             // DataTransfer ChargingAlarm
             ChargingAlarmReq chargingAlarmReq = new ChargingAlarmReq(connectorId);
@@ -71,6 +76,9 @@ public class StartTransactionHandler implements OcppHandler  {
             userSetSocReq.sendUserSetSoc();
 
             activity.getClassUiProcess().setUiSeq(UiSeq.CHARGING);
+            activity.getClassUiProcess().startMeterValuesWithDelay();
+//            activity.getClassUiProcess().onMeterValueStart(connectorId);
+            activity.getClassUiProcess().onBatteryInfoStart(GlobalVariables.batteryDelay);
             FragmentChange fragmentChange = new FragmentChange();
             fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
         } else {

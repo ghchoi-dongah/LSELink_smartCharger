@@ -74,7 +74,7 @@ public class ChangeAvailabilityHandler implements OcppHandler {
 
             // status
             AvailabilityStatus result =
-                    ((type == AvailabilityType.Inoperative) || (type == AvailabilityType.Maintenance) && isCharging)
+                    (type == AvailabilityType.Inoperative || type == AvailabilityType.Maintenance) && isCharging
                             ? AvailabilityStatus.Scheduled
                             : AvailabilityStatus.Accepted;
 

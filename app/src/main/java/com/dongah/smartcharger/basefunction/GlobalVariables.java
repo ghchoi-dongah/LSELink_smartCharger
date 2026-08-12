@@ -5,6 +5,8 @@ import android.os.Environment;
 import com.dongah.smartcharger.websocket.ocpp.localauthlist.UpdateStatus;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GlobalVariables {
 
@@ -71,6 +73,8 @@ public class GlobalVariables {
     public static boolean[] dumpSending = new boolean[maxChannel];
     public static boolean reconnectCheck = false;
     public static boolean Scheduled = false;
+    public static boolean RemoteStart = false;
+    public static Map<Integer, Integer> remoteConnectorId = new HashMap<>();
 
     public static boolean memberRegisterMode = false;
     public static MemberCardRegisterCallback memberCardRegisterCallback = null;

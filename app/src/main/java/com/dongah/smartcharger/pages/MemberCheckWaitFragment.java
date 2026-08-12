@@ -223,8 +223,9 @@ public class MemberCheckWaitFragment extends Fragment {
                         if (Objects.equals(chargingCurrentData.getParentIdTag(), idTagInfo[1]) ||
                                 Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                             // 같은 카드 or 상위 그룹 카드로 태그 → 충전 종료
-                            classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-                            fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
+                            stopCharging();
+//                            classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
+//                            fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                         } else {
                             // 다른 카드로 태그 → 충전 화면 유지
                             fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);

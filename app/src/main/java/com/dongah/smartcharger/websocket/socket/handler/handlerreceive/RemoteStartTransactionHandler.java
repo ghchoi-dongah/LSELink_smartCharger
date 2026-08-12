@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.PaymentType;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.websocket.ocpp.core.ChargePointStatus;
@@ -43,7 +44,6 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
 
             chargingCurrentData.setConnectorId(payload.getInt("connectorId"));
             chargingCurrentData.setIdTag(payload.getString("idTag"));
-            chargingCurrentData.setPaymentType(PaymentType.MEMBER);
 
             // 응답
             sendResponse(connector, messageId);
@@ -60,7 +60,7 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
             RemoteStartStopStatus status = !Objects.equals(uiSeq, UiSeq.INIT) ? RemoteStartStopStatus.Rejected
-                    : connectorId == 0 ? RemoteStartStopStatus.Rejected : RemoteStartStopStatus.Accepted;
+                    : connectorId == 1 ? RemoteStartStopStatus.Accepted : RemoteStartStopStatus.Rejected;
             RemoteStartTransactionConfirmation remoteStartTransactionConfirmation =
                     new RemoteStartTransactionConfirmation(status);
             activity.getSocketReceiveMessage().onResultSend(
@@ -71,19 +71,54 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
             );
 
             if (Objects.equals(status, RemoteStartStopStatus.Accepted)) {
-                chargingCurrentData.setAuthType("M");
+                String idTag = chargingCurrentData.getIdTag();
+                authType(idTag.charAt(0), chargingCurrentData);
+                GlobalVariables.RemoteStart = true;
 
                 // Authorize
                 AuthorizeReq authorizeReq = new AuthorizeReq(connectorId);
                 authorizeReq.sendAuthorize(chargingCurrentData.getIdTag());
 
                 // StatusNotification
-                chargingCurrentData.setChargePointStatus(ChargePointStatus.Preparing);
-                StatusNotificationReq statusNotificationReq = new StatusNotificationReq(connectorId);
-                statusNotificationReq.sendStatusNotification(connectorId, ChargePointStatus.Preparing);
+//                chargingCurrentData.setChargePointStatus(ChargePointStatus.Preparing);
+//                StatusNotificationReq statusNotificationReq = new StatusNotificationReq(connectorId);
+//                statusNotificationReq.sendStatusNotification(connectorId, ChargePointStatus.Preparing);
             }
         } catch (Exception e) {
             logger.error("RemoteStartTransactionHandler sendResponse error : {}", e.getMessage());
+        }
+    }
+
+    private void authType(char type, ChargingCurrentData chargingCurrentData) {
+
+        try {
+            switch (type) {
+                case 'C':
+                    chargingCurrentData.setAuthType("C");
+                    chargingCurrentData.setPaymentType(PaymentType.CORP);
+                    chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
+                    break;
+                case 'M':
+                    chargingCurrentData.setAuthType("M");
+                    chargingCurrentData.setPaymentType(PaymentType.MEMBER);
+                    chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
+                    break;
+                case 'N':
+                    chargingCurrentData.setAuthType("N");
+                    chargingCurrentData.setPaymentType(PaymentType.CREDIT);
+                    chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeN);
+                    break;
+                case 'K':
+                    chargingCurrentData.setAuthType("K");
+                    chargingCurrentData.setPaymentType(PaymentType.MOE);
+                    chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeK);
+                    break;
+                default:
+                    logger.error("authType none");
+                    break;
+            }
+        } catch (Exception e) {
+            logger.error("authType error : {}", e.getMessage(), e);
         }
     }
 }
