@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
 import com.dongah.smartcharger.basefunction.ChargerConfiguration;
-import com.dongah.smartcharger.basefunction.ChargerPointType;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.ClassUiProcess;
 import com.dongah.smartcharger.basefunction.FragmentChange;
@@ -194,6 +193,7 @@ public class MemberCheckWaitFragment extends Fragment {
 
             // reservation check
             if (chargingCurrentData.getReservedStatus() == ChargePointStatus.Reserved) {
+//                String idTag = idTagType(chargingCurrentData.getIdTag());
                 if (!Objects.equals(chargingCurrentData.getResIdTag(), chargingCurrentData.getIdTag())) {
                     // resIdTag ≠ idTag
                     if (Objects.equals(uiSeq, UiSeq.CHARGING)) {
@@ -211,6 +211,7 @@ public class MemberCheckWaitFragment extends Fragment {
                         } else {
                             // Charging 아닌 상태 && resParentIdTag가 없음 → 인증 불가로 HOME 이동
                             // 충전 시작 전인데 카드 ID가 다름 + 상위 카드도 없음 → 인증 불가, HOME 이동
+                            Toast.makeText(getActivity(), "예약한 회원번호가 틀립니다.", Toast.LENGTH_SHORT).show();
                             activity.getClassUiProcess().onHome();
                         }
                     }
@@ -224,10 +225,11 @@ public class MemberCheckWaitFragment extends Fragment {
                                 Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                             // 같은 카드 or 상위 그룹 카드로 태그 → 충전 종료
                             stopCharging();
-//                            classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-//                            fragmentChange.onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                         } else {
                             // 다른 카드로 태그 → 충전 화면 유지
+                            // 식별자가 상이할 경우 Authorize 전송
+                            AuthorizeReq authorizeReq = new AuthorizeReq(chargingCurrentData.getConnectorId());
+                            authorizeReq.sendAuthorize(chargingCurrentData.getIdTagStop());
                             fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                         }
                     } else {
@@ -254,6 +256,9 @@ public class MemberCheckWaitFragment extends Fragment {
                         stopCharging();
                     } else  {
                         // 다른 카드 → 충전 화면 유지
+                        // 식별자가 상이할 경우 Authorize 전송
+                        AuthorizeReq authorizeReq = new AuthorizeReq(chargingCurrentData.getConnectorId());
+                        authorizeReq.sendAuthorize(chargingCurrentData.getIdTagStop());
                         activity.getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                     }
                 } else {
@@ -296,12 +301,14 @@ public class MemberCheckWaitFragment extends Fragment {
                         if (Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                             stopCharging();
                         } else {
+                            AuthorizeReq authorizeReq = new AuthorizeReq(chargingCurrentData.getConnectorId());
+                            authorizeReq.sendAuthorize(chargingCurrentData.getIdTagStop());
                             activity.getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                         }
                     } else {
                         if (chargingCurrentData.getChargePointStatus() == ChargePointStatus.Reserved) {
                             if (!Objects.equals(chargingCurrentData.getResIdTag(), chargingCurrentData.getIdTag())) {
-                                Toast.makeText(getActivity(), "예약한 IdTag가 틀립니다. ", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "예약한 회원번호가 틀립니다. ", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
@@ -319,8 +326,6 @@ public class MemberCheckWaitFragment extends Fragment {
                             if (Objects.equals(chargingCurrentData.getParentIdTag(), idTagInfo[1]) ||
                                     Objects.equals(chargingCurrentData.getIdTag(), chargingCurrentData.getIdTagStop())) {
                                 stopCharging();
-//                                classUiProcess.setUiSeq(UiSeq.FINISH_WAIT);
-//                                activity.getFragmentChange().onFragmentChange(UiSeq.FINISH_WAIT, "FINISH_WAIT", null);
                             } else {
                                 activity.getFragmentChange().onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
                             }

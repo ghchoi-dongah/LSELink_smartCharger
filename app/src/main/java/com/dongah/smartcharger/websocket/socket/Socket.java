@@ -121,6 +121,12 @@ public class Socket extends WebSocketListener {
             reconnectingAttempts = 0;
             socketInterface.onOpen(webSocket);
 
+            // dump data send
+            for (int i = 1; i <= GlobalVariables.maxChannel; i++) {
+                GlobalVariables.setDumpSending(i, true);
+                ((MainActivity) MainActivity.mContext).getSocketReceiveMessage().getSocket().getDumpDataSend(i).onDumpSend(i);
+            }
+
             ProcessHandler ph = ((MainActivity) MainActivity.mContext).getProcessHandler();
             if (ph != null && !GlobalVariables.isConnectRetry()) {
                 ph.onBootNotificationStart(5);
@@ -344,8 +350,6 @@ public class Socket extends WebSocketListener {
             // 상태 초기화
             setState(SocketState.NONE);
 //            ((MainActivity) MainActivity.mContext).getProcessHandler().onHeartBeatStop();
-//            ((MainActivity) MainActivity.mContext).getProcessHandler().onCustomStatusNotificationStop();
-//            ((MainActivity) MainActivity.mContext).getProcessHandler().onCustomUnitPriceStop();
         } catch (Exception e) {
             logger.error("fullClose error", e);
         }
@@ -519,8 +523,6 @@ public class Socket extends WebSocketListener {
                     log.toString(),
                     true
             );
-
-            // JSON append 저장
 //            LogDataSave logDataSave = new LogDataSave("log");
 //            logDataSave.makeLogDate(100,"SOCKET_ERROR", log.toString());
 

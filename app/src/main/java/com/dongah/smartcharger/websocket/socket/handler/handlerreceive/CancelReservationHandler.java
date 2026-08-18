@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.basefunction.ChargingCurrentData;
-import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.websocket.ocpp.core.ChargePointStatus;
 import com.dongah.smartcharger.websocket.ocpp.reservation.CancelReservationConfirmation;
 import com.dongah.smartcharger.websocket.ocpp.reservation.CancelReservationStatus;
@@ -36,7 +35,7 @@ public class CancelReservationHandler implements OcppHandler {
             // response
             CancelReservationConfirmation cancelReservationConfirmation = new CancelReservationConfirmation(cancelReservationStatus);
             activity.getSocketReceiveMessage().onResultSend(
-                    cancelConnectorId,
+                    100,
                     cancelReservationConfirmation.getActionName(),
                     messageId,
                     cancelReservationConfirmation
@@ -55,18 +54,16 @@ public class CancelReservationHandler implements OcppHandler {
     private int onFindConnectorId(String reservationId) {
         int result = 0;
         try {
-            for (int i = 0; i < GlobalVariables.maxChannel; i++) {
-                ChargingCurrentData chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
-                if (Objects.equals(reservationId, chargingCurrentData.getResReservationId())) {
-                    result = chargingCurrentData.getResConnectorId();
-                    chargingCurrentData.setResConnectorId(0);
-                    chargingCurrentData.setResExpiryDate("");
-                    chargingCurrentData.setResIdTag("");
-                    chargingCurrentData.setResParentIdTag("");
-                    chargingCurrentData.setResReservationId("");
-                    chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
-                    break;
-                }
+            ChargingCurrentData chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
+            if (Objects.equals(reservationId, chargingCurrentData.getResReservationId())) {
+                result = chargingCurrentData.getResConnectorId();
+                chargingCurrentData.setResConnectorId(0);
+                chargingCurrentData.setResIdTag("");
+                chargingCurrentData.setResExpiryDate("");
+                chargingCurrentData.setResReservationId("");
+                chargingCurrentData.setResParentIdTag("");
+                chargingCurrentData.setChargePointStatus(ChargePointStatus.Available);
+                chargingCurrentData.setReservedStatus(ChargePointStatus.Available);
             }
         } catch (Exception e) {
             logger.error("onFindConnectorId error : {}", e.getMessage(), e);

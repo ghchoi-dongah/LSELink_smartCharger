@@ -64,6 +64,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     boolean chargingAlarm = true;
     boolean startCheck = true;
     boolean finishWaitScheduled = false;
+    boolean isChargingFlag = true;
     ZonedDateTime startTime;
 
     /** OCPP     */
@@ -430,15 +431,15 @@ public class ClassUiProcess implements RfCardReaderListener {
     private void onRfCardDataReceiveEvent(String cardNum, boolean b) {
         if (b) {
             try {
+                MainActivity activity = ((MainActivity) MainActivity.mContext);
+                ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+                UiSeq seq = activity.getClassUiProcess().getUiSeq();
+                int userType = chargingCurrentData.getPaymentType().value();
+
                 if (Objects.equals(cardNum,"0000000000000000")) {
                     rfCardReaderReceive.rfCardReadRequest();
                 } else if (!cardNum.isEmpty()) {
-                    MainActivity activity = ((MainActivity) MainActivity.mContext);
-                    ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
-                    UiSeq seq = activity.getClassUiProcess().getUiSeq();
-
                     if (Objects.equals(UiSeq.CHARGING, seq)) {
-                        int userType = chargingCurrentData.getPaymentType().value();
                         switch (userType) {
                             case 1:
                                 chargingCurrentData.setIdTagStop("M" + cardNum);
@@ -453,11 +454,27 @@ public class ClassUiProcess implements RfCardReaderListener {
                                 chargingCurrentData.setIdTagStop("K" + cardNum);
                                 break;
                             default:
-                                logger.error("onRfCardDataReceiveEvent userType none");
+                                logger.error("onRfCardDataReceiveEvent idTagStop userType none");
                                 break;
                         }
                     } else {
-                        chargingCurrentData.setIdTag(cardNum);
+                        switch (userType) {
+                            case 1:
+                                chargingCurrentData.setIdTag("M" + cardNum);
+                                break;
+                            case 2:
+                                chargingCurrentData.setIdTag("N" + cardNum);
+                                break;
+                            case 7:
+                                chargingCurrentData.setIdTag("C" + cardNum);
+                                break;
+                            case 8:
+                                chargingCurrentData.setIdTag("K" + cardNum);
+                                break;
+                            default:
+                                logger.error("onRfCardDataReceiveEvent idTag userType none");
+                                break;
+                        }
                         activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CHECK_WAIT);
                     }
                     fragmentChange.onFragmentChange(UiSeq.MEMBER_CHECK_WAIT,"MEMBER_CHECK_WAIT",null);
@@ -496,7 +513,7 @@ public class ClassUiProcess implements RfCardReaderListener {
         txData.setPwmDuty((short) 100);
         txData.setUiSequence((short) 1);
         txData.setMainMC(false);
-        chargingAlarm = startCheck = true;
+        chargingAlarm = startCheck = isChargingFlag = true;
         finishWaitScheduled = false;
 
         onMeterValueStop();
@@ -569,6 +586,17 @@ public class ClassUiProcess implements RfCardReaderListener {
             chargingCurrentData.setChargingStartTime(zonedDateTimeConvert.getStringCurrentTimeZone());
             startTime = zonedDateTimeConvert.doZonedDateTimeToDatetime(chargingCurrentData.getChargingStartTime());
 
+            // target soc
+            int targetSoc = Math.min(chargingCurrentData.getLimitSoc(), chargingCurrentData.getFullrechgsoc());
+            if (targetSoc == 0 || Objects.equals(chargerConfiguration.getOpMode(), 0)) {
+                targetSoc = chargerConfiguration.getTargetSoc() == 0 ? 100 : chargerConfiguration.getTargetSoc();
+            }
+
+            if (GlobalVariables.startApp) {
+                targetSoc = Math.min(chargingCurrentData.getTargetSoc(), targetSoc);
+            }
+            chargingCurrentData.setTargetSoc(targetSoc);
+
             // Auto 및 Test mode
             // socket receive message get instance
             socketReceiveMessage = ((MainActivity) MainActivity.mContext).getSocketReceiveMessage();
@@ -582,20 +610,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                 // start transaction send to server(Accepted → Charging Fragment)
                 StartTransactionReq startTransactionReq = new StartTransactionReq(chargingCurrentData.getConnectorId());
                 startTransactionReq.sendStartTransactionReq();
-//                startMeterValuesWithDelay();
-//                onBatteryInfoStart(GlobalVariables.batteryDelay);
                 startCheck = false;
-
-                // target soc
-                int targetSoc = Math.min(chargingCurrentData.getLimitSoc(), chargingCurrentData.getFullrechgsoc());
-                if (targetSoc == 0 || Objects.equals(chargerConfiguration.getOpMode(), 0)) {
-                    targetSoc = chargerConfiguration.getTargetSoc() == 0 ? 100 : chargerConfiguration.getTargetSoc();
-                }
-
-                if (GlobalVariables.startApp) {
-                    targetSoc = Math.min(chargingCurrentData.getTargetSoc(), targetSoc);
-                }
-                chargingCurrentData.setTargetSoc(targetSoc);
             }
         }
     }
@@ -604,6 +619,11 @@ public class ClassUiProcess implements RfCardReaderListener {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void handleCharging(RxData rxData, TxData txData) {
         try {
+            if (isChargingFlag) {
+                isChargingFlag = false;
+                startMeterValuesWithDelay();
+                onBatteryInfoStart(GlobalVariables.batteryDelay);
+            }
             // 충전 사용량 계산
             onUsePowerMeter(rxData);
             txData.setUiSequence((short) 2);

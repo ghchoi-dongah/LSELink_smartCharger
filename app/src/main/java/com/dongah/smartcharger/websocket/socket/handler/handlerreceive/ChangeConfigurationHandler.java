@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.basefunction.ChargerConfiguration;
+import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.UiSeq;
 import com.dongah.smartcharger.utils.DataTransformation;
@@ -32,6 +33,7 @@ public class ChangeConfigurationHandler implements OcppHandler {
         try {
             boolean result;
             MainActivity activity = (MainActivity) MainActivity.mContext;
+            ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             ChargerConfiguration chargerConfiguration = activity.getChargerConfiguration();
             GlobalVariables.setNotSupportedKey(false);
             String key = payload.has("key") ? payload.getString("key") : "";
@@ -56,7 +58,7 @@ public class ChangeConfigurationHandler implements OcppHandler {
                 result = setConfigurationValue(key, value);
             }
 
-            if (result) ((MainActivity) MainActivity.mContext).getConfigurationKeyRead().onRead();
+            if (result) activity.getConfigurationKeyRead().onRead();
 
             //response
             ConfigurationStatus configurationStatus = GlobalVariables.isNotSupportedKey() ? ConfigurationStatus.NotSupported :
@@ -75,32 +77,13 @@ public class ChangeConfigurationHandler implements OcppHandler {
                 logger.info("webSocketURL changed. Reconnecting to: {}", value);
 
                 // config 변경 및 저장
-                activity.getChargerConfiguration().setServerConnectingString(value);
-                activity.getChargerConfiguration().onSaveConfiguration();
+                GlobalVariables.setWebSocketURL(value);
+                chargerConfiguration.setServerConnectingString(value);
+                chargerConfiguration.onSaveConfiguration();
 
-                // 충전 중이면 종료
-                UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
-                if (UiSeq.CHARGING.equals(uiSeq)) {
-                    // TODO
-//                    activity.getControlBoard().getTxData().setStart(false);
-//                    activity.getControlBoard().getTxData().setStop(true);
-                }
-
-                // rebooting
-                activity.getChargingCurrentData().setStopReason(Reason.HardReset);
-                activity.getChargingCurrentData().setReBoot(true);
+                stopChargingIfActionAndReboot();
             } else if (Objects.equals(key, "UseBasicAuth") && Boolean.parseBoolean(value)) {
-                // 충전 중이면 종료
-                UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
-                if (UiSeq.CHARGING.equals(uiSeq)) {
-                    // TODO
-//                    activity.getControlBoard().getTxData().setStart(false);
-//                    activity.getControlBoard().getTxData().setStop(true);
-                }
-
-                // rebooting
-                activity.getChargingCurrentData().setStopReason(Reason.HardReset);
-                activity.getChargingCurrentData().setReBoot(true);
+                stopChargingIfActionAndReboot();
             }
         } catch (Exception e) {
             logger.error("ChangeConfigurationHandler error :  {}", e.getMessage());
@@ -157,5 +140,21 @@ public class ChangeConfigurationHandler implements OcppHandler {
             logger.error("doAuthorizationKeyConvert error : {}", e.getMessage());
             return "0";
         }
+    }
+
+    private void stopChargingIfActionAndReboot() {
+        MainActivity activity = (MainActivity) MainActivity.mContext;
+        ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+
+        UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
+        if (UiSeq.CHARGING.equals(uiSeq)) {
+            chargingCurrentData.setUserStop(true);
+            activity.getControlBoard().getTxData().setMainMC(false);
+            activity.getControlBoard().getTxData().setPwmDuty((short) 100);
+        }
+
+        // rebooting
+        chargingCurrentData.setStopReason(Reason.HardReset);
+        chargingCurrentData.setReBoot(true);
     }
 }

@@ -210,10 +210,10 @@ public class ChargingCurrentData {
             setParentIdTag("");
             setIdTagStop("");
             setParentIdTagStop("");
-            setResExpiryDate("");
-            setResIdTag("");
-            setResParentIdTag("");
-            setResReservationId("");
+//            setResExpiryDate("");
+//            setResIdTag("");
+//            setResParentIdTag("");
+//            setResReservationId("");
             setRemoteStartSmartCharging(false);
             setSoc(0);
             setTargetSoc(100);

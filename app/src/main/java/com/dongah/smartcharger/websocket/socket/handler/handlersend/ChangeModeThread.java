@@ -280,7 +280,6 @@ public class ChangeModeThread extends Thread {
             }
 
             int value = cursor.getInt(cursor.getColumnIndexOrThrow("RECHG_ELEC"));
-            // TODO
             if (value == 0) {
                 float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
                 chargingCurrentData.setLimitPower(power);

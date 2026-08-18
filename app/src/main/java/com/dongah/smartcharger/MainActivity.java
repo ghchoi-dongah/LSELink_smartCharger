@@ -209,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
         // 1. charger configuration, ConfigurationKey read
         chargerConfiguration = new ChargerConfiguration();
         chargerConfiguration.onLoadConfiguration();
-        chargerConfiguration.setSigned(true);
         textViewVersion.setText("VER-DEVW " + GlobalVariables.VERSION + " | ");
 
         // 2. fragment change management
@@ -247,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
          *  충전소ID : 000000
          *  충전기ID : 26
          */
-        chargerConfiguration.setSigned(false);
 
         // 5. handler
         processHandler = new ProcessHandler();
@@ -269,8 +267,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (state != SocketState.OPEN || Objects.equals(chargerConfiguration.getOpMode(), 0)) {
             // 전류, SoC 제한 설정
-//            ((MainActivity) MainActivity.mContext).getControlBoard().getTxData().setOutPowerLimit((short) chargerConfiguration.getDr());
             ((MainActivity) MainActivity.mContext).getChargingCurrentData().setLimitSoc(chargerConfiguration.getTargetSoc());
+            ((MainActivity) MainActivity.mContext).getChargingCurrentData().setLimitPower(
+                    chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3);
         }
 
         // 7. classUiProcess

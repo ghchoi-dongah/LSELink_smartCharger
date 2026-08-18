@@ -6,6 +6,7 @@ import android.os.Environment;
 import androidx.annotation.RequiresApi;
 
 import com.dongah.smartcharger.MainActivity;
+import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.utils.FileManagement;
 import com.dongah.smartcharger.websocket.ocpp.utilities.ZonedDateTimeConvert;
 
@@ -19,7 +20,7 @@ import java.text.DecimalFormat;
 public class DiagnosticsThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(DiagnosticsThread.class);
 
-    private static final String FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download";
+    private static final String FILE_PATH = GlobalVariables.getRootPath();
     private static final String FILE_NAME = "diagnostics.dongah";
     private volatile boolean stopped = false;
     long delayTime;
@@ -51,13 +52,12 @@ public class DiagnosticsThread extends Thread {
                 if (count > delayTime) {
                     try {
                         count = 0;
-                        String startTime = zonedDateTimeConvert.doGetKstDatetimeAsString();
-                        // TODO
-//                        String powerMeter = powerFormatter.format(((MainActivity) MainActivity.mContext).getControlBoard().getRxData().getPowerMeter() * 0.01);
-//                        JSONArray data = insertData(startTime, powerMeter);
-//                        JSONObject obj = new JSONObject();
-//                        obj.put("diagnostics", data);
-//                        fileManagement.stringToFileSave(FILE_PATH, FILE_NAME, obj.toString(), true);
+                        String startTime = zonedDateTimeConvert.doGetUtcDatetimeAsStringSimple();
+                        String powerMeter = powerFormatter.format(((MainActivity) MainActivity.mContext).getControlBoard().getRxData().getActiveEnergy());
+                        JSONArray data = insertData(startTime, powerMeter);
+                        JSONObject obj = new JSONObject();
+                        obj.put("diagnostics", data);
+                        fileManagement.stringToFileSave(FILE_PATH, FILE_NAME, obj.toString(), true);
                     } catch (Exception e) {
                         logger.error(e.getMessage());
                     }

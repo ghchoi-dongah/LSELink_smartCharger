@@ -76,9 +76,6 @@ public class StartTransactionHandler implements OcppHandler  {
             userSetSocReq.sendUserSetSoc();
 
             activity.getClassUiProcess().setUiSeq(UiSeq.CHARGING);
-            activity.getClassUiProcess().startMeterValuesWithDelay();
-//            activity.getClassUiProcess().onMeterValueStart(connectorId);
-            activity.getClassUiProcess().onBatteryInfoStart(GlobalVariables.batteryDelay);
             FragmentChange fragmentChange = new FragmentChange();
             fragmentChange.onFragmentChange(UiSeq.CHARGING, "CHARGING", null);
         } else {
