@@ -140,7 +140,8 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                 }
                 textViewLimitSocValue.setText("목표 충전율: " + chargingCurrentData.getTargetSoc() + "%");
                 startTime = zonedDateTimeConvert.doStringDateToDate(chargingCurrentData.getChargingStartTime());
-                txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
+//                txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
+                txtPowerUnitPrice.setText(chargingCurrentData.getPowerUnitPrice() + "원");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

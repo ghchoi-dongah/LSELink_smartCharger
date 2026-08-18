@@ -44,6 +44,7 @@
         tools:ignore="contentDescription"/>
 
     <TextView
+        android:id="@+id/textViewRetry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"

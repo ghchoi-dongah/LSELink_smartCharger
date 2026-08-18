@@ -130,7 +130,8 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
                     textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
                     textViewChargingTimeValue.setText(chargingCurrentData.getChargingUseTime());
                     txtChargePay.setText(payFormatter.format(chargingCurrentData.getPowerMeterUsePay()) + "원") ;
-                    txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
+//                    txtPowerUnitPrice.setText(payFormatter.format((long) chargingCurrentData.getPowerUnitPrice()) + "원");
+                    txtPowerUnitPrice.setText(chargingCurrentData.getPowerUnitPrice() + "원");
                 }
             });
         } catch (Exception e) {

@@ -609,8 +609,9 @@ public class ClassUiProcess implements RfCardReaderListener {
             txData.setUiSequence((short) 2);
             boolean isStopped = rxData.isCsStop();
             boolean isPilotDisconnected = rxData.getCsCPStatus() == 1 || rxData.getCsCPStatus() == 0;
-            boolean isSocReached = (chargingCurrentData.getSoc() != 0
-                    && chargingCurrentData.getSoc() >= chargingCurrentData.getTargetSoc());
+            boolean isSocReached = ((chargingCurrentData.getSoc() != 0
+                    && chargingCurrentData.getSoc() >= chargingCurrentData.getTargetSoc())
+                    || chargingCurrentData.getTargetSoc() == 0);
             boolean isPrePaymentEnabled = chargingCurrentData.isPrePaymentResult();
             boolean isPaymentDepleted = chargingCurrentData.getPrePayment() <= chargingCurrentData.getPowerMeterUsePay();
 

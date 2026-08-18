@@ -83,7 +83,7 @@ public class AuthorizeReq {
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             int userType = chargingCurrentData.getPaymentType().value();
 
-            /** pay type : MEMBER(1) CREDIT(2) */
+            /** pay type : MEMBER(1) CREDIT(2) CORP(7) MOE(8)*/
             switch (userType) {
                 case 1:
                     chargingCurrentData.setIdTag("M" + chargingCurrentData.getIdTag());
@@ -91,8 +91,14 @@ public class AuthorizeReq {
                 case 2:
                     chargingCurrentData.setIdTag("N" + chargingCurrentData.getIdTag());
                     break;
+                case 7:
+                    chargingCurrentData.setIdTag("C" + chargingCurrentData.getIdTag());
+                    break;
+                case 8:
+                    chargingCurrentData.setIdTag("K" + chargingCurrentData.getIdTag());
+                    break;
                 default:
-                    logger.warn("userType none");
+                    logger.error("userType none");
                     break;
             }
             return chargingCurrentData.getIdTag();

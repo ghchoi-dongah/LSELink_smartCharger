@@ -209,12 +209,14 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                             activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
                             break;
                         case 1:
+                        case 2:
+                        case 3:
                             activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
                             activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
                             break;
                         default:
                             logger.error("InitFragment changeFragment error >> Invalid value");
-                            activity.getToastPositionMake().onShowToast("충전을 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+                            activity.getToastPositionMake().onShowToast("충전을 할 수 없습니다. 고객센터에 문의주세요.");
                             break;
                     }
                 } catch (Exception e){

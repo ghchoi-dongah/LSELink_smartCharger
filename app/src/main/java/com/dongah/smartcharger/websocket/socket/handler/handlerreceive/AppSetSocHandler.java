@@ -27,7 +27,8 @@ public class AppSetSocHandler implements OcppHandler {
             MainActivity activity = (MainActivity) MainActivity.mContext;
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
-            JSONObject dataJson = payload.getJSONObject("data");
+            String dataStr = payload.getString("data");
+            JSONObject dataJson = dataStr.startsWith("{") ? new JSONObject(dataStr) : payload.getJSONObject("data");
             String idTag = dataJson.getString("idTag");
             int soc = dataJson.getInt("setSoc");
 

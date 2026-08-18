@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
+import com.dongah.smartcharger.controlboard.RxData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +39,12 @@ public class ConnectionFailedFragment extends Fragment implements View.OnClickLi
     private String mParam1;
     private String mParam2;
 
-    private static final long UI_CHECK_INTERVAL_MS = 2 * 60 * 1000; // 2분
-    TextView textViewFailed;
+    private static final long UI_CHECK_INTERVAL_MS = 1 * 60 * 1000; // 1분
+    TextView textViewFailed, textViewRetry;
     ObjectAnimator fadeAnimator;
     Handler uiCheckHandler;
+
+    RxData rxData;
 
     public ConnectionFailedFragment() {
         // Required empty public constructor
@@ -80,6 +83,11 @@ public class ConnectionFailedFragment extends Fragment implements View.OnClickLi
         View view = inflater.inflate(R.layout.fragment_connection_failed, container, false);
         view.setOnClickListener(this);
         textViewFailed = view.findViewById(R.id.textViewFailed);
+        textViewRetry = view.findViewById(R.id.textViewRetry);
+        rxData = ((MainActivity) MainActivity.mContext).getControlBoard().getRxData();
+
+        textViewRetry.setText(rxData.isCsPilot() ?
+                R.string.connectorRetryMessage : R.string.retry);
 
         // textViewFailed animation
         fadeAnimator = ObjectAnimator.ofFloat(textViewFailed, "alpha", 1f, 0.2f);
