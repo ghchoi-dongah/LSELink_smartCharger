@@ -205,14 +205,25 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                             chargingCurrentData.setAuthType("M");
                             chargingCurrentData.setPaymentType(PaymentType.MEMBER);
                             chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
-                            activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
-                            activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
+                            fragmentChangeAuthSelect();
                             break;
                         case 1:
                         case 2:
                         case 3:
                             activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
                             activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
+                            break;
+                        case 4:
+                            chargingCurrentData.setAuthType("C");
+                            chargingCurrentData.setPaymentType(PaymentType.CORP);
+                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
+                            fragmentChangeAuthSelect();
+                            break;
+                        case 5:
+                            chargingCurrentData.setAuthType("K");
+                            chargingCurrentData.setPaymentType(PaymentType.MOE);
+                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeK);
+                            fragmentChangeAuthSelect();
                             break;
                         default:
                             logger.error("InitFragment changeFragment error >> Invalid value");
@@ -242,6 +253,11 @@ public class InitFragment extends Fragment implements View.OnClickListener {
             logger.error("onUnitPrice error : {}", e.getMessage(), e);
             return false;
         }
+    }
+
+    private void fragmentChangeAuthSelect() {
+        activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
+        activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
     }
 
     @Override

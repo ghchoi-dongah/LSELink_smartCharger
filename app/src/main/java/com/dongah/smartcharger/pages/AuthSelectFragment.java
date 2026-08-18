@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
 
     MainActivity activity;
     ChargingCurrentData chargingCurrentData;
+    Handler uiCheckHandler;
 
     public AuthSelectFragment() {}
 
@@ -128,6 +130,14 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
             textViewNoMemberUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeN));
             textViewCorporateUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeC));
             textViewEnvironmentUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeK));
+
+            uiCheckHandler = new Handler();
+            uiCheckHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    activity.getClassUiProcess().onHome();
+                }
+            }, 60000);
         } catch (Exception e) {
             logger.error("onViewCreated error : {}", e.getMessage(), e);
         }
@@ -165,6 +175,19 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
             }
         } catch (Exception e) {
             logger.error("onClick error : {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        try {
+            if (uiCheckHandler != null) {
+                uiCheckHandler.removeCallbacksAndMessages(null);
+                uiCheckHandler = null;
+            }
+        } catch (Exception e) {
+            logger.error("onDestroyView error : {}", e.getMessage(), e);
         }
     }
 

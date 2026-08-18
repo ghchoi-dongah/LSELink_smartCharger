@@ -5,5 +5,7 @@
         <item>2. 회원카드 + 신용카드</item>
         <item>3. 회원카드 + 법인 + 환경부</item>
         <item>4. 회원카드 + 신용카드 + 법인 + 환경부</item>
+        <item>5. 법인</item>
+        <item>6. 환경부</item>
     </string-array>
 </resources>
