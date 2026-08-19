@@ -66,7 +66,6 @@ public class MemberCheckWaitFragment extends Fragment {
 
     int TIME_MAX = 20;
     int cnt = 0;
-    boolean isFlag = false;
     TextView textViewMemberWaitMessage, textViewFailed, textViewConnectorRetryMessage, textViewMemberRegistMessage;
     ImageView imageViewLoading, imageViewMemberFailed;
     AnimationDrawable animationDrawable;
@@ -151,7 +150,6 @@ public class MemberCheckWaitFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         try {
-            isFlag = false;
             animationDrawable.start();
             mediaPlayer();   // media player
 
