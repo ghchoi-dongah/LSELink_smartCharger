@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.R;
@@ -38,7 +39,7 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
     private String mParam1;
     private String mParam2;
 
-    Button btnConfig, btnWebSocket, btnControl, btnDbControl, btnMember, btnUi, btnSystemExit, btnRemoteTest;
+    Button btnConfig, btnWebSocket, btnControl, btnDbControl, btnMember, btnUi, btnSystemExit;
 
     public EnvironmentFragment() {
         // Required empty public constructor
@@ -89,8 +90,6 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
         btnUi.setOnClickListener(this);
         btnSystemExit = view.findViewById(R.id.btnSystemExit);
         btnSystemExit.setOnClickListener(this);
-        btnRemoteTest = view.findViewById(R.id.btnRemoteTest);
-        btnRemoteTest.setOnClickListener(this);
         return  view;
     }
 
@@ -107,7 +106,7 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
             } else if (Objects.equals(getId, R.id.btnDbControl)) {
                 ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.DATABASE, "DATABASE", null);
             } else if (Objects.equals(getId, R.id.btnMember)) {
-                // TODO: insert member
+                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.MEMBER_REGISTER, "MEMBER_REGISTER", null);
             } else if (Objects.equals(getId, R.id.btnUi)) {
                 UiSeq uiSeq = ((MainActivity) MainActivity.mContext).getClassUiProcess().getUiSeq();
                 switch (uiSeq) {
@@ -128,9 +127,6 @@ public class EnvironmentFragment extends Fragment implements View.OnClickListene
             } else if (Objects.equals(getId, R.id.btnSystemExit)) {
                 ActivityCompat.finishAffinity((MainActivity) MainActivity.mContext);
                 System.exit(0);
-            } else if (Objects.equals(getId, R.id.btnRemoteTest)) {
-                ((MainActivity) MainActivity.mContext).getClassUiProcess().setUiSeq(UiSeq.REMOTE_TEST);
-                ((MainActivity) MainActivity.mContext).getFragmentChange().onFragmentChange(UiSeq.REMOTE_TEST, "REMOTE_TEST", null);
             }
         } catch (Exception e){
             logger.error("onClick error : {}", e.getMessage(), e);

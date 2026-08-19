@@ -64,7 +64,7 @@ public class BatteryInfoReq {
 
             BatteryInfoRequest batteryInfoRequest = new BatteryInfoRequest();
             batteryInfoRequest.setVendorId(activity.getChargerConfiguration().getChargePointVendor());
-            batteryInfoRequest.setMessageId("Battery Info");
+            batteryInfoRequest.setMessageId("batteryInfo");
             batteryInfoRequest.setData(gson.toJson(batteryInfoData));
 
             activity.getSocketReceiveMessage().onSend(

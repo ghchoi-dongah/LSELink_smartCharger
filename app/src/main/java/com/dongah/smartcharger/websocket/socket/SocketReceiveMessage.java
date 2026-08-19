@@ -194,7 +194,7 @@ public class SocketReceiveMessage extends JSONCommunicator implements SocketInte
 
         // smart charger
         handlerMap.put("batteryEncryptKey", new BatteryEncryptKeyHandler());
-        handlerMap.put("Battery Info", new BatteryInfoHandler());
+        handlerMap.put("batteryInfo", new BatteryInfoHandler());
         handlerMap.put("appSetSoc", new AppSetSocHandler());
         handlerMap.put("UpdateCertification", new UpdateCertificationHandler());
     }

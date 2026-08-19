@@ -1,7 +1,6 @@
 package com.dongah.smartcharger.basefunction;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -29,8 +28,8 @@ import com.dongah.smartcharger.pages.InitFragment;
 import com.dongah.smartcharger.pages.MemberCardFragment;
 import com.dongah.smartcharger.pages.MemberCheckFailedFragment;
 import com.dongah.smartcharger.pages.MemberCheckWaitFragment;
+import com.dongah.smartcharger.pages.MemberRegisterFragment;
 import com.dongah.smartcharger.pages.OperationStopFragment;
-import com.dongah.smartcharger.pages.RemoteTestFragment;
 import com.dongah.smartcharger.pages.ScreenSaverFragment;
 import com.dongah.smartcharger.pages.WebSocketDebugFragment;
 
@@ -285,17 +284,6 @@ public class FragmentChange {
                     logger.error("onFragmentChange error : SCREEN_SAVER {}", e.getMessage());
                 }
                 break;
-            case REMOTE_TEST:
-                try {
-                    onFrameLayoutChange(true);
-                    RemoteTestFragment remoteTestFragment = new RemoteTestFragment();
-                    remoteTestFragment.setArguments(bundle);
-                    transaction.replace(R.id.frameFull, remoteTestFragment, "REMOTE_TEST");
-                    transaction.commit();
-                } catch (Exception e) {
-                    logger.error("onFragmentChange error : REMOTE_TEST {}", e.getMessage());
-                }
-                break;
             case DATABASE:
                 try {
                     onFrameLayoutChange(true);
@@ -305,6 +293,17 @@ public class FragmentChange {
                     transaction.commit();
                 } catch (Exception e) {
                     logger.error("onFragmentChange error : DATABASE {}", e.getMessage());
+                }
+                break;
+            case MEMBER_REGISTER:
+                try {
+                    onFrameLayoutChange(true);
+                    MemberRegisterFragment memberRegisterFragment = new MemberRegisterFragment();
+                    memberRegisterFragment.setArguments(bundle);
+                    transaction.replace(R.id.frameFull, memberRegisterFragment, "MEMBER_REGISTER");
+                    transaction.commit();
+                } catch (Exception e) {
+                    logger.error("onFragmentChange error : MEMBER_REGISTER {}", e.getMessage());
                 }
                 break;
             default:

@@ -3,7 +3,6 @@ package com.dongah.smartcharger.basefunction;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
@@ -35,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -310,7 +308,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     }
 
     /**
-     * Battery info start
+     * batteryInfo start
      * @param delay duration time
      */
     public void onBatteryInfoStart(int delay) {

@@ -32,8 +32,8 @@ public enum UiSeq {
     LOAD_TEST_TOTAL(28),
     LOAD_TEST_IO(29),
     SCREEN_SAVER(30),
-    REMOTE_TEST(31),
-    DATABASE(32);
+    DATABASE(31),
+    MEMBER_REGISTER(32);
 
     private final int value;
 

@@ -128,7 +128,7 @@ public class BatteryInfoThread extends Thread {
 
                         BatteryInfoRequest batteryInfoRequest = new BatteryInfoRequest();
                         batteryInfoRequest.setVendorId(chargerConfiguration.getChargePointVendor());
-                        batteryInfoRequest.setMessageId("Battery Info");
+                        batteryInfoRequest.setMessageId("batteryInfo");
 
                         Gson gson = new Gson();
                         batteryInfoRequest.setData(gson.toJson(batteryInfoData));
