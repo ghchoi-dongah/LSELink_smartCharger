@@ -205,7 +205,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
                                  textViewChargingTimeValue.setText(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
                                  chargingCurrentData.setChargingUseTime(textViewChargingTimeValue.getText().toString());
                                  txtChargePay.setText(payFormatter.format((long) chargingCurrentData.getPowerMeterUsePay()) + "원");
-                                 textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.01) + "kWh");
+                                 textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.001) + "kWh");
 
                                  if (chargingCurrentData.getSoc() == 0) {
                                      textViewSocValue.setVisibility(View.INVISIBLE);
