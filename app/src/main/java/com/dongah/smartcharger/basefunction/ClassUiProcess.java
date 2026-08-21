@@ -704,6 +704,16 @@ public class ClassUiProcess implements RfCardReaderListener {
             onMeterValueStop();
             onBatteryInfoStop();
 
+            if (chargingCurrentData.getReservedStatus() == ChargePointStatus.Reserved) {
+                // reservation clear
+                chargingCurrentData.setResConnectorId(0);
+                chargingCurrentData.setResIdTag("");
+                chargingCurrentData.setResExpiryDate("");
+                chargingCurrentData.setResReservationId("");
+                chargingCurrentData.setResParentIdTag("");
+                chargingCurrentData.setReservedStatus(ChargePointStatus.Available);
+            }
+
             handler.postDelayed(() -> {
                 finishWaitScheduled = false;   // 완료 후 해제
 
