@@ -40,21 +40,17 @@ public class RemoteStopTransactionHandler implements OcppHandler  {
         try {
             MainActivity activity = ((MainActivity) MainActivity.mContext);
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
+            UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
 
-            RemoteStartStopStatus status = !Objects.equals(chargingCurrentData.getTransactionId(), transactionId) ?
-                    RemoteStartStopStatus.Rejected : RemoteStartStopStatus.Accepted;
+            boolean result = false;
 
-            RemoteStopTransactionConfirmation remoteStopTransactionConfirmation =
-                    new RemoteStopTransactionConfirmation(status);
-            activity.getSocketReceiveMessage().onResultSend(
-                    100,
-                    remoteStopTransactionConfirmation.getActionName(),
-                    messageId,
-                    remoteStopTransactionConfirmation
-            );
+            if (Objects.equals(uiSeq, UiSeq.CHARGING) && Objects.equals(chargingCurrentData.getTransactionId(), transactionId)) {
+                activity.getClassUiProcess().onRemoteTransactionStop(Reason.Remote);
+                GlobalVariables.RemoteStart = false;
+                result = true;
+            }
 
-            if (status.equals(RemoteStartStopStatus.Accepted)) {
-                // RemoteStop을 실행할 transactionId가 있는지 확인
+            if (result) {
                 boolean found = GlobalVariables.remoteConnectorId.containsValue(transactionId);
                 int rConnectorId = -1;
                 if (found) {
@@ -66,13 +62,20 @@ public class RemoteStopTransactionHandler implements OcppHandler  {
                             .orElse(-1);
                 }
 
-                UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
-                if (Objects.equals(uiSeq, UiSeq.CHARGING) && (rConnectorId != -1)) {
+                if (rConnectorId != -1) {
                     GlobalVariables.remoteConnectorId.remove(rConnectorId);
-                    activity.getClassUiProcess().onRemoteTransactionStop(Reason.Remote);
-                    GlobalVariables.RemoteStart = false;
                 }
             }
+
+            RemoteStartStopStatus status = result ? RemoteStartStopStatus.Accepted : RemoteStartStopStatus.Rejected;
+            RemoteStopTransactionConfirmation remoteStopTransactionConfirmation =
+                    new RemoteStopTransactionConfirmation(status);
+            activity.getSocketReceiveMessage().onResultSend(
+                    100,
+                    remoteStopTransactionConfirmation.getActionName(),
+                    messageId,
+                    remoteStopTransactionConfirmation
+            );
         } catch (Exception e) {
             logger.error(" RemoteStopTransaction sendResponse error : {}", e.getMessage());
         }
