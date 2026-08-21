@@ -522,7 +522,7 @@ public class ClassUiProcess implements RfCardReaderListener {
         else if (!GlobalVariables.ChargerOperation[getCh()+1]) {
             setUiSeq(UiSeq.OP_STOP);
             fragmentChange.onFragmentChange(UiSeq.OP_STOP, "OP_STOP", null);
-        } else if (chargingCurrentData.getChargePointStatus() == ChargePointStatus.Reserved) {
+        } else if (chargingCurrentData.getReservedStatus() == ChargePointStatus.Reserved) {
             // reservation
             String currentTime = zonedDateTimeConvert.doGetKstDatetimeAsString();
             // 현재 KST 시간과 예약 만료 시간 비교 => 현재 시간이 예약 만료 시간을 지났는지 확인
