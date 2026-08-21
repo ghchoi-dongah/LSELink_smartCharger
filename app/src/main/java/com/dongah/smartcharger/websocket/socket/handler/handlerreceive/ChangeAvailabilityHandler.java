@@ -66,9 +66,9 @@ public class ChangeAvailabilityHandler implements OcppHandler {
             }
 
             // Operative → 충전기 사용 가능
-            boolean checkType = type == AvailabilityType.Operative;
+            boolean checkType = (type.equals(AvailabilityType.Operative) || type.equals(AvailabilityType.Managecomplete));
             // cp status
-            ChargePointStatus status = (type.equals(AvailabilityType.Operative) || type.equals(AvailabilityType.Managecomplete))
+            ChargePointStatus status = checkType
                     ? ChargePointStatus.Available : type.equals(AvailabilityType.Inoperative)
                     ? ChargePointStatus.Unavailable : ChargePointStatus.Maintenance;
 
