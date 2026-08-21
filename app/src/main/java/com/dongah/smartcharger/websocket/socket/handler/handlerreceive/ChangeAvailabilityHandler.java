@@ -1,6 +1,8 @@
 package com.dongah.smartcharger.websocket.socket.handler.handlerreceive;
 
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.RequiresApi;
 
@@ -84,8 +86,16 @@ public class ChangeAvailabilityHandler implements OcppHandler {
 
             // StatusNotification send
             chargingCurrentData.setChargePointStatus(status);
+
             StatusNotificationReq statusNotificationReq = new StatusNotificationReq(rConnectorId);
-            statusNotificationReq.sendStatusNotification(rConnectorId, chargingCurrentData.getChargePointStatus());
+            if (isCharging) {
+                if (checkType) return;
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    statusNotificationReq.sendStatusNotification(rConnectorId, chargingCurrentData.getChargePointStatus());
+                }, 6000);
+            } else {
+                statusNotificationReq.sendStatusNotification(rConnectorId, chargingCurrentData.getChargePointStatus());
+            }
 
             onChargerOperateSave(checkType);
         } catch (Exception e) {
