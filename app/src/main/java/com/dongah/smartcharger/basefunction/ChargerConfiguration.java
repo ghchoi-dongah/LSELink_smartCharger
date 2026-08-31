@@ -41,14 +41,14 @@ public class ChargerConfiguration {
     public int serverPort = 4000;
 
     /** 회원 인증 모드
-     * 0: 회원
-     * 1: 환경부+회원
-     * 2: 환경부+법인+회원
-     * 3: 환경부+법인+회원+비회원
-     * 4: 법인
-     * 5: 환경부
+     * 0: 환경부
+     * 1: 법인
+     * 2: 회원
+     * 3: 환경부+회원
+     * 4: 환경부+법인+회원(기본)
+     * 5: 환경부+법인+회원+비회원
      * */
-    public int authMode = 0;
+    public int authMode = 4;
     public int authModeId;
 
     /** 운영모드

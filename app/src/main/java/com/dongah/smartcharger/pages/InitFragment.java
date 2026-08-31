@@ -201,32 +201,38 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                 }
                 try {
                     switch (chargerConfiguration.getAuthMode()) {
-                        case 0:
-                            chargingCurrentData.setAuthType("M");
-                            chargingCurrentData.setPaymentType(PaymentType.MEMBER);
-                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
-                            fragmentChangeAuthSelect();
-                            break;
-                        case 1:
-                        case 2:
-                        case 3:
-                            activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
-                            activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", null);
-                            break;
-                        case 4:
-                            chargingCurrentData.setAuthType("C");
-                            chargingCurrentData.setPaymentType(PaymentType.CORP);
-                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
-                            fragmentChangeAuthSelect();
-                            break;
-                        case 5:
+                        case 0: // 환경부
                             chargingCurrentData.setAuthType("K");
                             chargingCurrentData.setPaymentType(PaymentType.MOE);
                             chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeK);
                             fragmentChangeAuthSelect();
                             break;
+                        case 1: // 법인
+                            chargingCurrentData.setAuthType("C");
+                            chargingCurrentData.setPaymentType(PaymentType.CORP);
+                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
+                            fragmentChangeAuthSelect();
+                            break;
+                        case 2: // 회원
+                            chargingCurrentData.setAuthType("M");
+                            chargingCurrentData.setPaymentType(PaymentType.MEMBER);
+                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
+                            fragmentChangeAuthSelect();
+                            break;
+                        case 3: // 환경부+회원
+                            activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
+                            activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", "AUTH2");
+                            break;
+                        case 4: // 환경부+법인+회원
+                            activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
+                            activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", "AUTH3");
+                            break;
+                        case 5: // 환경부+법인+회원+비회원
+                            activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
+                            activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", "AUTH4");
+                            break;
                         default:
-                            logger.error("InitFragment changeFragment error >> Invalid value");
+                            logger.error("changeFragment error >> Invalid value");
                             activity.getToastPositionMake().onShowToast("충전을 할 수 없습니다. 고객센터에 문의주세요.");
                             break;
                     }
