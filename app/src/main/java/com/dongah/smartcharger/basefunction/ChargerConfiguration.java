@@ -41,8 +41,12 @@ public class ChargerConfiguration {
     public int serverPort = 4000;
 
     /** 회원 인증 모드
-     * 0: 회원카드
-     * 1: 회원카드 + 신용카드
+     * 0: 회원
+     * 1: 환경부+회원
+     * 2: 환경부+법인+회원
+     * 3: 환경부+법인+회원+비회원
+     * 4: 법인
+     * 5: 환경부
      * */
     public int authMode = 0;
     public int authModeId;
@@ -90,7 +94,7 @@ public class ChargerConfiguration {
     public int targetSoc = 80;                          // SoC
     public int dr = 0;                                  // 전류 제한
 
-    public boolean StopConfirm;
+    public boolean StopConfirm = true;
     public boolean signed = true ;
     public boolean controlMonitor = true;
     public boolean initInfo = true;

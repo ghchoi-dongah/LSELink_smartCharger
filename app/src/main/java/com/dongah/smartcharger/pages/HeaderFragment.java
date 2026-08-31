@@ -48,7 +48,6 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
 
     int clickedCnt = 0;
     ImageButton btnHome, btnLogo;
-    TextView textViewChargerId;
     MainActivity activity;
     ChargerConfiguration chargerConfiguration;
     SharedModel sharedModel;
@@ -89,19 +88,14 @@ public class HeaderFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_header, container, false);
-        activity = (MainActivity) MainActivity.mContext; 
+        activity = (MainActivity) MainActivity.mContext;
+        chargerConfiguration = activity.getChargerConfiguration();
+
         btnHome = view.findViewById(R.id.btnHome);
         btnHome.setOnClickListener(this);
         btnLogo = view.findViewById(R.id.btnLogo);
         btnLogo.setOnClickListener(this);
-        textViewChargerId = view.findViewById(R.id.textViewChargerId);
 
-        try {
-            chargerConfiguration = activity.getChargerConfiguration();
-            textViewChargerId.setText("| ID-" + chargerConfiguration.getChargerId());
-        } catch (Exception e) {
-            logger.error("onCreateView error : {}", e.getMessage());
-        }
         return view;
     }
 
