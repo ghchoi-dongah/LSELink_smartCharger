@@ -158,9 +158,11 @@ public class ControlBoard implements Runnable {
                         String fwVersion = new ControlBoardUtil().parseVersion(fw);
                         if (fwVersion != null) {
                             ChargerConfiguration chargerConfiguration = ((MainActivity) MainActivity.mContext).getChargerConfiguration();
-                            chargerConfiguration.setFirmwareVersion(fwVersion);
-                            chargerConfiguration.onSaveConfiguration();
-                            GlobalVariables.FW_VERSION = fwVersion;
+                            if (!fwVersion.equals(chargerConfiguration.getFirmwareVersion())) {
+                                chargerConfiguration.setFirmwareVersion(fwVersion);
+                                chargerConfiguration.onSaveConfiguration();
+                                GlobalVariables.FW_VERSION = fwVersion;
+                            }
                         }
                     }
                     if (controlBoardListener != null) controlBoardListener.onControlBoardReceive(rxData);
