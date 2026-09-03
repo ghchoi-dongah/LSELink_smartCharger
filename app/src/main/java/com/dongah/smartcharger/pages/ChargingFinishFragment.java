@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
@@ -45,7 +46,9 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
 
     private static final long UI_CHECK_INTERVAL_MS = 3 * 60 * 1000; // 3분
     Button btnCheck;
-    TextView textViewSocValue, textViewChargingAmtValue, textViewChargingTimeValue, textViewLimitSocValue, txtChargePay, txtPowerUnitPrice;
+    TextView textViewSocValue, textViewChargingAmtValue, textViewChargingTimeValue,
+            textViewLimitSocValue,txtChargePay, txtPowerUnitPrice;
+    ImageView imageViewSoc;
 
     MediaPlayer mediaPlayer;
     Handler uiCheckHandler;
@@ -98,6 +101,7 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
         textViewLimitSocValue = view.findViewById(R.id.textViewLimitSocValue);
         txtChargePay = view.findViewById(R.id.txtChargePay);
         txtPowerUnitPrice = view.findViewById(R.id.txtPowerUnitPrice);
+        imageViewSoc = view.findViewById(R.id.imageViewSoc);
         return view;
     }
 
@@ -107,6 +111,16 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
         super.onViewCreated(view, savedInstanceState);
         try {
             mediaPlayer();
+
+            if (chargingCurrentData.getSoc() == 0) {
+                textViewSocValue.setVisibility(View.INVISIBLE);
+                imageViewSoc.setVisibility(View.INVISIBLE);
+                textViewLimitSocValue.setVisibility(View.INVISIBLE);
+            } else {
+                textViewSocValue.setVisibility(View.VISIBLE);
+                imageViewSoc.setVisibility(View.VISIBLE);
+                textViewLimitSocValue.setVisibility(View.VISIBLE);
+            }
 
             // unplug check 후 초기 화면
             uiCheckHandler = new Handler();
@@ -125,7 +139,7 @@ public class ChargingFinishFragment extends Fragment implements View.OnClickList
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    textViewSocValue.setText(chargingCurrentData.getSoc() == 0 ? "미지원" : chargingCurrentData.getSoc() + "%");
+                    textViewSocValue.setText(chargingCurrentData.getSoc() == 0 ? "" : chargingCurrentData.getSoc() + "%");
                     textViewLimitSocValue.setText("목표 충전율: " +chargingCurrentData.getTargetSoc() + "%");
                     textViewChargingAmtValue.setText(powerFormatter.format(chargingCurrentData.getPowerMeterUse() * 0.001) + "kWh");
                     textViewChargingTimeValue.setText(chargingCurrentData.getChargingUseTime());

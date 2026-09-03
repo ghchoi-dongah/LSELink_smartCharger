@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dongah.smartcharger.MainActivity;
@@ -55,7 +56,9 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
     private String mParam2;
 
     Button btnChargingStop;
-    TextView textViewSocValue, textViewLimitSocValue, textViewChargingAmtValue, txtChargePay, textViewChargingTimeValue, txtPowerUnitPrice;
+    TextView textViewSocValue, textViewLimitSocValue, textViewChargingAmtValue,
+            txtChargePay, textViewChargingTimeValue, txtPowerUnitPrice;
+    ImageView imageViewSoc;
 
     MediaPlayer mediaPlayer;
     SharedModel sharedModel;
@@ -110,6 +113,7 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         chargingCurrentData = activity.getChargingCurrentData();
         chargerConfiguration = activity.getChargerConfiguration();
         txData = activity.getControlBoard().getTxData();
+
         btnChargingStop = view.findViewById(R.id.btnChargingStop);
         btnChargingStop.setOnClickListener(this);
         textViewSocValue = view.findViewById(R.id.textViewSocValue);
@@ -118,6 +122,8 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
         textViewChargingTimeValue = view.findViewById(R.id.textViewChargingTimeValue);
         txtChargePay = view.findViewById(R.id.txtChargePay);
         txtPowerUnitPrice = view.findViewById(R.id.txtPowerUnitPrice);
+        imageViewSoc = view.findViewById(R.id.imageViewSoc);
+
         return view;
     }
 
@@ -134,9 +140,13 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
             try {
                 if (chargingCurrentData.getSoc() == 0) {
                     textViewSocValue.setVisibility(View.INVISIBLE);
+                    imageViewSoc.setVisibility(View.INVISIBLE);
+                    textViewLimitSocValue.setVisibility(View.INVISIBLE);
                 } else {
                     textViewSocValue.setVisibility(View.VISIBLE);
                     textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
+                    imageViewSoc.setVisibility(View.VISIBLE);
+                    textViewLimitSocValue.setVisibility(View.VISIBLE);
                 }
                 textViewLimitSocValue.setText("목표 충전율: " + chargingCurrentData.getTargetSoc() + "%");
                 startTime = zonedDateTimeConvert.doStringDateToDate(chargingCurrentData.getChargingStartTime());
@@ -209,9 +219,13 @@ public class ChargingFragment extends Fragment implements View.OnClickListener {
 
                                  if (chargingCurrentData.getSoc() == 0) {
                                      textViewSocValue.setVisibility(View.INVISIBLE);
+                                     imageViewSoc.setVisibility(View.INVISIBLE);
+                                     textViewLimitSocValue.setVisibility(View.INVISIBLE);
                                  } else {
                                      textViewSocValue.setVisibility(View.VISIBLE);
                                      textViewSocValue.setText(chargingCurrentData.getSoc() + "%");
+                                     imageViewSoc.setVisibility(View.VISIBLE);
+                                     textViewLimitSocValue.setVisibility(View.VISIBLE);
                                  }
                              }
                          } catch (Exception e) {
