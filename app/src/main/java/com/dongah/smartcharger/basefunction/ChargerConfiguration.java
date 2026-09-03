@@ -55,7 +55,7 @@ public class ChargerConfiguration {
      * 0: test
      * 1: server
      * */
-    public int opMode = 0;
+    public int opMode = 1;
     public int opModeId;
 
     /** 시작 모드

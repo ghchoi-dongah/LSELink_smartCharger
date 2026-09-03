@@ -617,7 +617,7 @@ public class ClassUiProcess implements RfCardReaderListener {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void handleCharging(RxData rxData, TxData txData) {
         try {
-            if (isChargingFlag) {
+            if (isChargingFlag && Objects.equals(chargerConfiguration.getOpMode(), 1)) {
                 isChargingFlag = false;
                 startMeterValuesWithDelay();
                 onBatteryInfoStart(GlobalVariables.batteryDelay);
