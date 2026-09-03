@@ -218,7 +218,6 @@ public class ChangeModeThread extends Thread {
 
                 if (!Objects.equals(currentStatus, targetStatus)) {
                     boolean isCheck = uiSeq.equals(UiSeq.CHARGING) || uiSeq.equals(UiSeq.FINISH_WAIT) || uiSeq.equals(UiSeq.FINISH);
-//                    Objects.equals(currentStatus, ChargePointStatus.Available) || Objects.equals(currentStatus, ChargePointStatus.Unavailable) || Objects.equals(currentStatus, ChargePointStatus.Preparing);
 
                     if (!isCheck) {
                         chargingCurrentData.setChargePointStatus(targetStatus);
@@ -263,8 +262,10 @@ public class ChangeModeThread extends Thread {
             if (!helper.isTableExists(helper, tableName)) {
                 logger.warn("setChgModeElec {} doesn't exist", tableName);
                 float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
-                chargingCurrentData.setLimitPower(power);
-                if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
+                if (!Objects.equals(chargingCurrentData.getLimitPower(), power)) {
+                    chargingCurrentData.setLimitPower(power);
+                    onHome();
+                }
                 return;
             }
 
@@ -274,19 +275,25 @@ public class ChangeModeThread extends Thread {
             if (cursor == null || !cursor.moveToFirst()) {
                 logger.warn("setChgModeElec {} cursor is null or no data. connectorId : {}", tableName, connectorId);
                 float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
-                chargingCurrentData.setLimitPower(power);
-                if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
+                if (!Objects.equals(chargingCurrentData.getLimitPower(), power)) {
+                    chargingCurrentData.setLimitPower(power);
+                    onHome();
+                }
                 return;
             }
 
             int value = cursor.getInt(cursor.getColumnIndexOrThrow("RECHG_ELEC"));
             if (value == 0) {
                 float power = chargerConfiguration.getDuty() >= 50 ? 7 : (float) 3.3;
-                chargingCurrentData.setLimitPower(power);
-            } else {
+                if (!Objects.equals(chargingCurrentData.getLimitPower(), power)) {
+                    chargingCurrentData.setLimitPower(power);
+                    onHome();
+                }
+            } else if (!Objects.equals(value, chargingCurrentData.getLimitPower())){
                 chargingCurrentData.setLimitPower(value);
                 chargerConfiguration.setDuty(value >= 7 ? 50 : 25);
                 chargerConfiguration.onSaveConfiguration();
+                onHome();
             }
 
             logger.info("setChgModeElec connectorId[{}] outPowerLimit : {}", connectorId, chargingCurrentData.getLimitPower());
@@ -315,8 +322,10 @@ public class ChangeModeThread extends Thread {
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
             if (!helper.isTableExists(helper, tableName)) {
                 logger.warn("setChgModeSoc {} doesn't exist", tableName);
-                chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());
-                if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
+                if (!Objects.equals(chargingCurrentData.getLimitSoc(), chargerConfiguration.getTargetSoc())) {
+                    chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());
+                    onHome();
+                }
                 return;
             }
 
@@ -325,16 +334,22 @@ public class ChangeModeThread extends Thread {
             // Cursor null 여부 확인, 조회 결과 존재 여부 확인
             if (cursor == null || !cursor.moveToFirst()) {
                 logger.warn("setChgModeSoc {} cursor is null or no data. connectorId : {}", tableName, connectorId);
-                chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());
-                if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) classUiProcess.onHome();
+                if (!Objects.equals(chargingCurrentData.getLimitSoc(), chargerConfiguration.getTargetSoc())) {
+                    chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());
+                    onHome();
+                }
                 return;
             }
 
             int value = cursor.getInt(cursor.getColumnIndexOrThrow("RECHG_AMT"));
             if (value == 0) {
-                chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());
-            } else {
+                if (!Objects.equals(chargingCurrentData.getLimitSoc(), chargerConfiguration.getTargetSoc())) {
+                    chargingCurrentData.setLimitSoc(chargerConfiguration.getTargetSoc());
+                    onHome();
+                }
+            } else if (!Objects.equals(value, chargingCurrentData.getLimitSoc())) {
                 chargingCurrentData.setLimitSoc(value);
+                onHome();
             }
 
             logger.info("setChgModeSoc connectorId[{}] limitSOc : {}", connectorId, chargingCurrentData.getLimitSoc());
@@ -343,6 +358,13 @@ public class ChangeModeThread extends Thread {
             cursor.close();
         } catch (Exception e) {
             logger.error("setChgModeSoc error : {}", e.getMessage(), e);
+        }
+    }
+
+    private static void onHome() {
+        MainActivity activity = (MainActivity) MainActivity.mContext;
+        if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
+            activity.getClassUiProcess().onHome();
         }
     }
 }

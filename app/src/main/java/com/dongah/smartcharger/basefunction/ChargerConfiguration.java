@@ -2,14 +2,19 @@ package com.dongah.smartcharger.basefunction;
 
 import android.annotation.SuppressLint;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.dongah.smartcharger.MainActivity;
 import com.dongah.smartcharger.utils.FileManagement;
 import com.dongah.smartcharger.websocket.ocpp.firmware.DiagnosticsStatus;
 import com.dongah.smartcharger.websocket.ocpp.firmware.FirmwareStatus;
 import com.dongah.smartcharger.websocket.ocpp.security.SignedFirmwareStatus;
 import com.dongah.smartcharger.websocket.ocpp.security.UploadLogStatus;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,36 +123,48 @@ public class ChargerConfiguration {
             // get file context json string
             configurationString = fileManagement.getStringFromFile(GlobalVariables.ROOT_PATH  + File.separator + CONFIG_FILE_NAME);
             if (!TextUtils.isEmpty(configurationString)) {
-                JSONObject obj = new JSONObject(configurationString);
-                setChargerId(obj.getString("CHARGER_ID"));
-                setServerConnectingString(obj.getString("SERVER_CONNECTING_STRING"));
-                setServerPort(obj.getInt("SERVER_PORT"));
-                setAuthMode(obj.getInt("AUTH_MODE"));
-                setAuthModeId(obj.getInt("AUTH_MODE_ID"));
-                setOpMode(obj.getInt("OP_MODE"));
-                setOpModeId(obj.getInt("OP_MODE_ID"));
-                setPlcCom(obj.getString("PLC_COM"));
-                setControlCom(obj.getString("CONTROL_COM"));
-                setRfCom(obj.getString("RF_COM"));
-                setCreditCom(obj.getString("CREDIT_COM"));
-                setTestPrice(obj.getString("TEST_PRICE"));
-                setChargerPointType(obj.getInt("CHARGER_POINT_TYPE"));
-                setChargePointVendor(obj.getString("CHARGE_POINT_VENDOR"));
-                setChargerPointModel(obj.getString("CHARGER_POINT_MODEL"));
-                setChargerPointModelCode(obj.getInt("CHARGER_POINT_MODEL_CODE"));
-                setChargeBoxSerialNumber(obj.getString("CHARGE_BOX_SERIAL_NUMBER"));
-                setChargePointSerialNumber(obj.getString("CHARGE_POINT_SERIAL_NUMBER"));
-                setFirmwareVersion(obj.getString("FIRMWARE_VERSION"));
-                setIccid(obj.getString("ICCID"));
-                setImsi(obj.getString("IMSI"));
-                setMeterSerialNumber(obj.getString("METER_SERIAL_NUMBER"));
-                setMeterType(obj.getString("METER_TYPE"));
-                setStopConfirm(obj.getBoolean("STOP_CONFIRM"));
-                setTargetSoc(obj.getInt("TARGET_SOC"));
-                setDuty(obj.getInt("DUTY"));
-                setSigned(obj.getBoolean("SIGNED"));
-                setControlMonitor(obj.getBoolean("CONTROL_MONITOR"));
-                setInitInfo(obj.getBoolean("INIT_INFO"));
+                /**
+                 * - JSON 파싱 블록을 별도 try-catch(JSONException)로 분리
+                 *   - 파싱 실패 시 → return (덮어쓰기 없음)
+                 *   - 파싱 성공 시 → 기존과 동일하게 동작
+                 * - 기존 외부 catch(Exception)는 유지
+                 *   - 파일 읽기 자체가 실패하는 경우(IO 오류 등)는 그대로 로그만 남김
+                 * */
+                try {
+                    JSONObject obj = new JSONObject(configurationString);
+                    setChargerId(obj.getString("CHARGER_ID"));
+                    setServerConnectingString(obj.getString("SERVER_CONNECTING_STRING"));
+                    setServerPort(obj.getInt("SERVER_PORT"));
+                    setAuthMode(obj.getInt("AUTH_MODE"));
+                    setAuthModeId(obj.getInt("AUTH_MODE_ID"));
+                    setOpMode(obj.getInt("OP_MODE"));
+                    setOpModeId(obj.getInt("OP_MODE_ID"));
+                    setPlcCom(obj.getString("PLC_COM"));
+                    setControlCom(obj.getString("CONTROL_COM"));
+                    setRfCom(obj.getString("RF_COM"));
+                    setCreditCom(obj.getString("CREDIT_COM"));
+                    setTestPrice(obj.getString("TEST_PRICE"));
+                    setChargerPointType(obj.getInt("CHARGER_POINT_TYPE"));
+                    setChargePointVendor(obj.getString("CHARGE_POINT_VENDOR"));
+                    setChargerPointModel(obj.getString("CHARGER_POINT_MODEL"));
+                    setChargerPointModelCode(obj.getInt("CHARGER_POINT_MODEL_CODE"));
+                    setChargeBoxSerialNumber(obj.getString("CHARGE_BOX_SERIAL_NUMBER"));
+                    setChargePointSerialNumber(obj.getString("CHARGE_POINT_SERIAL_NUMBER"));
+                    setFirmwareVersion(obj.getString("FIRMWARE_VERSION"));
+                    setIccid(obj.getString("ICCID"));
+                    setImsi(obj.getString("IMSI"));
+                    setMeterSerialNumber(obj.getString("METER_SERIAL_NUMBER"));
+                    setMeterType(obj.getString("METER_TYPE"));
+                    setStopConfirm(obj.getBoolean("STOP_CONFIRM"));
+                    setTargetSoc(obj.getInt("TARGET_SOC"));
+                    setDuty(obj.getInt("DUTY"));
+                    setSigned(obj.getBoolean("SIGNED"));
+                    setControlMonitor(obj.getBoolean("CONTROL_MONITOR"));
+                    setInitInfo(obj.getBoolean("INIT_INFO"));
+                } catch (JSONException e) {
+                    logger.error("configuration json parse fail: {}", e.getMessage(), e);
+                    return;
+                }
             }
         } catch (Exception e) {
             logger.error("configuration load fail: {}", e.getMessage(), e);

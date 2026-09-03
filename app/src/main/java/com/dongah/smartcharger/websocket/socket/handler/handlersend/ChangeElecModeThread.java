@@ -139,16 +139,13 @@ public class ChangeElecModeThread extends Thread {
                      **/
                     if (value == 0) {
                         ChangeModeThread.setChgModeElec(i);
-                    } else {
+                    } else if (!Objects.equals(value, chargingCurrentData.getLimitPower())){
                         chargingCurrentData.setLimitPower(value);
                         chargerConfiguration.setDuty(value >= 7 ? 50 : 25);
                         chargerConfiguration.onSaveConfiguration();
+                        onHome();
                     }
                     logger.info("processRechgElec connectorId[{}] outPowerLimit : {}", i,chargingCurrentData.getLimitPower());
-
-                    if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
-                        activity.getClassUiProcess().onHome();
-                    }
 
                     cursor.close();
                 } catch (Exception e) {
@@ -188,11 +185,16 @@ public class ChangeElecModeThread extends Thread {
             chargingCurrentData.setLimitPower(power);
             logger.info("insertChgElecMode connectorId[{}] limitPower : {}", connectorId, chargingCurrentData.getLimitPower());
 
-            if (Objects.equals(classUiProcess.getUiSeq(), UiSeq.INIT)) {
-                classUiProcess.onHome();
-            }
+            onHome();
         } catch (Exception e) {
             logger.error("insertChgElecMode error : {}", e.getMessage(), e);
+        }
+    }
+
+    private static void onHome() {
+        MainActivity activity = (MainActivity) MainActivity.mContext;
+        if (Objects.equals(activity.getClassUiProcess().getUiSeq(), UiSeq.INIT)) {
+            activity.getClassUiProcess().onHome();
         }
     }
 }
