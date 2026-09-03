@@ -63,9 +63,9 @@ public class StartTransactionHandler implements OcppHandler  {
             ChargingAlarmReq chargingAlarmReq = new ChargingAlarmReq(connectorId);
             chargingAlarmReq.sendChargingAlarmReq(1);
 
-            // DataTransfer fullrechgsoc
-            FullRechgSocReq fullRechgSocReq = new FullRechgSocReq(connectorId);
-            fullRechgSocReq.sendFullRechSoc();
+            // DataTransfer fullrechgsoc - B2C 사용X
+//            FullRechgSocReq fullRechgSocReq = new FullRechgSocReq(connectorId);
+//            fullRechgSocReq.sendFullRechSoc();
 
             // StatusNotification
             StatusNotificationReq statusNotificationReq = new StatusNotificationReq(connectorId);
