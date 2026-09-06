@@ -63,7 +63,7 @@ public class StopTransactionReq {
 
             // 충전 사용량
             SampledValue energy = new SampledValue();
-            energy.setValue(String.valueOf(chargingCurrentData.getPowerMeterUse() * 0.01));
+            energy.setValue(String.valueOf(chargingCurrentData.getPowerMeterUse() * 0.001));
             energy.setContext("Transaction.End");
             energy.setFormat(ValueFormat.Raw);
             energy.setMeasurand("Current.Export");

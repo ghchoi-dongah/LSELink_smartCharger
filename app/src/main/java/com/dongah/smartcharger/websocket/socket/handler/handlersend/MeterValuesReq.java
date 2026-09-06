@@ -115,8 +115,8 @@ public class MeterValuesReq {
         meterValuesData.power = (float) ((chargingCurrentData.getOutPutVoltage() * 10) * (chargingCurrentData.getOutPutCurrent() * 0.001));
         meterValuesData.eps = (int) (chargingCurrentData.getOutPutVoltage() * 10);
         meterValuesData.ecu = (int) (chargingCurrentData.getOutPutCurrent() * 0.001) ;
-        meterValuesData.accWh = (float) (chargingCurrentData.getPowerMeter() * 10);
-        meterValuesData.accTickWh = (float) (diffPowerMeter *10);
+        meterValuesData.accWh = (float) (chargingCurrentData.getPowerMeter() * 0.001);
+        meterValuesData.accTickWh = (float) (diffPowerMeter * 0.001);
         meterValuesData.accTickTime = GlobalVariables.getMeterValueSampleInterval();
         meterValuesData.rechgHr = (int) chargingCurrentData.getChargingTime();
         meterValuesData.remnHr = chargingCurrentData.getRemaintime() / 60;
