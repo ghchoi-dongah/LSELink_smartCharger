@@ -63,7 +63,7 @@
     <string name="powerAmountUnit">kWh</string>
     <string name="adminMessage">패스워드를 입력한 후 확인 버튼을 눌러주세요.</string>
     <string name="opStopMessage"><font color="#000">서비스 점검 중</font></string>
-    <string name="systemCheckMessage"><font color="#000">안정적인 서비스 제공을 위해 \n시스템 점검을 진행하고 있습니다.</font></string>
+    <string name="systemCheckMessage"><font color="#000">안정적인 서비스 제공을 위해 시스템 점검을 진행하고 있습니다.</font></string>
     <string name="screenSaverMessage">현재 화면 보호기가 실행 중입니다.\n충전을 시작하려면 화면을 터치해 주세요.</string>
     <string name="connector"><font color="#000">커넥터</font></string>
     <string name="connectorSeq"><font color="#000">커넥터(순차모드)</font></string>
