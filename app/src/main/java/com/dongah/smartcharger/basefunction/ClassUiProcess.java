@@ -25,6 +25,7 @@ import com.dongah.smartcharger.websocket.socket.SocketState;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.BatteryInfoThread;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.ChargingAlarmReq;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.MeterValuesReq;
+import com.dongah.smartcharger.websocket.socket.handler.handlersend.MeterValuesStopReq;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.ProcessHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.StartTransactionReq;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.StatusNotificationReq;
@@ -371,7 +372,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                 //전력량 변화 여부 체크
                 chargingCurrentData = ((MainActivity) MainActivity.mContext).getChargingCurrentData();
                 gapPower = rxData.getActiveEnergy() - chargingCurrentData.getPowerMeterCalculate();
-                gapPower = (gapPower <= 0) ? 0 : (gapPower > 300) ? 100 : gapPower;
+                gapPower = (gapPower <= 0) ? 0 : (gapPower > 300) ? 0 : gapPower;
                 //전력량 변화 여부 체크 892 = 8.92kW
                 powerMeterCheck = gapPower == 0 ? powerMeterCheck + 1 : 0;
                 chargingCurrentData.setPowerMeterUse(chargingCurrentData.getPowerMeterUse() + gapPower);
@@ -687,6 +688,12 @@ public class ClassUiProcess implements RfCardReaderListener {
         finishWaitScheduled = true;        // 첫 진입 시 잠금
 
         try {
+            if (meterValuesReq != null) {
+                new MeterValuesStopReq(chargingCurrentData.getConnectorId()).sendMeterValuesStop(meterValuesReq);
+            }
+            onMeterValueStop();
+            onBatteryInfoStop();
+
             txData.setUiSequence((short) 3);
             chargingCurrentData.setStopReason(
                     chargingCurrentData.isUserStop() ? Reason.Local :
@@ -696,13 +703,6 @@ public class ClassUiProcess implements RfCardReaderListener {
             chargingCurrentData.setPowerMeterStop(rxData.getActiveEnergy());
             chargingCurrentData.setChargingEndTime(zonedDateTimeConvert.getStringCurrentTimeZone());
             chargingCurrentData.setChargePointStatus(ChargePointStatus.Finishing);
-
-            // stop MeterValues
-            if (meterValuesReq != null) {
-                meterValuesReq.sendMeterValues(chargingCurrentData.getConnectorId());
-            }
-            onMeterValueStop();
-            onBatteryInfoStop();
 
             if (chargingCurrentData.getReservedStatus() == ChargePointStatus.Reserved) {
                 // reservation clear
@@ -727,7 +727,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                 GlobalVariables.RemoteStart = false;
                 setUiSeq(UiSeq.FINISH);
                 fragmentChange.onFragmentChange(UiSeq.FINISH, "FINISH", null);
-            }, 2000);
+            }, 300);
         } catch (Exception e) {
             finishWaitScheduled = false;
             logger.error("ClassUiProcess - FINISH_WAIT error : {} ", e.getMessage());
@@ -752,7 +752,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                     chargingCurrentData.setChargePointStatus(ChargePointStatus.Finishing);
 
                     // meter values stop
-                    meterValuesReq.sendMeterValues(chargingCurrentData.getConnectorId());
+                    new MeterValuesStopReq(chargingCurrentData.getConnectorId()).sendMeterValuesStop(meterValuesReq);
                     onMeterValueStop();
                     onBatteryInfoStop();
 
