@@ -242,7 +242,17 @@ public class InitFragment extends Fragment implements View.OnClickListener {
             if (!helper.isTableExists(helper, "CP_UNIT_PRICE")) {
                 return false;
             }
-            for (String userType : new String[]{"K", "C", "N", "M"}) {
+
+            String[] userTypes;
+            switch (chargerConfiguration.getAuthMode()) {
+                case 0:  userTypes = new String[]{"K"};           break;
+                case 1:  userTypes = new String[]{"C"};           break;
+                case 2:  userTypes = new String[]{"K", "N"};      break;
+                case 3:  userTypes = new String[]{"K", "C", "N"}; break;
+                default: return false;
+            }
+
+            for (String userType : userTypes) {
                 Double price = getUnitPriceFromDb(helper, userType);
                 if (price == null || price == 0.0) {
                     logger.error("onUnitPrice error >> USER_TYPE_CD={} UNIT_PRICE is invalid", userType);
