@@ -38,8 +38,8 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
     private String mParam2;
 
 
-    CardView cardViewMember, cardViewCorp, cardViewMoe;
-    TextView textViewMemberUnitInput, textViewCorpUnitInput, textViewMoeUnitInput;
+    CardView cardViewNoMember, cardViewCorp, cardViewMoe;
+    TextView textViewNoMemberUnitInput, textViewCorpUnitInput, textViewMoeUnitInput;
 
     MainActivity activity;
     ChargingCurrentData chargingCurrentData;
@@ -71,14 +71,14 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
         activity = (MainActivity) MainActivity.mContext;
         chargingCurrentData = activity.getChargingCurrentData();
 
-        cardViewMember = view.findViewById(R.id.cardViewMember);
-        cardViewMember.setOnClickListener(this);
+        cardViewNoMember = view.findViewById(R.id.cardViewNoMember);
+        cardViewNoMember.setOnClickListener(this);
         cardViewCorp = view.findViewById(R.id.cardViewCorp);
         cardViewCorp.setOnClickListener(this);
         cardViewMoe = view.findViewById(R.id.cardViewMoe);
         cardViewMoe.setOnClickListener(this);
 
-        textViewMemberUnitInput = view.findViewById(R.id.textViewMemberUnitInput);
+        textViewNoMemberUnitInput = view.findViewById(R.id.textViewNoMemberUnitInput);
         textViewCorpUnitInput = view.findViewById(R.id.textViewCorpUnitInput);
         textViewMoeUnitInput = view.findViewById(R.id.textViewMoeUnitInput);
 
@@ -93,10 +93,10 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
         try {
             // 각 영역에 다른 색 적용
             setCardBorderColor(view.findViewById(R.id.layoutMoe),    R.color.green);
-            setCardBorderColor(view.findViewById(R.id.layoutMember), R.color.primary);
+            setCardBorderColor(view.findViewById(R.id.layoutNoMember), R.color.yellow_900);
             setCardBorderColor(view.findViewById(R.id.layoutCorp),   R.color.blue_900);
 
-            textViewMemberUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeM));
+            textViewNoMemberUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeN));
             textViewCorpUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeC));
             textViewMoeUnitInput.setText(getString(R.string.price, GlobalVariables.userTypeK));
 
@@ -116,12 +116,13 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         try {
             int id = v.getId();
-            if (id == R.id.cardViewMember) {
-                chargingCurrentData.setAuthType("M");
-                chargingCurrentData.setPaymentType(PaymentType.MEMBER);
-                chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
-                activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
-                activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
+            if (id == R.id.cardViewNoMember) {
+                Toast.makeText(getActivity(), "서비스 준비 중입니다.", Toast.LENGTH_SHORT).show();
+//                chargingCurrentData.setAuthType("N");
+//                chargingCurrentData.setPaymentType(PaymentType.CREDIT);
+//                chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeN);
+//                activity.getClassUiProcess().setUiSeq(UiSeq.CREDIT_CARD);
+//                activity.getFragmentChange().onFragmentChange(UiSeq.CREDIT_CARD, "CREDIT_CARD", null);
             } else if (id == R.id.cardViewCorp) {
                 chargingCurrentData.setAuthType("C");
                 chargingCurrentData.setPaymentType(PaymentType.CORP);

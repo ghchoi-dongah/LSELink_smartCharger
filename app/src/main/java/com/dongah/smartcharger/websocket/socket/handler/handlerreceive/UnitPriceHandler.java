@@ -27,22 +27,26 @@ public class UnitPriceHandler implements OcppHandler  {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void handle(JSONObject payload, int connectorId, String messageId) throws Exception {
-        DataTransferStatus status = DataTransferStatus.valueOf(payload.getString("status"));
-        String dataStr = payload.getString("data");
+        try {
+            DataTransferStatus status = DataTransferStatus.valueOf(payload.getString("status"));
+            String dataStr = payload.getString("data");
 
-        if (status.equals(DataTransferStatus.Accepted)) {
-            // 저장
-            FileManagement fileManagement = new FileManagement();
-            fileManagement.stringToFileSave(GlobalVariables.getRootPath(), GlobalVariables.FILE_UNIT, dataStr, false);
+            if (status.equals(DataTransferStatus.Accepted)) {
+                // 저장
+                FileManagement fileManagement = new FileManagement();
+                fileManagement.stringToFileSave(GlobalVariables.getRootPath(), GlobalVariables.FILE_UNIT, dataStr, false);
 
-            /* DB update */
-            if (connectorId == 0 || connectorId == 100) {
-                for (int i = 1; i <= GlobalVariables.maxChannel; i++) {
-                    updateUnitPrice(dataStr, i);
+                /* DB update */
+                if (connectorId == 0 || connectorId == 100) {
+                    for (int i = 1; i <= GlobalVariables.maxChannel; i++) {
+                        updateUnitPrice(dataStr, i);
+                    }
+                } else {
+                    updateUnitPrice(dataStr, connectorId);
                 }
-            } else {
-                updateUnitPrice(dataStr, connectorId);
             }
+        } catch (Exception e) {
+            logger.error("UnitPriceHandler error : {}", e.getMessage(), e);
         }
     }
 
@@ -56,7 +60,7 @@ public class UnitPriceHandler implements OcppHandler  {
 
             JSONArray dataArr = new JSONArray(dataStr);
 
-            helper.dropTable(sqLiteDatabase, tableName);
+//            helper.dropTable(sqLiteDatabase, tableName);
             // 테이블이 없으면 테이블 생성 후 insertUnitPrice
             if (!helper.isTableExists(helper, tableName)) {
                 logger.warn("updateUnitPrice table not exists : {}", tableName);
@@ -78,7 +82,7 @@ public class UnitPriceHandler implements OcppHandler  {
                 try {
                     cursor = sqLiteDatabase.rawQuery(
                             "SELECT 1 FROM " + tableName +
-                                    " WHERE connector_id = ? AND USER_TYPE_CD = ?",
+                                    " WHERE CONNECTOR_ID = ? AND USER_TYPE_CD = ?",
                             new String[]{ String.valueOf(connectorId), userTypeCd });
                     exists = (cursor != null && cursor.moveToFirst());
                 } finally {

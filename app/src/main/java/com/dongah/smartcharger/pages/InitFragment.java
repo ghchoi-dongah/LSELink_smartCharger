@@ -213,23 +213,13 @@ public class InitFragment extends Fragment implements View.OnClickListener {
                             chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
                             fragmentChangeAuthSelect();
                             break;
-                        case 2: // 회원
-                            chargingCurrentData.setAuthType("M");
-                            chargingCurrentData.setPaymentType(PaymentType.MEMBER);
-                            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
-                            fragmentChangeAuthSelect();
-                            break;
-                        case 3: // 환경부+회원
+                        case 2: // 환경부+비회원
                             activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
                             activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", "AUTH2");
                             break;
-                        case 4: // 환경부+법인+회원
+                        case 3: // 환경부+법인+비회원
                             activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
                             activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", "AUTH3");
-                            break;
-                        case 5: // 환경부+법인+회원+비회원
-                            activity.getClassUiProcess().setUiSeq(UiSeq.AUTH_SELECT);
-                            activity.getFragmentChange().onFragmentChange(UiSeq.AUTH_SELECT, "AUTH_SELECT", "AUTH4");
                             break;
                         default:
                             logger.error("changeFragment error >> Invalid value");
@@ -252,12 +242,43 @@ public class InitFragment extends Fragment implements View.OnClickListener {
             if (!helper.isTableExists(helper, "CP_UNIT_PRICE")) {
                 return false;
             }
-
-            Cursor cursor = helper.selectAll("CP_UNIT_PRICE");
-            return cursor != null && cursor.moveToFirst();
-        } catch (Exception e){
+            for (String userType : new String[]{"K", "C", "N", "M"}) {
+                Double price = getUnitPriceFromDb(helper, userType);
+                if (price == null || price == 0.0) {
+                    logger.error("onUnitPrice error >> USER_TYPE_CD={} UNIT_PRICE is invalid", userType);
+                    return false;
+                }
+                syncGlobalUnitPrice(userType, price);
+            }
+            return true;
+        } catch (Exception e) {
             logger.error("onUnitPrice error : {}", e.getMessage(), e);
             return false;
+        }
+    }
+
+    private Double getUnitPriceFromDb(SQLiteHelper helper, String userTypeCd) {
+        Cursor cursor = null;
+        try {
+            cursor = helper.select("CP_UNIT_PRICE", "USER_TYPE_CD = ?", new String[]{userTypeCd});
+            if (cursor == null || !cursor.moveToFirst()) return null;
+            int colIdx = cursor.getColumnIndex("UNIT_PRICE");
+            if (colIdx < 0 || cursor.isNull(colIdx)) return null;
+            return cursor.getDouble(colIdx);
+        } catch (Exception e) {
+            logger.error("getUnitPriceFromDb error. userTypeCd={} : {}", userTypeCd, e.getMessage(), e);
+            return null;
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+    }
+
+    private void syncGlobalUnitPrice(String userTypeCd, double price) {
+        switch (userTypeCd) {
+            case "K": GlobalVariables.userTypeK = price; break;
+            case "C": GlobalVariables.userTypeC = price; break;
+            case "N": GlobalVariables.userTypeN = price; break;
+            case "M": GlobalVariables.userTypeM = price; break;
         }
     }
 

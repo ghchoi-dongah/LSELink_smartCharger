@@ -752,7 +752,9 @@ public class ClassUiProcess implements RfCardReaderListener {
                     chargingCurrentData.setChargePointStatus(ChargePointStatus.Finishing);
 
                     // meter values stop
-                    new MeterValuesStopReq(chargingCurrentData.getConnectorId()).sendMeterValuesStop(meterValuesReq);
+                    if (meterValuesReq != null) {
+                        new MeterValuesStopReq(chargingCurrentData.getConnectorId()).sendMeterValuesStop(meterValuesReq);
+                    }
                     onMeterValueStop();
                     onBatteryInfoStop();
 
@@ -765,7 +767,7 @@ public class ClassUiProcess implements RfCardReaderListener {
                             StopTransactionReq stopTransactionReq = new StopTransactionReq(chargingCurrentData.getConnectorId());
                             stopTransactionReq.sendStopTransactionReq();
                         }
-                    }, 3000);
+                    }, 300);
                 }
                 fragmentChange.onFragmentChange(UiSeq.FAULT, "FAULT", null);
             }
