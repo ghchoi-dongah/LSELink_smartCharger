@@ -9,12 +9,10 @@ import com.dongah.smartcharger.basefunction.ChargingCurrentData;
 import com.dongah.smartcharger.basefunction.GlobalVariables;
 import com.dongah.smartcharger.basefunction.PaymentType;
 import com.dongah.smartcharger.basefunction.UiSeq;
-import com.dongah.smartcharger.websocket.ocpp.core.ChargePointStatus;
 import com.dongah.smartcharger.websocket.ocpp.core.RemoteStartStopStatus;
 import com.dongah.smartcharger.websocket.ocpp.core.RemoteStartTransactionConfirmation;
 import com.dongah.smartcharger.websocket.socket.OcppHandler;
 import com.dongah.smartcharger.websocket.socket.handler.handlersend.AuthorizeReq;
-import com.dongah.smartcharger.websocket.socket.handler.handlersend.StatusNotificationReq;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -59,7 +57,10 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
             UiSeq uiSeq = activity.getClassUiProcess().getUiSeq();
             ChargingCurrentData chargingCurrentData = activity.getChargingCurrentData();
 
-            RemoteStartStopStatus status = !Objects.equals(uiSeq, UiSeq.INIT) ? RemoteStartStopStatus.Rejected
+            String idTag = chargingCurrentData.getIdTag();
+            boolean result = isMemberIdTag(idTag.charAt(0), chargingCurrentData);
+
+            RemoteStartStopStatus status = (!Objects.equals(uiSeq, UiSeq.INIT) || !result) ? RemoteStartStopStatus.Rejected
                     : connectorId == 1 ? RemoteStartStopStatus.Accepted : RemoteStartStopStatus.Rejected;
             RemoteStartTransactionConfirmation remoteStartTransactionConfirmation =
                     new RemoteStartTransactionConfirmation(status);
@@ -71,18 +72,11 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
             );
 
             if (Objects.equals(status, RemoteStartStopStatus.Accepted)) {
-                String idTag = chargingCurrentData.getIdTag();
-                authType(idTag.charAt(0), chargingCurrentData);
                 GlobalVariables.RemoteStart = true;
 
                 // Authorize
                 AuthorizeReq authorizeReq = new AuthorizeReq(connectorId);
                 authorizeReq.sendAuthorize(chargingCurrentData.getIdTag());
-
-                // StatusNotification
-//                chargingCurrentData.setChargePointStatus(ChargePointStatus.Preparing);
-//                StatusNotificationReq statusNotificationReq = new StatusNotificationReq(connectorId);
-//                statusNotificationReq.sendStatusNotification(connectorId, ChargePointStatus.Preparing);
             }
         } catch (Exception e) {
             logger.error("RemoteStartTransactionHandler sendResponse error : {}", e.getMessage());
@@ -97,21 +91,25 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
                     chargingCurrentData.setAuthType("C");
                     chargingCurrentData.setPaymentType(PaymentType.CORP);
                     chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
+                    chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceC);
                     break;
                 case 'M':
                     chargingCurrentData.setAuthType("M");
                     chargingCurrentData.setPaymentType(PaymentType.MEMBER);
                     chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
+                    chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceM);
                     break;
                 case 'N':
                     chargingCurrentData.setAuthType("N");
                     chargingCurrentData.setPaymentType(PaymentType.CREDIT);
                     chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeN);
+                    chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceN);
                     break;
                 case 'K':
                     chargingCurrentData.setAuthType("K");
                     chargingCurrentData.setPaymentType(PaymentType.MOE);
                     chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeK);
+                    chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceK);
                     break;
                 default:
                     logger.error("authType none");
@@ -120,5 +118,17 @@ public class RemoteStartTransactionHandler implements OcppHandler  {
         } catch (Exception e) {
             logger.error("authType error : {}", e.getMessage(), e);
         }
+    }
+
+    private boolean isMemberIdTag(char type, ChargingCurrentData chargingCurrentData) {
+        boolean result = false;
+        if (Objects.equals(type, 'M')) {
+            chargingCurrentData.setAuthType("M");
+            chargingCurrentData.setPaymentType(PaymentType.MEMBER);
+            chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeM);
+            chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceM);
+            result = true;
+        }
+        return result;
     }
 }

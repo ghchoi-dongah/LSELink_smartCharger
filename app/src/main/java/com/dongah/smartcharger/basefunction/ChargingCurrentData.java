@@ -58,7 +58,7 @@ public class ChargingCurrentData {
     int soc = 0;
     int targetSoc = 80;
     long chargingRemainTime = 0;
-    double unitPrice = 0f;
+    double crtrPrice = 0;
 
 
     /**
@@ -136,7 +136,7 @@ public class ChargingCurrentData {
      * M: 회원카드
      * N: 신용카드
      * */
-    public String authType = "M";
+    public String authType = "K";
 
     /**
      * 커넥터 상태
@@ -218,11 +218,11 @@ public class ChargingCurrentData {
             setSoc(0);
             setTargetSoc(100);
             setTargetCurrent(0);
-            setAuthType("M");
+            setAuthType("K");
             setFullrechgsoc(100);
-            setUnitPrice(0);
             setBatCurrent(0);
             setBatVoltage(0);
+            setCrtrPrice(0);
             setStopReason(Reason.Other);
         } catch (Exception e) {
             logger.error("ChargingCurrentData onCurrentDataClear error : {}", e.getMessage(), e);
@@ -885,14 +885,6 @@ public class ChargingCurrentData {
         this.fullrechgsoc = fullrechgsoc;
     }
 
-    public double getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
     public long getBatVoltage() {
         return batVoltage;
     }
@@ -907,5 +899,13 @@ public class ChargingCurrentData {
 
     public void setBatCurrent(long batCurrent) {
         this.batCurrent = batCurrent;
+    }
+
+    public double getCrtrPrice() {
+        return crtrPrice;
+    }
+
+    public void setCrtrPrice(double crtrPrice) {
+        this.crtrPrice = crtrPrice;
     }
 }

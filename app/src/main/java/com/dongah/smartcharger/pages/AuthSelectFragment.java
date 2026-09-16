@@ -121,18 +121,21 @@ public class AuthSelectFragment extends Fragment implements View.OnClickListener
 //                chargingCurrentData.setAuthType("N");
 //                chargingCurrentData.setPaymentType(PaymentType.CREDIT);
 //                chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeN);
+                chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceN);
 //                activity.getClassUiProcess().setUiSeq(UiSeq.CREDIT_CARD);
 //                activity.getFragmentChange().onFragmentChange(UiSeq.CREDIT_CARD, "CREDIT_CARD", null);
             } else if (id == R.id.cardViewCorp) {
                 chargingCurrentData.setAuthType("C");
                 chargingCurrentData.setPaymentType(PaymentType.CORP);
                 chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeC);
+                chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceC);
                 activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
                 activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
             } else if (id == R.id.cardViewMoe) {
                 chargingCurrentData.setAuthType("K");
                 chargingCurrentData.setPaymentType(PaymentType.MOE);
                 chargingCurrentData.setPowerUnitPrice(GlobalVariables.userTypeK);
+                chargingCurrentData.setCrtrPrice(GlobalVariables.crtrUnitPriceK);
                 activity.getClassUiProcess().setUiSeq(UiSeq.MEMBER_CARD);
                 activity.getFragmentChange().onFragmentChange(UiSeq.MEMBER_CARD, "MEMBER_CARD", null);
             }
